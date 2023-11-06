@@ -12,7 +12,20 @@
           "package_name": "com.example.instreet"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "369647008742-tp42lhgeul7ib6fsgdb61c5g80d2u4k9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.instreet",
+            "certificate_hash": "76b170dd274f35aa15c985d263c2bed3330a15a3"
+          }
+        },
+        {
+          "client_id": "369647008742-kv1hrn4gfegbehm9cri4cs7439hqr38e.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCMwq_zXecXq7cYDVbmwUUV-SAKHiepyiI"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "369647008742-kv1hrn4gfegbehm9cri4cs7439hqr38e.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "369647008742-gm9k9pn7am901ro1q31i10apvd7855q1.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.instreet"
+              }
+            }
+          ]
         }
       }
     }
