@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "369647008742",
+    "project_id": "instreet-29644",
+    "storage_bucket": "instreet-29644.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:369647008742:android:f842eed84edce4d4b13427",
+        "android_client_info": {
+          "package_name": "com.example.instreet"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCMwq_zXecXq7cYDVbmwUUV-SAKHiepyiI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
