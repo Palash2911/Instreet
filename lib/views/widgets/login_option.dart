@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
 
 class LoginOpt extends StatefulWidget {
-  String optionText;
-  String imgUrl;
   LoginOpt({
     super.key,
-    required this.imgUrl,
-    required this.optionText
   });
 
   @override
@@ -22,6 +18,7 @@ class _LoginOptState extends State<LoginOpt> {
         Container(
           width: 40,
           height: 40,
+          padding: EdgeInsets.all(6),
           decoration: BoxDecoration(
             color: Colors.white,
             border: Border.all(
@@ -31,17 +28,13 @@ class _LoginOptState extends State<LoginOpt> {
             borderRadius: BorderRadius.circular(100),
           ),
           child: Center(
-            child: Icon(
-              Icons.login,
-            ),
+            child: Image.asset('assets/images/google.png'),
           ),
         ),
-        SizedBox(
+        const SizedBox(
           width: 10,
         ),
-        Container(
-          child: Text('Sign In with Facebook'),
-        ),
+        const Text('Sign In with Google'),
       ],
     );
   }

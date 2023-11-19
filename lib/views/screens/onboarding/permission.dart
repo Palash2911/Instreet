@@ -9,18 +9,18 @@ void main() {
   runApp(const MaterialApp(
     debugShowCheckedModeBanner: false,
     title: 'Payment App',
-    home: HomeScreen(),
+    home: PermissionScreen(),
   ));
 }
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+class PermissionScreen extends StatefulWidget {
+  const PermissionScreen({Key? key}) : super(key: key);
 
   @override
-  _HomeScreenState createState() => _HomeScreenState();
+  _PermissionScreenState createState() => _PermissionScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _PermissionScreenState extends State<PermissionScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
