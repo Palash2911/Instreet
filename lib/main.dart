@@ -43,7 +43,7 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        initialRoute: RegisterScreen.routeName,
+        initialRoute: '/',
         theme: instreetTheme,
         navigatorKey: navigatorKey,
         routes: approutes,

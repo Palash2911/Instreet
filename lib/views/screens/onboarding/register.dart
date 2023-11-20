@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:instreet/views/screens/bottomnav/bottomNav.dart';
 import 'package:intl/intl.dart';
 
 import '../../../constants/constants.dart';
@@ -54,6 +55,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.dispose();
   }
 
+  void register(BuildContext ctx) {
+    final isValid = _form.currentState!.validate();
+    if (isValid) {
+      Navigator.of(context).pushReplacementNamed(BottomNav.routeName);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -70,6 +78,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               key: _form,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   TextFormField(
                     controller: _nameController,
@@ -81,9 +90,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       filled: true,
                       fillColor: Colors.transparent,
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                          borderSide: const BorderSide(width: 1, color: Colors.black)
-                      ),
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide:
+                              const BorderSide(width: 1, color: Colors.black)),
                     ),
                     validator: (value) {
                       if (value!.isEmpty) {
@@ -103,9 +112,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       filled: true,
                       fillColor: Colors.transparent,
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                          borderSide: const BorderSide(width: 1, color: Colors.black)
-                      ),
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide:
+                              const BorderSide(width: 1, color: Colors.black)),
                     ),
                     validator: (value) {
                       if (value!.isEmpty) {
@@ -125,9 +134,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       filled: true,
                       fillColor: Colors.transparent,
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                          borderSide: const BorderSide(width: 1, color: Colors.black)
-                      ),
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide:
+                              const BorderSide(width: 1, color: Colors.black)),
                     ),
                     validator: (value) {
                       if (value!.isEmpty) {
@@ -148,8 +157,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       decoration: InputDecoration(
                         hintText: "Date of Birth",
                         hintStyle: kTextPopR14,
-                        icon: const Icon(
-                            Icons.calendar_today_rounded),
+                        icon: const Icon(Icons.calendar_today_rounded),
                         filled: true,
                         fillColor: Colors.transparent,
                         border: OutlineInputBorder(
@@ -172,8 +180,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             lastDate: DateTime(2018));
                         if (pickedDate != null) {
                           String formattedDate =
-                          DateFormat.yMMMMd('en_US')
-                              .format(pickedDate);
+                              DateFormat.yMMMMd('en_US').format(pickedDate);
                           setState(() {
                             _dateController.text = formattedDate;
                           });
@@ -210,32 +217,27 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                       onTap: () {
                                         setState(() {
                                           genders.forEach((gender) =>
-                                          gender.isSelected =
-                                          false);
-                                          genders[index].isSelected =
-                                          true;
-                                          gender =
-                                              genders[index].name;
+                                              gender.isSelected = false);
+                                          genders[index].isSelected = true;
+                                          gender = genders[index].name;
                                         });
                                       },
                                       child: Container(
-                                        margin: const EdgeInsets.only(
-                                            right: 9),
+                                        margin: const EdgeInsets.only(right: 9),
                                         child: Chip(
                                           label: Text(
                                             genders[index].name,
                                             style: TextStyle(
                                                 fontSize: 12,
-                                                color: !genders[index]
-                                                    .isSelected
-                                                    ? kprimaryColor
-                                                    : Colors.white),
+                                                color:
+                                                    !genders[index].isSelected
+                                                        ? kprimaryColor
+                                                        : Colors.white),
                                           ),
                                           backgroundColor:
-                                          !genders[index]
-                                              .isSelected
-                                              ? Colors.white
-                                              : kprimaryColor,
+                                              !genders[index].isSelected
+                                                  ? Colors.white
+                                                  : kprimaryColor,
                                         ),
                                       ),
                                     );
@@ -247,7 +249,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ],
                   ),
                   ElevatedButton(
-                    onPressed: null,
+                    onPressed: () => register(context),
                     style: ElevatedButton.styleFrom(
                         fixedSize: const Size(300, 50),
                         shape: RoundedRectangleBorder(

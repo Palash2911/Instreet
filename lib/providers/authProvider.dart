@@ -74,11 +74,15 @@ class Auth extends ChangeNotifier {
     }
   }
 
-  Future<void> signInGoogle() async {
+  Future<bool> signInGoogle() async {
     try {
       GoogleAuthProvider googleAuthProvider = GoogleAuthProvider();
-      _auth.signInWithProvider(googleAuthProvider);
+      await _auth.signInWithProvider(googleAuthProvider).then((value) {
+        print(value);
+      });
+      return true;
     } catch(e) {
+      return false;
       print(e);
     }
   }

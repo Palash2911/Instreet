@@ -40,9 +40,6 @@ class _PermissionBtnState extends State<PermissionBtn> {
                 type: PageTransitionType.fade, child: const LoginScreen(),
             ),
           );
-          setState(() {
-            isFinished = false;
-          });
         },
       ),
     );
