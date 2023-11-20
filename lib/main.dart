@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:instreet/providers/authProvider.dart';
 import 'package:instreet/views/screens/onboarding/login.dart';
 import 'package:instreet/views/screens/onboarding/permission.dart';
+import 'package:instreet/views/screens/onboarding/register.dart';
 import 'package:provider/provider.dart';
 
+import 'constants/constants.dart';
 import 'constants/routes.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
@@ -41,7 +43,8 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        initialRoute: '/',
+        initialRoute: RegisterScreen.routeName,
+        theme: instreetTheme,
         navigatorKey: navigatorKey,
         routes: approutes,
       ),

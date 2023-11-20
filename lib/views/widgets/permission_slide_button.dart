@@ -34,10 +34,10 @@ class _PermissionBtnState extends State<PermissionBtn> {
           });
         },
         onFinish: () async {
-          await Navigator.push(
+          await Navigator.pushReplacement(
             context,
             PageTransition(
-                type: PageTransitionType.fade, child: LoginScreen()
+                type: PageTransitionType.fade, child: const LoginScreen(),
             ),
           );
           setState(() {

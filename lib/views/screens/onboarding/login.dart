@@ -25,7 +25,7 @@ class _LoginScreenState extends State<LoginScreen> {
   var isLoading = false;
   final _form = GlobalKey<FormState>();
 
-  // late bool isFinished;
+  bool otpBtn = false;
 
   @override
   void initState() {
@@ -92,6 +92,9 @@ class _LoginScreenState extends State<LoginScreen> {
           textColor: Colors.white,
           fontSize: 16.0,
         );
+        setState(() {
+          otpBtn = true;
+        });
       });
     } else {
       Fluttertoast.showToast(
@@ -274,7 +277,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 20.0, vertical: 0),
                     child: ElevatedButton(
-                      onPressed: () => _verifyOtp(context),
+                      onPressed: otpBtn ? () => _verifyOtp(context) : null  ,
                       style: ElevatedButton.styleFrom(
                           fixedSize: const Size(300, 50),
                           shape: RoundedRectangleBorder(

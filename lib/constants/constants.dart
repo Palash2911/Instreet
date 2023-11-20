@@ -11,7 +11,7 @@ const kAnimationDuration = Duration(milliseconds: 200);
 
 ThemeData instreetTheme = ThemeData(
   // textTheme: GoogleFonts.poppinsTextTheme(),
-  scaffoldBackgroundColor: ksecondaryColor,
+  scaffoldBackgroundColor: Colors.white,
   iconTheme: IconThemeData(color: Color(0xfff1BB273)),
   colorScheme: ColorScheme.fromSwatch().copyWith(
     primary: kprimaryColor,
