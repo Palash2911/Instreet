@@ -34,7 +34,7 @@ class _LoginOptState extends State<LoginOpt> {
         const SizedBox(
           width: 10,
         ),
-        const Text('Sign In with Google'),
+        const Text('Sign up with Google'),
       ],
     );
   }

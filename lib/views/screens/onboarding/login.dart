@@ -6,6 +6,7 @@ import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:lottie/lottie.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
+import 'package:sign_in_button/sign_in_button.dart';
 import 'package:swipeable_button_view/swipeable_button_view.dart';
 
 import '../../../providers/authProvider.dart';
@@ -44,6 +45,29 @@ class _LoginScreenState extends State<LoginScreen> {
     _phoneController.dispose();
     _otpController.dispose();
     super.dispose();
+  }
+
+  Future _signInGoogle(BuildContext ctx) async {
+    await Provider.of<Auth>(ctx, listen: false).signInGoogle().catchError((e) {
+      Fluttertoast.showToast(
+        msg: e,
+        toastLength: Toast.LENGTH_SHORT,
+        timeInSecForIosWeb: 1,
+        backgroundColor: const Color(0xFFFF4500),
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+    }).then((value) {
+      Fluttertoast.showToast(
+        msg: "Welcome To Instreet",
+        toastLength: Toast.LENGTH_SHORT,
+        timeInSecForIosWeb: 1,
+        backgroundColor: const Color(0xFFFF4500),
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+      Navigator.of(ctx).pushReplacementNamed(RegisterScreen.routeName);
+    });
   }
 
   Future _sendOtP(BuildContext ctx) async {
@@ -98,17 +122,17 @@ class _LoginScreenState extends State<LoginScreen> {
       if (isValid) {
         var user = await authProvider.checkUser();
         // var fcmT = await FirebaseNotification().getToken();
-          if (user) {
-            // await Provider.of<UserProvider>(context, listen: false)
-            //     .updateToken(fcmT.toString(), authProvider.token)
-            //     .then((value) {
-            //   const initin = 0;
-            //
-            // });
-            print('old user');
-          } else {
-            Navigator.of(ctx).pushReplacementNamed(RegisterScreen.routeName);
-          }
+        if (user) {
+          // await Provider.of<UserProvider>(context, listen: false)
+          //     .updateToken(fcmT.toString(), authProvider.token)
+          //     .then((value) {
+          //   const initin = 0;
+          //
+          // });
+          print('old user');
+        } else {
+          Navigator.of(ctx).pushReplacementNamed(RegisterScreen.routeName);
+        }
       } else {
         setState(() {
           isLoading = false;
@@ -134,11 +158,11 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       body: SingleChildScrollView(
         child: SafeArea(
-          child: Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 35.0, vertical: 145.0),
+          child: Container(
+            height: MediaQuery.of(context).size.height * 0.81,
+            padding: const EdgeInsets.only(left: 35, right: 35, top: 50),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
                 const Text(
                   'Welcome Explorer',
@@ -147,14 +171,19 @@ class _LoginScreenState extends State<LoginScreen> {
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                const SizedBox(height: 20),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    LoginOpt(),
-                  ],
+                // const SizedBox(height: 20),
+                SizedBox(
+                  height: 50,
+                  width: 270,
+                  child: SignInButton(
+                    Buttons.google,
+                    text: "Sign up with Google",
+                    onPressed: () {
+                      _signInGoogle(context);
+                    },
+                  ),
                 ),
-                const SizedBox(height: 20),
+                // const SizedBox(height: 20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -171,7 +200,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     )
                   ],
                 ),
-                const SizedBox(height: 20),
+                // const SizedBox(height: 20),
                 Form(
                   key: _form,
                   child: Column(
@@ -217,11 +246,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       const SizedBox(height: 20),
                       Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 40),
                         padding: const EdgeInsets.all(6.0),
                         decoration: BoxDecoration(
                           color: Colors.transparent,
-                          border:Border.all(
+                          border: Border.all(
                             color: Colors.black,
                             width: 1.0,
                           ),
@@ -231,8 +259,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           controller: _otpController,
                           decoration: InputDecoration(
                             border: InputBorder.none,
-                            prefixIcon:
-                                const Icon(Icons.lock, color: Color(0xff555C69)),
+                            prefixIcon: const Icon(Icons.lock,
+                                color: Color(0xff555C69)),
                             hintText: 'Enter OTP',
                             hintStyle: TextStyle(
                                 color: Color(0xff555C69).withOpacity(0.7)),
@@ -247,28 +275,21 @@ class _LoginScreenState extends State<LoginScreen> {
                   opacity: 1,
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 20.0, vertical: 20),
-                    child: SwipeableButtonView(
-                            buttonText: 'Start Exploring',
-                            buttonWidget: const Icon(
-                              Icons.arrow_forward,
-                              color: Colors.grey,
-                            ),
-                            activeColor: Color(0xFFFF4500),
-                            isFinished: false,
-                            onWaitingProcess: () {
-                              _verifyOtp(context);
-                              // Future.delayed(Duration(seconds: 2), () {
-                              //   setState(() {
-                              //     // isFinished = true;
-                              //   });
-                              // });
-                            },
-                            onFinish: () async {
-                              print('hello');
-                            },
-                          )
-                         // If not finished, show an empty SizedBox
+                        horizontal: 20.0, vertical: 0),
+                    child: ElevatedButton(
+                      onPressed: () => _verifyOtp(context),
+                      style: ElevatedButton.styleFrom(
+                          fixedSize: const Size(300, 50),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10)),
+                          backgroundColor: Color(0xFFFF4500),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 10),
+                          textStyle: const TextStyle(
+                            fontSize: 18,
+                          )),
+                      child: const Text('Start Exploring'),
+                    ),
                   ),
                 ),
               ],
