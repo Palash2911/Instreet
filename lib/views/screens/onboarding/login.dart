@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:instreet/constants/constants.dart';
 import 'package:instreet/views/screens/onboarding/register.dart';
-import 'package:instreet/views/widgets/login_option.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
-import 'package:lottie/lottie.dart';
-import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:sign_in_button/sign_in_button.dart';
-import 'package:swipeable_button_view/swipeable_button_view.dart';
 
 import '../../../providers/authProvider.dart';
 
@@ -190,13 +187,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     Container(
                       width: MediaQuery.of(context).size.width * 0.35,
                       height: 2,
-                      color: Colors.orange,
+                      color: kprimaryColor,
                     ),
                     const Text("   OR   "),
                     Container(
                       width: MediaQuery.of(context).size.width * 0.35,
                       height: 2,
-                      color: Colors.orange,
+                      color: kprimaryColor,
                     )
                   ],
                 ),
@@ -217,7 +214,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             margin: EdgeInsets.all(9.0),
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: Color(0xFFFF4500).withOpacity(0.9),
+                              color: kprimaryColor.withOpacity(0.9),
                             ),
                             child: IconButton(
                               icon: Icon(Icons.arrow_forward),
@@ -259,11 +256,11 @@ class _LoginScreenState extends State<LoginScreen> {
                           controller: _otpController,
                           decoration: InputDecoration(
                             border: InputBorder.none,
-                            prefixIcon: const Icon(Icons.lock,
-                                color: Color(0xff555C69)),
+                            prefixIcon: Icon(Icons.lock,
+                                color: ksecondaryColor),
                             hintText: 'Enter OTP',
                             hintStyle: TextStyle(
-                                color: Color(0xff555C69).withOpacity(0.7)),
+                                color: ksecondaryColor.withOpacity(0.7)),
                           ),
                         ),
                       ),
@@ -282,7 +279,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           fixedSize: const Size(300, 50),
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10)),
-                          backgroundColor: Color(0xFFFF4500),
+                          backgroundColor: kprimaryColor,
                           padding: const EdgeInsets.symmetric(
                               horizontal: 20, vertical: 10),
                           textStyle: const TextStyle(

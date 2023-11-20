@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:instreet/constants/constants.dart';
 import 'package:instreet/views/screens/onboarding/login.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:swipeable_button_view/swipeable_button_view.dart';
@@ -15,16 +16,15 @@ class _PermissionBtnState extends State<PermissionBtn> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 30),
+      padding: const EdgeInsets.symmetric(horizontal: 50.0),
       child: SwipeableButtonView(
+        buttontextstyle: kTextPopB14.copyWith(color: Colors.white),
         buttonText: 'Start Exploring',
-        buttonWidget: Container(
-          child: Icon(
-            Icons.arrow_forward_ios_rounded,
-            color: Colors.grey,
-          ),
+        buttonWidget: const Icon(
+          Icons.arrow_forward_ios_rounded,
+          color: Colors.grey,
         ),
-        activeColor: Colors.orange,
+        activeColor: kprimaryColor,
         isFinished: isFinished,
         onWaitingProcess: () {
           Future.delayed(Duration(seconds: 2), () {

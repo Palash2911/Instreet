@@ -15,7 +15,7 @@ class PermissionList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(top: 20, left: 7),
+      margin: EdgeInsets.only(left: 9),
       child: ListTile(
         onTap: (){
           // permission logic

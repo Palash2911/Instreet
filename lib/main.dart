@@ -41,7 +41,7 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        initialRoute: LoginScreen.routeName,
+        initialRoute: '/',
         navigatorKey: navigatorKey,
         routes: approutes,
       ),
