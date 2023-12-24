@@ -7,7 +7,8 @@ import 'package:instreet/views/screens/onboarding/splashScreen.dart';
 
 var approutes = <String, WidgetBuilder>{
    // Inital Route
-  '/': (context) => const SplashScreen(),
+  // '/': (context) => const SplashScreen(),
+  '/': (context) => const BottomNav(),
 
   // Onboarding Routes
   PermissionScreen.routeName: (context) => PermissionScreen(),
