@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:instreet/providers/authProvider.dart';
 import 'package:instreet/providers/stallProvider.dart';
+import 'package:instreet/providers/userProvider.dart';
 import 'package:instreet/views/screens/onboarding/login.dart';
 import 'package:instreet/views/screens/onboarding/permission.dart';
 import 'package:instreet/views/screens/onboarding/register.dart';
@@ -45,9 +46,9 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (BuildContext context) => StallProvider(),
         ),
-        // ChangeNotifierProvider(
-        //   create: (BuildContext context) => EntryProvider(),
-        // ),
+        ChangeNotifierProvider(
+          create: (BuildContext context) => UserProvider(),
+        ),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

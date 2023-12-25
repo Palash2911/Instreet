@@ -3,17 +3,44 @@ import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:instreet/constants/constants.dart';
 import 'package:instreet/models/stallModel.dart';
+import 'package:instreet/providers/stallProvider.dart';
+import 'package:provider/provider.dart';
+
+import '../../models/userModel.dart';
 
 class HomePageCard extends StatefulWidget {
   final Stall stall;
-  const HomePageCard({super.key, required this.stall});
+  final UserModel user;
+  const HomePageCard({super.key, required this.stall, required this.user});
 
   @override
   State<HomePageCard> createState() => _HomePageCardState();
 }
 
 class _HomePageCardState extends State<HomePageCard> {
-  bool isHeartFilled = false;
+  bool isFavorite = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    setState(() {
+      isFavorite = widget.user.favorites.contains(widget.stall.sId);
+    });
+  }
+
+  Future toggleFav() async {
+    setState(() {
+      isFavorite = !isFavorite; // Toggle the state
+    });
+    var sProvider = Provider.of<StallProvider>(context, listen: false);
+    await sProvider.toggleFavorite(widget.user, widget.stall.sId).then((val) {
+    }).catchError((e) {
+      setState(() {
+        isFavorite = !isFavorite;
+      });
+      print(e);
+    });
+  }
 
   List<Widget> buildStars(double rating) {
     List<Widget> stars = [];
@@ -110,19 +137,14 @@ class _HomePageCardState extends State<HomePageCard> {
             ),
             IconButton(
               icon: Icon(
-                isHeartFilled
+                isFavorite
                     ? Icons.favorite
                     : Icons
-                    .favorite_border, // Toggle between filled and outline
+                        .favorite_border, // Toggle between filled and outline
                 color: kprimaryColor,
-                size: 27,// Your predefined color
+                size: 27, // Your predefined color
               ),
-              onPressed: () {
-                setState(() {
-                  isHeartFilled =
-                  !isHeartFilled; // Toggle the state
-                });
-              },
+              onPressed: toggleFav,
             )
           ],
         ),

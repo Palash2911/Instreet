@@ -1,5 +1,3 @@
-import 'dart:io';
-
 class Stall {
   final String sId;
   final String ownerName;
