@@ -32,27 +32,16 @@ class _HomeScreenState extends State<HomeScreen> {
     init = false;
   }
 
-  Future<void> loadUserData(BuildContext ctx) async {
-    final userProvider = Provider.of<UserProvider>(ctx);
+  Future loadUserData(BuildContext ctx) async {
+    final userProvider = Provider.of<UserProvider>(ctx, listen: false);
     await userProvider.getUser('GDLHs3YUAwYJe71jNzNG').then((value) {
-      setState(() {
-        isLoading = false;
-        currentUser = UserModel(uid: 'GDLHs3YUAwYJe71jNzNG',favorites: value['favorites']);
-      });
+      currentUser =
+          UserModel(uid: 'GDLHs3YUAwYJe71jNzNG', favorites: value['favorites']);
     }).catchError((e) {
-      setState(() {
-        isLoading = false;
-      });
       print(e);
     });
-  }
-
-  Future loadItems() async {
-    isLoading = true;
-    Future.delayed(const Duration(seconds: 2), () {
-      setState(() {
-        isLoading = false;
-      });
+    setState(() {
+      isLoading = false;
     });
   }
 
@@ -67,6 +56,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ? const Center(
                 child: SizedBox(
                   height: 25.0,
+                  width: 25.0,
                   child: CircularProgressIndicator(),
                 ),
               )
@@ -75,7 +65,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     kBottomNavigationBarHeight,
                 padding: const EdgeInsets.only(bottom: 20),
                 child: RefreshIndicator(
-                  onRefresh: loadItems,
+                  onRefresh: () => loadUserData(context),
                   child: StreamBuilder<QuerySnapshot>(
                     stream: stallRef.snapshots(),
                     builder: (context, snapshot) {
