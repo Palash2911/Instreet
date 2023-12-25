@@ -58,6 +58,7 @@ dependencies:
   swipeable_button_view: ^0.0.2
   page_transition: ^2.1.0
   sign_in_button: ^3.2.0
+  shimmer: ^3.0.0
 
 dev_dependencies:
   flutter_test:

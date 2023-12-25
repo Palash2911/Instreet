@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:instreet/models/stallModel.dart';
 import 'package:instreet/providers/userProvider.dart';
 import 'package:instreet/views/widgets/homePageCard.dart';
+import 'package:instreet/views/widgets/shimmerSkeleton.dart';
 import 'package:provider/provider.dart';
+import 'package:shimmer/shimmer.dart';
 
 import '../../../constants/constants.dart';
 import '../../../models/userModel.dart';
@@ -33,6 +35,9 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future loadUserData(BuildContext ctx) async {
+    setState(() {
+      isLoading = true;
+    });
     final userProvider = Provider.of<UserProvider>(ctx, listen: false);
     await userProvider.getUser('GDLHs3YUAwYJe71jNzNG').then((value) {
       currentUser =
@@ -40,8 +45,10 @@ class _HomeScreenState extends State<HomeScreen> {
     }).catchError((e) {
       print(e);
     });
-    setState(() {
-      isLoading = false;
+    await Future.delayed(Duration(milliseconds: 500), () {
+      setState(() {
+        isLoading = false;
+      });
     });
   }
 
@@ -53,12 +60,15 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: SafeArea(
         child: isLoading
-            ? const Center(
-                child: SizedBox(
-                  height: 25.0,
-                  width: 25.0,
-                  child: CircularProgressIndicator(),
-                ),
+            ? ListView.builder(
+                itemCount: 5,
+                itemBuilder: (context, index) {
+                  return Shimmer.fromColors(
+                    baseColor: Colors.grey[300]!,
+                    highlightColor: Colors.grey[100]!,
+                    child: const ShimmerSkeleton(),
+                  );
+                },
               )
             : Container(
                 height: MediaQuery.of(context).size.height -
@@ -70,10 +80,19 @@ class _HomeScreenState extends State<HomeScreen> {
                     stream: stallRef.snapshots(),
                     builder: (context, snapshot) {
                       if (!snapshot.hasData) {
-                        return const Center(
+                        return Center(
                           child: SizedBox(
                             height: 27,
-                            child: CircularProgressIndicator(),
+                            child: ListView.builder(
+                              itemCount: 5,
+                              itemBuilder: (context, index) {
+                                return Shimmer.fromColors(
+                                  baseColor: Colors.grey[300]!,
+                                  highlightColor: Colors.grey[100]!,
+                                  child: const ShimmerSkeleton(),
+                                );
+                              },
+                            ),
                           ),
                         );
                       } else {
