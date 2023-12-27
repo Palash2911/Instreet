@@ -212,7 +212,6 @@ class _LoginScreenState extends State<LoginScreen> {
       );
     }
     setState(() {
-      otpBtn = isValid;
       isLoading = false;
     });
   }

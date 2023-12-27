@@ -1,8 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:instreet/models/userModel.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class UserProvider extends ChangeNotifier {
+  Future registerUser(UserModel user) async {
+    final prefs = await SharedPreferences.getInstance();
+    try {
+      CollectionReference users =
+      FirebaseFirestore.instance.collection('users');
+      await users.doc(user.uid).set({
+        'Name': user.uName,
+        "CreatedAt": user.createdAt,
+        "PhoneNo": user.phoneNo,
+        "UID": user.uid,
+        "Email": user.uEmail,
+        "Gender": user.gender,
+        "DOB": user.dob,
+      });
+      prefs.setString("UserName", user.uName);
+      notifyListeners();
+    } catch (e) {
+      prefs.setString("UserName", "");
+      notifyListeners();
+      rethrow;
+    }
+  }
+
   Future getUser(String uid) async {
     try {
       DocumentSnapshot userSnapshot = await FirebaseFirestore.instance

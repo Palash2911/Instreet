@@ -1,7 +1,13 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:instreet/views/screens/bottomnav/bottomNav.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:instreet/models/userModel.dart';
+import 'package:instreet/providers/authProvider.dart';
+import 'package:instreet/providers/userProvider.dart';
 import 'package:intl/intl.dart';
-
+import 'package:intl_phone_field/intl_phone_field.dart';
+import 'package:intl_phone_field/phone_number.dart';
+import 'package:provider/provider.dart';
 import '../../../constants/constants.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -20,21 +26,30 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _emailController = TextEditingController();
   final _dateController = TextEditingController();
   String get name => _nameController.text;
-  String get phone => _phoneController.text;
   String get email => _emailController.text;
   String get date => _dateController.text;
+  String phoneNo = '';
 
   String gender = "";
+  String isoCode = 'IN';
   List<Gender> genders = [];
+  var isLoading = false;
 
   bool isInit = false;
 
   @override
   void didChangeDependencies() {
     if (!isInit) {
+      var auth = FirebaseAuth.instance;
       _nameController.text = "";
-      _phoneController.text = "";
-      _emailController.text = "";
+      _phoneController.text = auth.currentUser?.phoneNumber ?? '';
+      if (_phoneController.text.isNotEmpty) {
+        var number = PhoneNumber.fromCompleteNumber(
+            completeNumber: _phoneController.text);
+        _phoneController.text = number.number;
+        isoCode = number.countryISOCode;
+      }
+      _emailController.text = auth.currentUser?.email ?? "";
       _dateController.text = "";
       genders.add(Gender("Male", Icons.male, false));
       genders.add(Gender("Female", Icons.female, false));
@@ -55,18 +70,58 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.dispose();
   }
 
-  void register(BuildContext ctx) {
+  Future register(BuildContext ctx) async {
+    var userProvider = Provider.of<UserProvider>(context, listen: false);
+    var authId = Provider.of<Auth>(context, listen: false).token;
     final isValid = _form.currentState!.validate();
     if (isValid) {
-      Navigator.of(context).pushReplacementNamed(BottomNav.routeName);
+      await userProvider
+          .registerUser(
+        UserModel(
+          uid: authId,
+          uName: name,
+          uEmail: email,
+          phoneNo: phoneNo,
+          dob: date,
+          gender: gender,
+          createdAt: DateTime.now(),
+          favorites: [],
+        ),
+      ).catchError((e) {
+        Fluttertoast.showToast(
+          msg: "Something went wrong!",
+          toastLength: Toast.LENGTH_SHORT,
+          timeInSecForIosWeb: 1,
+          backgroundColor: kprimaryColor,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
+      }).then((_) async {
+        await Provider.of<Auth>(context, listen: false)
+            .autoLogin()
+            .then((value) {
+          Fluttertoast.showToast(
+            msg: "Successfully Registered !",
+            toastLength: Toast.LENGTH_SHORT,
+            timeInSecForIosWeb: 1,
+            backgroundColor: kprimaryColor,
+            textColor: Colors.white,
+            fontSize: 16.0,
+          );
+          Navigator.of(ctx).pushReplacementNamed('bottom-nav');
+        });
+      });
     }
+    setState(() {
+      isLoading = false;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Tell us about you'),
+        title: const Text('Tell us about you'),
       ),
       body: SingleChildScrollView(
         child: SafeArea(
@@ -124,30 +179,28 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     },
                     textInputAction: TextInputAction.next,
                   ),
-                  TextFormField(
+                  IntlPhoneField(
                     controller: _phoneController,
-                    keyboardType: TextInputType.phone,
                     decoration: InputDecoration(
-                      hintText: "Phone",
-                      hintStyle: kTextPopR14,
-                      icon: const Icon(Icons.phone),
-                      filled: true,
-                      fillColor: Colors.transparent,
+                      labelText: 'Phone Number',
+                      counterText: "",
                       border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide:
-                              const BorderSide(width: 1, color: Colors.black)),
+                        borderRadius: BorderRadius.circular(15.0),
+                      ),
+                      icon: const Icon(Icons.phone),
                     ),
                     validator: (value) {
-                      if (value!.isEmpty) {
-                        return 'Please enter your phone number';
+                      if (value!.number.isEmpty) {
+                        return 'Please Enter Valid Number!';
                       }
-                      final phoneRegex = RegExp(r'^\+?\d{9,15}$');
-                      if (!phoneRegex.hasMatch(value)) {
-                        return 'Please enter a valid phone number';
-                      }
+                      return null;
                     },
-                    textInputAction: TextInputAction.next,
+                    initialCountryCode: isoCode,
+                    onChanged: (phone) {
+                      setState(() {
+                        phoneNo = phone.completeNumber.toString();
+                      });
+                    },
                   ),
                   Padding(
                     padding: const EdgeInsets.only(right: 10.0),
@@ -162,7 +215,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         fillColor: Colors.transparent,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(width: 1, color: Colors.black),
+                          borderSide:
+                              const BorderSide(width: 1, color: Colors.black),
                         ),
                       ),
                       validator: (value) {

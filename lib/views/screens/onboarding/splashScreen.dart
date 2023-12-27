@@ -30,9 +30,14 @@ class _SplashScreenState extends State<SplashScreen> {
           if(user && mounted) {
             Navigator.of(ctx).pushReplacementNamed('bottom-nav');
           } else {
+            await authProvider.signOut();
             if(mounted) {
               Navigator.of(ctx).pushReplacementNamed('login');
             }
+          }
+        } else {
+          if(mounted) {
+            Navigator.of(ctx).pushReplacementNamed('login');
           }
         }
       });

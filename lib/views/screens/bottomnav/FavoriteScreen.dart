@@ -22,7 +22,16 @@ class _FavroiteScreenState extends State<FavroiteScreen> {
       FirebaseFirestore.instance.collection('stalls');
   var isLoading = true;
   var init = true;
-  UserModel currentUser = UserModel(uid: '', favorites: []);
+  UserModel currentUser = UserModel(
+    uid: '',
+    favorites: [],
+    gender: '',
+    uName: '',
+    uEmail: '',
+    phoneNo: '',
+    dob: '',
+    createdAt: DateTime.now(),
+  );
 
   @override
   void didChangeDependencies() {
@@ -39,8 +48,16 @@ class _FavroiteScreenState extends State<FavroiteScreen> {
     });
     final userProvider = Provider.of<UserProvider>(ctx, listen: false);
     await userProvider.getUser('GDLHs3YUAwYJe71jNzNG').then((value) {
-      currentUser =
-          UserModel(uid: 'GDLHs3YUAwYJe71jNzNG', favorites: value['favorites']);
+      currentUser = UserModel(
+        uid: 'GDLHs3YUAwYJe71jNzNG',
+        favorites: value['favorites'],
+        uName: value['Name'],
+        uEmail: value['Email'],
+        phoneNo: value['PhoneNo'],
+        dob: value['DOB'],
+        gender: value['Gender'],
+        createdAt: value['CreatedAt'],
+      );
     }).catchError((e) {
       print(e);
     });
