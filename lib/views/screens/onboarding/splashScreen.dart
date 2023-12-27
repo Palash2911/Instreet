@@ -25,7 +25,7 @@ class _SplashScreenState extends State<SplashScreen> {
     var authProvider = Provider.of<Auth>(context, listen: false);
 
     Future.delayed(const Duration(seconds: 3), () async {
-      Navigator.of(ctx).pushReplacementNamed(PermissionScreen.routeName);
+      Navigator.of(ctx).pushReplacementNamed('register-screen');
     });
   }
 

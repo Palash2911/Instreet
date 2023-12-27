@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:instreet/models/stallModel.dart';
 import 'package:instreet/providers/userProvider.dart';
@@ -7,9 +6,9 @@ import 'package:instreet/views/widgets/homePageCard.dart';
 import 'package:instreet/views/widgets/shimmerSkeleton.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
-
 import '../../../constants/constants.dart';
 import '../../../models/userModel.dart';
+import '../../widgets/app_bar_search.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -52,11 +51,15 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  bool isExpanded = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Hello'),
+        elevation: 0,
+        title: AppBarSearch(),
+        backgroundColor: Colors.white,
       ),
       body: SafeArea(
         child: isLoading
@@ -143,6 +146,49 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
       ),
+      // body: SingleChildScrollView(
+      //   child: Column(
+      //     children: <Widget>[
+      //       const CarousalSlider(),
+      //
+      //       ListTile(
+      //         title: const Text(
+      //           'Categories',
+      //           style: TextStyle(
+      //             fontSize: 16,
+      //             fontWeight: FontWeight.w500
+      //           ),
+      //         ),
+      //         trailing: IconButton(
+      //           icon: Icon(isExpanded ? Icons.remove : Icons.add),
+      //           onPressed: () {
+      //             setState(() {
+      //               isExpanded = !isExpanded;
+      //             });
+      //           },
+      //         ),
+      //       ),
+      //
+      //       AnimatedContainer(
+      //         duration: const Duration(milliseconds: 500),
+      //         height: isExpanded ? calculateGridHeight() : 100, // Adjust as needed
+      //         child: const CategoriesItems(),
+      //       ),
+      //
+      //       const ListTile(
+      //         title: Text(
+      //           'Trending',
+      //           style: TextStyle(
+      //             fontSize: 16,
+      //             fontWeight: FontWeight.w500
+      //           ),
+      //         ),
+      //       ),
+      //
+      //       // Trending widget bellow this
+      //
+      //     ],
+      //   ),
     );
   }
 }

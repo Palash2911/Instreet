@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:instreet/models/categories_model.dart';
 
 // Colors
 Color kprimaryColor = Color(0xFFFF4500);
@@ -46,3 +47,26 @@ TextStyle kTextPopR12 =
 GoogleFonts.poppins(fontSize: 12.0, fontWeight: FontWeight.w400);
 
 //MediaQuery
+
+
+// Category
+List<Category> categories = [
+  Category('Books', 'assets/images/book.jpg'),
+  Category('Electronics', 'assets/images/electronics.png'),
+  Category('Clothes', 'assets/images/cloothes.png'),
+  Category('Art', 'assets/images/art.png'),
+  Category('Toys', 'assets/images/toys.png'),
+  Category('Sport', 'assets/images/sport.png'),
+  Category('Saloon', 'assets/images/saloon4.jpg'),
+  Category('Jawelry', 'assets/images/jawelry.png'),
+  Category('Health', 'assets/images/health.jpg'),
+  Category('Food', 'assets/images/food.png'),
+  Category('Flowers', 'assets/images/flower.jpg'),
+  Category('Other', 'assets/images/all.png')
+];
+
+// calculate grid size 
+double calculateGridHeight() {
+    int numberOfRows = (categories.length / 4).ceil();
+    return numberOfRows * 100.0; // Adjust the multiplier based on your item size
+}
