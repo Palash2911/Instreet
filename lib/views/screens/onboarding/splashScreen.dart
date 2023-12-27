@@ -23,9 +23,19 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Future loadScreen(BuildContext ctx) async {
     var authProvider = Provider.of<Auth>(context, listen: false);
-
-    Future.delayed(const Duration(seconds: 3), () async {
-      Navigator.of(ctx).pushReplacementNamed('register-screen');
+    await Future.delayed(const Duration(seconds: 3), () async {
+      await authProvider.autoLogin().then((_) async {
+        if (authProvider.isAuth) {
+          var user = await authProvider.checkUser();
+          if(user && mounted) {
+            Navigator.of(ctx).pushReplacementNamed('bottom-nav');
+          } else {
+            if(mounted) {
+              Navigator.of(ctx).pushReplacementNamed('login');
+            }
+          }
+        }
+      });
     });
   }
 

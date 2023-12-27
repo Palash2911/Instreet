@@ -18,10 +18,6 @@ class Auth extends ChangeNotifier {
     return _fcmToken;
   }
 
-  bool get isProfile {
-    return _profileCreated;
-  }
-
   String get token {
     return _token;
   }
@@ -74,16 +70,13 @@ class Auth extends ChangeNotifier {
     }
   }
 
-  Future<bool> signInGoogle() async {
+  Future signInGoogle() async {
     try {
       GoogleAuthProvider googleAuthProvider = GoogleAuthProvider();
-      await _auth.signInWithProvider(googleAuthProvider).then((value) {
-        print(value);
-      });
-      return true;
+      var user = await _auth.signInWithProvider(googleAuthProvider);
+      return user;
     } catch(e) {
-      return false;
-      print(e);
+      rethrow;
     }
   }
 
@@ -91,17 +84,12 @@ class Auth extends ChangeNotifier {
     try {
       var user = true;
       CollectionReference users =
-      FirebaseFirestore.instance.collection('Users');
+      FirebaseFirestore.instance.collection('users');
       await users.doc(_auth.currentUser?.uid).get().then(
-            (datasnapshot) => {
-          if (!datasnapshot.exists) {user = false}
+            (dataSnapshot) => {
+          if (!dataSnapshot.exists) {user = false}
         },
       );
-      if (!user) {
-        _profileCreated = false;
-      } else {
-        _profileCreated = true;
-      }
       return user;
     } catch (e) {
       rethrow;

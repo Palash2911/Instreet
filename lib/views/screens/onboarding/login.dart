@@ -12,7 +12,7 @@ import '../../../providers/authProvider.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
-  static var routeName = "/login";
+  static var routeName = "login";
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -21,13 +21,14 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final _phoneController = TextEditingController();
   final _otpController = TextEditingController();
-  String get otp => _otpController.text;
+  String otp = "";
   String phoneNo = "";
   int countdown = 45;
   var isLoading = false;
   final _form = GlobalKey<FormState>();
 
   bool otpBtn = false;
+  var isOtpEnable = false;
 
   @override
   void initState() {
@@ -43,35 +44,35 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void startCountdown() {
-    const oneSec = Duration(seconds: 1);
-    Timer.periodic(oneSec, (Timer timer) {
-      if (countdown == 0) {
-        timer.cancel();
-        // Optionally, you can perform an action when the countdown reaches 0
-      } else {
-        setState(() {
-          countdown--;
-        });
-      }
-    });
-  }
+  // void startCountdown() {
+  //   const oneSec = Duration(seconds: 1);
+  //   Timer.periodic(oneSec, (Timer timer) {
+  //     if (countdown == 0) {
+  //       timer.cancel();
+  //     } else {
+  //       setState(() {
+  //         countdown--;
+  //       });
+  //     }
+  //   });
+  // }
 
-  void resetCountdown() {
-    setState(() {
-      countdown = 45; // Set the initial countdown value
-    });
-    startCountdown(); // Start the countdown timer
-  }
+  // void resetCountdown() {
+  //   setState(() {
+  //     countdown = 45;
+  //   });
+  //   startCountdown();
+  // }
 
-  String _formatDuration(Duration duration) {
-    String twoDigits(int n) => n.toString().padLeft(2, '0');
-    String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
-    String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
-    return '$twoDigitMinutes:$twoDigitSeconds';
-  }
+  // String _formatDuration(Duration duration) {
+  //   String twoDigits(int n) => n.toString().padLeft(2, '0');
+  //   String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
+  //   String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
+  //   return '$twoDigitMinutes:$twoDigitSeconds';
+  // }
 
   Future _signInGoogle(BuildContext ctx) async {
+    var authProvider = Provider.of<Auth>(ctx, listen: false);
     setState(() {
       isLoading = true;
     });
@@ -80,21 +81,37 @@ class _LoginScreenState extends State<LoginScreen> {
         msg: e,
         toastLength: Toast.LENGTH_SHORT,
         timeInSecForIosWeb: 1,
-        backgroundColor: const Color(0xFFFF4500),
+        backgroundColor: kprimaryColor,
         textColor: Colors.white,
         fontSize: 16.0,
       );
-    }).then((value) {
-      if (value) {
+    }).then((value) async {
+      if (value!=null) {
         Fluttertoast.showToast(
           msg: "Welcome To Instreet",
           toastLength: Toast.LENGTH_SHORT,
           timeInSecForIosWeb: 1,
-          backgroundColor: const Color(0xFFFF4500),
+          backgroundColor: kprimaryColor,
           textColor: Colors.white,
           fontSize: 16.0,
         );
-        Navigator.of(ctx).pushReplacementNamed(RegisterScreen.routeName);
+        var user = await authProvider.checkUser();
+        // var fcmT = await FirebaseNotification().getToken();
+        if (user) {
+          // await Provider.of<UserProvider>(context, listen: false)
+          //     .updateToken(fcmT.toString(), authProvider.token)
+          //     .then((value) {
+          //   const initin = 0;
+          //
+          // });
+          if(mounted){
+            Navigator.of(ctx).pushReplacementNamed('bottom-nav');
+          }
+        } else {
+          if(mounted){
+            Navigator.of(ctx).pushReplacementNamed('register-screen');
+          }
+        }
       }
     });
     setState(() {
@@ -103,7 +120,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future _sendOtP(BuildContext ctx) async {
-    final isValid = _form.currentState!.validate();
+    var isValid = _form.currentState!.validate();
     isLoading = true;
     _form.currentState!.save();
     if (isValid) {
@@ -114,22 +131,23 @@ class _LoginScreenState extends State<LoginScreen> {
           msg: e,
           toastLength: Toast.LENGTH_SHORT,
           timeInSecForIosWeb: 1,
-          backgroundColor: const Color(0xFFFF4500),
+          backgroundColor: kprimaryColor,
           textColor: Colors.white,
           fontSize: 16.0,
         );
-      }).then((value) {
+      }).then((_) {
         Fluttertoast.showToast(
           msg: "OTP Sent Successfully !",
           toastLength: Toast.LENGTH_SHORT,
           timeInSecForIosWeb: 1,
-          backgroundColor: const Color(0xFFFF4500),
+          backgroundColor: kprimaryColor,
           textColor: Colors.white,
           fontSize: 16.0,
         );
-        resetCountdown();
+        // resetCountdown();
         setState(() {
           otpBtn = true;
+          isOtpEnable = true;
         });
       });
     } else {
@@ -152,6 +170,7 @@ class _LoginScreenState extends State<LoginScreen> {
     isLoading = true;
     var isValid = false;
     var authProvider = Provider.of<Auth>(ctx, listen: false);
+    otp = _otpController.text;
     if (otp.length == 6) {
       isValid = await authProvider.verifyOtp(otp).catchError((e) {
         return false;
@@ -166,9 +185,13 @@ class _LoginScreenState extends State<LoginScreen> {
           //   const initin = 0;
           //
           // });
-          print('old user');
+          if(mounted){
+            Navigator.of(ctx).pushReplacementNamed('bottom-nav');
+          }
         } else {
-          Navigator.of(ctx).pushReplacementNamed(RegisterScreen.routeName);
+          if(mounted){
+            Navigator.of(ctx).pushReplacementNamed('register-screen');
+          }
         }
       } else {
         setState(() {
@@ -205,11 +228,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   ? Container(
                       height: MediaQuery.of(context).size.height,
                       color: Colors.black.withOpacity(0.7),
-                      child: Center(child: CircularProgressIndicator()),
+                      child: const Center(child: CircularProgressIndicator()),
                     )
-                  : SizedBox(
-                      width: 1,
-                    ),
+                  : SizedBox(width: 0),
               Container(
                 height: MediaQuery.of(context).size.height * 0.81,
                 padding: const EdgeInsets.only(left: 35, right: 35, top: 50),
@@ -266,14 +287,14 @@ class _LoginScreenState extends State<LoginScreen> {
                                 borderRadius: BorderRadius.circular(15.0),
                               ),
                               suffixIcon: Container(
-                                margin: EdgeInsets.all(9.0),
+                                margin: const EdgeInsets.all(9.0),
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: kprimaryColor.withOpacity(0.9),
+                                  color: isOtpEnable ? Colors.grey : kprimaryColor.withOpacity(0.9),
                                 ),
                                 child: IconButton(
                                   icon: Icon(Icons.arrow_forward),
-                                  onPressed: () {
+                                  onPressed: isOtpEnable ? null : () {
                                     setState(() {
                                       // isFinished = true;
                                     });
@@ -299,9 +320,13 @@ class _LoginScreenState extends State<LoginScreen> {
                           const SizedBox(height: 20),
                           PinCodeTextField(
                             appContext: context,
-                            length: 6, // Change this based on your OTP length
-                            onChanged: (value) {
-                              // Handle OTP input
+                            length: 6,
+                            controller: _otpController,
+                            enabled: isOtpEnable,
+                            onChanged: (otp) {
+                              setState(() {
+                                otp = otp.toString();
+                              });
                             },
                             pinTheme: PinTheme(
                               shape: PinCodeFieldShape.box,
@@ -311,11 +336,6 @@ class _LoginScreenState extends State<LoginScreen> {
                               activeFillColor: Colors.grey.withOpacity(0.1),
                               // Adjust other styling properties as needed
                             ),
-                          ),
-                          SizedBox(height: 20),
-                          Text(
-                            '${_formatDuration(Duration(seconds: countdown))}',
-                            style: TextStyle(fontSize: 16),
                           ),
                         ],
                       ),
