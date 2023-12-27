@@ -5,6 +5,8 @@ import 'package:instreet/views/screens/onboarding/register.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:provider/provider.dart';
 import 'package:sign_in_button/sign_in_button.dart';
+import 'package:pin_code_fields/pin_code_fields.dart';
+import 'dart:async';
 
 import '../../../providers/authProvider.dart';
 
@@ -21,7 +23,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _otpController = TextEditingController();
   String get otp => _otpController.text;
   String phoneNo = "";
-
+  int countdown = 45;
   var isLoading = false;
   final _form = GlobalKey<FormState>();
 
@@ -39,6 +41,34 @@ class _LoginScreenState extends State<LoginScreen> {
     _phoneController.dispose();
     _otpController.dispose();
     super.dispose();
+  }
+
+  void startCountdown() {
+    const oneSec = Duration(seconds: 1);
+    Timer.periodic(oneSec, (Timer timer) {
+      if (countdown == 0) {
+        timer.cancel();
+        // Optionally, you can perform an action when the countdown reaches 0
+      } else {
+        setState(() {
+          countdown--;
+        });
+      }
+    });
+  }
+
+  void resetCountdown() {
+    setState(() {
+      countdown = 45; // Set the initial countdown value
+    });
+    startCountdown(); // Start the countdown timer
+  }
+
+  String _formatDuration(Duration duration) {
+    String twoDigits(int n) => n.toString().padLeft(2, '0');
+    String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
+    String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
+    return '$twoDigitMinutes:$twoDigitSeconds';
   }
 
   Future _signInGoogle(BuildContext ctx) async {
@@ -97,6 +127,7 @@ class _LoginScreenState extends State<LoginScreen> {
           textColor: Colors.white,
           fontSize: 16.0,
         );
+        resetCountdown();
         setState(() {
           otpBtn = true;
         });
@@ -111,6 +142,7 @@ class _LoginScreenState extends State<LoginScreen> {
         fontSize: 16.0,
       );
     }
+
     setState(() {
       isLoading = false;
     });
@@ -157,6 +189,7 @@ class _LoginScreenState extends State<LoginScreen> {
       );
     }
     setState(() {
+      otpBtn = isValid;
       isLoading = false;
     });
   }
@@ -168,11 +201,15 @@ class _LoginScreenState extends State<LoginScreen> {
         child: SafeArea(
           child: Stack(
             children: [
-              isLoading ? Container(
-                height: MediaQuery.of(context).size.height,
-              color: Colors.black.withOpacity(0.7),
-                child: Center(child: CircularProgressIndicator()),
-              ) : SizedBox(width: 1,),
+              isLoading
+                  ? Container(
+                      height: MediaQuery.of(context).size.height,
+                      color: Colors.black.withOpacity(0.7),
+                      child: Center(child: CircularProgressIndicator()),
+                    )
+                  : SizedBox(
+                      width: 1,
+                    ),
               Container(
                 height: MediaQuery.of(context).size.height * 0.81,
                 padding: const EdgeInsets.only(left: 35, right: 35, top: 50),
@@ -260,27 +297,25 @@ class _LoginScreenState extends State<LoginScreen> {
                             },
                           ),
                           const SizedBox(height: 20),
-                          Container(
-                            padding: const EdgeInsets.all(6.0),
-                            decoration: BoxDecoration(
-                              color: Colors.transparent,
-                              border: Border.all(
-                                color: Colors.black,
-                                width: 1.0,
-                              ),
-                              borderRadius: BorderRadius.circular(8.0),
+                          PinCodeTextField(
+                            appContext: context,
+                            length: 6, // Change this based on your OTP length
+                            onChanged: (value) {
+                              // Handle OTP input
+                            },
+                            pinTheme: PinTheme(
+                              shape: PinCodeFieldShape.box,
+                              borderRadius: BorderRadius.circular(5),
+                              fieldHeight: 50,
+                              fieldWidth: 40,
+                              activeFillColor: Colors.grey.withOpacity(0.1),
+                              // Adjust other styling properties as needed
                             ),
-                            child: TextFormField(
-                              controller: _otpController,
-                              decoration: InputDecoration(
-                                border: InputBorder.none,
-                                prefixIcon:
-                                    Icon(Icons.lock, color: ksecondaryColor),
-                                hintText: 'Enter OTP',
-                                hintStyle: TextStyle(
-                                    color: ksecondaryColor.withOpacity(0.7)),
-                              ),
-                            ),
+                          ),
+                          SizedBox(height: 20),
+                          Text(
+                            '${_formatDuration(Duration(seconds: countdown))}',
+                            style: TextStyle(fontSize: 16),
                           ),
                         ],
                       ),
