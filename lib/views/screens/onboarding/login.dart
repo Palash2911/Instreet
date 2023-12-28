@@ -78,7 +78,7 @@ class _LoginScreenState extends State<LoginScreen> {
     });
     await Provider.of<Auth>(ctx, listen: false).signInGoogle().catchError((e) {
       Fluttertoast.showToast(
-        msg: e,
+        msg: e.toString(),
         toastLength: Toast.LENGTH_SHORT,
         timeInSecForIosWeb: 1,
         backgroundColor: kprimaryColor,
@@ -97,6 +97,7 @@ class _LoginScreenState extends State<LoginScreen> {
         );
         var user = await authProvider.checkUser();
         // var fcmT = await FirebaseNotification().getToken();
+        print(user);
         if (user) {
           // await Provider.of<UserProvider>(context, listen: false)
           //     .updateToken(fcmT.toString(), authProvider.token)

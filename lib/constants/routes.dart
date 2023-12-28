@@ -9,7 +9,6 @@ import 'package:instreet/views/screens/postscreens/Categories.dart';
 var approutes = <String, WidgetBuilder>{
    // Inital Route
   '/': (context) => const SplashScreen(),
-  // '/': (context) => const BottomNav(),
 
   // Onboarding Routes
   PermissionScreen.routeName: (context) => PermissionScreen(),

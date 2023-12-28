@@ -19,6 +19,13 @@ class BottomNav extends StatefulWidget {
 
 class _BottomNavState extends State<BottomNav> {
   final _controller = PersistentTabController(initialIndex: 0);
+  List<Widget> _screens = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _screens = _buildScreens();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,6 +38,7 @@ class _BottomNavState extends State<BottomNav> {
         screens: _buildScreens(),
         items: _navBarsItems(),
         navBarStyle: NavBarStyle.style6,
+        confineInSafeArea: true,
       ),
     );
   }

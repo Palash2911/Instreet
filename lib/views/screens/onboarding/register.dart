@@ -85,7 +85,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
           dob: date,
           gender: gender,
           createdAt: DateTime.now(),
-          favorites: [],
         ),
       ).catchError((e) {
         Fluttertoast.showToast(

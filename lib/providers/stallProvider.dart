@@ -3,45 +3,46 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:instreet/models/userModel.dart';
+import 'package:instreet/providers/authProvider.dart';
+import 'package:provider/provider.dart';
 import '../models/stallModel.dart';
 
 class StallProvider extends ChangeNotifier {
-  // Future registerStall(Stall stall) async {
-  //   try {
-  //     var storage = FirebaseStorage.instance;
-  //     String filePath = 'Stalls/BannerImages/${stall.bannerImageUrl}'; // Replace with your file path
-  //     var ref = storage.ref().child(filePath);
-  //
-  //     stall.bannerImageUrl = await ref.getDownloadURL();
-  //     CollectionReference stalls =
-  //     FirebaseFirestore.instance.collection('stalls');
-  //     await stalls.doc().set({
-  //       'stallName': stall.stallName,
-  //       'stallDescription': stall.stallDescription,
-  //       "ownerName": stall.ownerName,
-  //       "stallCategory": stall.stallCategories,
-  //       "bannerImage": stall.bannerImageUrl,
-  //       "rating": stall.rating,
-  //     });
-  //     notifyListeners();
-  //   } catch (e) {
-  //     notifyListeners();
-  //     rethrow;
-  //   }
-  // }
-  //
+  List<Stall> _stalls = [];
+  List<Stall> get stalls => _stalls;
 
-  Future toggleFavorite(UserModel user, String stallId) async {
-    try {
-      user.toggleFavorite(stallId);
-      CollectionReference userRef = FirebaseFirestore.instance.collection('users');
-      await userRef.doc(user.uid).update({
-        'favorites': user.favorites,
-      });
-      notifyListeners();
-    } catch (e) {
-      notifyListeners();
-      rethrow;
+  Future<void> fetchStalls() async {
+    var stallCollection = FirebaseFirestore.instance.collection('stalls');
+    var querySnapshot = await stallCollection.get();
+    _stalls =
+        querySnapshot.docs.map((doc) => Stall.fromFirestore(doc)).toList();
+    notifyListeners();
+  }
+
+  Future<void> toggleFavorite(String stallId, String uid) async {
+    if (uid.isEmpty) return;
+    var stallIndex = _stalls.indexWhere((stall) => stall.sId == stallId);
+    if (stallIndex != -1 && uid.isNotEmpty) {
+      if (_stalls[stallIndex].favoriteUsers.contains(uid)) {
+        _stalls[stallIndex].favoriteUsers.remove(uid);
+      } else {
+        _stalls[stallIndex].favoriteUsers.add(uid);
+      }
+      try {
+        var stallDoc =
+            FirebaseFirestore.instance.collection('stalls').doc(stallId);
+        await stallDoc
+            .update({'favoriteUsers': _stalls[stallIndex].favoriteUsers});
+        notifyListeners();
+      } catch (e) {
+        notifyListeners();
+        print(e);
+        rethrow;
+      }
     }
+  }
+
+  List<Stall> getFavoriteStalls(String uid) {
+    return _stalls.where((stall) => stall.favoriteUsers.contains(uid)).toList();
   }
 }

@@ -1,17 +1,14 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:instreet/constants/constants.dart';
 import 'package:instreet/models/stallModel.dart';
+import 'package:instreet/providers/authProvider.dart';
 import 'package:instreet/providers/stallProvider.dart';
 import 'package:provider/provider.dart';
 
-import '../../models/userModel.dart';
-
 class HomePageCard extends StatefulWidget {
   final Stall stall;
-  final UserModel user;
-  const HomePageCard({super.key, required this.stall, required this.user});
+  const HomePageCard({super.key, required this.stall});
 
   @override
   State<HomePageCard> createState() => _HomePageCardState();
@@ -19,27 +16,27 @@ class HomePageCard extends StatefulWidget {
 
 class _HomePageCardState extends State<HomePageCard> {
   bool isFavorite = false;
+  var uid = '';
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     setState(() {
-      isFavorite = widget.user.favorites.contains(widget.stall.sId);
+      uid = Provider.of<Auth>(context, listen: false).token;
+      isFavorite = widget.stall.favoriteUsers.contains(uid);
     });
   }
 
   Future toggleFav() async {
     setState(() {
-      isFavorite = !isFavorite; // Toggle the state
+      isFavorite = !isFavorite;
     });
     var sProvider = Provider.of<StallProvider>(context, listen: false);
-    await sProvider.toggleFavorite(widget.user, widget.stall.sId).then((val) {
-    }).catchError((e) {
-      setState(() {
-        isFavorite = !isFavorite;
-      });
+    try {
+      await sProvider.toggleFavorite(widget.stall.sId, uid);
+    } catch (e) {
       print(e);
-    });
+    }
   }
 
   List<Widget> buildStars(double rating) {

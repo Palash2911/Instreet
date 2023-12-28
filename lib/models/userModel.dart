@@ -6,7 +6,6 @@ class UserModel {
   final String dob;
   final String gender;
   final DateTime createdAt;
-  final List<dynamic> favorites;
 
   UserModel({
     required this.uid,
@@ -16,14 +15,5 @@ class UserModel {
     required this.dob,
     required this.gender,
     required this.createdAt,
-    required this.favorites,
   });
-
-  void toggleFavorite(String stallId) {
-    if (favorites.contains(stallId)) {
-      favorites.remove(stallId);
-    } else {
-      favorites.add(stallId);
-    }
-  }
 }

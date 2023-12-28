@@ -5,74 +5,62 @@ import 'package:shimmer/shimmer.dart';
 
 import '../../../constants/constants.dart';
 import '../../../models/stallModel.dart';
-import '../../../models/userModel.dart';
-import '../../../providers/userProvider.dart';
+import '../../../providers/authProvider.dart';
+import '../../../providers/stallProvider.dart';
+import '../../widgets/app_bar_search.dart';
+import '../../widgets/carousal_slider.dart';
 import '../../widgets/homePageCard.dart';
 import '../../widgets/shimmerSkeleton.dart';
 
 class FavroiteScreen extends StatefulWidget {
-  const FavroiteScreen({super.key});
+  const FavroiteScreen({Key? key}) : super(key: key);
 
   @override
   State<FavroiteScreen> createState() => _FavroiteScreenState();
 }
 
 class _FavroiteScreenState extends State<FavroiteScreen> {
-  CollectionReference stallRef =
-      FirebaseFirestore.instance.collection('stalls');
   var isLoading = true;
   var init = true;
-  UserModel currentUser = UserModel(
-    uid: '',
-    favorites: [],
-    gender: '',
-    uName: '',
-    uEmail: '',
-    phoneNo: '',
-    dob: '',
-    createdAt: DateTime.now(),
-  );
+  var currentUid = '';
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (init) {
-      loadUserData(context);
+      currentUid = Provider.of<Auth>(context, listen: false).token;
+      loadStallsData(context);
     }
     init = false;
   }
 
-  Future<void> loadUserData(BuildContext ctx) async {
+  Future<void> loadStallsData(BuildContext context) async {
     setState(() {
       isLoading = true;
     });
-    final userProvider = Provider.of<UserProvider>(ctx, listen: false);
-    await userProvider.getUser('GDLHs3YUAwYJe71jNzNG').then((value) {
-      currentUser = UserModel(
-        uid: 'GDLHs3YUAwYJe71jNzNG',
-        favorites: value['favorites'],
-        uName: value['Name'],
-        uEmail: value['Email'],
-        phoneNo: value['PhoneNo'],
-        dob: value['DOB'],
-        gender: value['Gender'],
-        createdAt: value['CreatedAt'],
-      );
-    }).catchError((e) {
+    try {
+      Provider.of<StallProvider>(context, listen: false).fetchStalls();
+    } catch (e) {
       print(e);
-    });
-    await Future.delayed(Duration(milliseconds: 500), () {
-      setState(() {
-        isLoading = false;
+    } finally {
+      await Future.delayed(Duration(milliseconds: 500), () {
+        setState(() {
+          isLoading = false;
+        });
       });
-    });
+    }
   }
+
+  bool isExpanded = false;
 
   @override
   Widget build(BuildContext context) {
+    final favoriteStalls = currentUid.isNotEmpty ? Provider.of<StallProvider>(context).getFavoriteStalls(currentUid) : [];
     return Scaffold(
       appBar: AppBar(
-        title: Text('Favorites'),
+        elevation: 0,
+        title: AppBarSearch(),
+        backgroundColor: Colors.white,
       ),
       body: SafeArea(
         child: isLoading
@@ -91,79 +79,61 @@ class _FavroiteScreenState extends State<FavroiteScreen> {
                     kBottomNavigationBarHeight,
                 padding: const EdgeInsets.only(bottom: 20),
                 child: RefreshIndicator(
-                  onRefresh: () => loadUserData(context),
-                  child: StreamBuilder<QuerySnapshot>(
-                    stream: stallRef.snapshots(),
-                    builder: (context, snapshot) {
-                      if (!snapshot.hasData) {
-                        return Center(
-                          child: SizedBox(
-                            height: 27,
-                            child: ListView.builder(
-                              itemCount: 5,
-                              itemBuilder: (context, index) {
-                                return Shimmer.fromColors(
-                                  baseColor: Colors.grey[300]!,
-                                  highlightColor: Colors.grey[100]!,
-                                  child: const ShimmerSkeleton(),
-                                );
-                              },
-                            ),
-                          ),
-                        );
-                      } else {
-                        if (snapshot.data!.docs.isEmpty) {
-                          return Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                SizedBox(
-                                  height: 100.0,
-                                  child: Image.asset(
-                                    'assets/images/google.jpg',
-                                    fit: BoxFit.contain,
-                                  ),
-                                ),
-                                const SizedBox(height: 20.0),
-                                Text(
-                                  "No Favorites Yet !",
-                                  style: kTextPopM16,
-                                ),
-                              ],
-                            ),
-                          );
-                        } else {
-                          return ListView.builder(
-                            itemCount: snapshot.data!.docs.length,
-                            itemBuilder: (context, index) {
-                              var document = snapshot.data!.docs[index];
-                              if (currentUser.favorites.contains(document.id)) {
-                                return HomePageCard(
-                                  stall: Stall(
-                                    sId: document.id,
-                                    stallName: document['stallName'],
-                                    ownerName: document['ownerName'],
-                                    rating: document['rating'].toDouble(),
-                                    stallCategories: document['stallCategory'],
-                                    stallDescription:
-                                        document['stallDescription'],
-                                    bannerImageUrl: document['bannerImage'],
-                                  ),
-                                  user: currentUser,
-                                );
-                              } else {
-                                return SizedBox
-                                    .shrink(); // Skip the item if it's not a favorite
-                              }
-                            },
-                          );
-                        }
-                      }
+                  onRefresh: () => loadStallsData(context),
+                  child: ListView.builder(
+                    itemCount: favoriteStalls.length,
+                    itemBuilder: (context, index) {
+                      return HomePageCard(
+                        stall: favoriteStalls[index],
+                      );
                     },
                   ),
                 ),
               ),
       ),
+      // body: SingleChildScrollView(
+      //   child: Column(
+      //     children: <Widget>[
+      //       const CarousalSlider(),
+      //
+      //       ListTile(
+      //         title: const Text(
+      //           'Categories',
+      //           style: TextStyle(
+      //             fontSize: 16,
+      //             fontWeight: FontWeight.w500
+      //           ),
+      //         ),
+      //         trailing: IconButton(
+      //           icon: Icon(isExpanded ? Icons.remove : Icons.add),
+      //           onPressed: () {
+      //             setState(() {
+      //               isExpanded = !isExpanded;
+      //             });
+      //           },
+      //         ),
+      //       ),
+      //
+      //       AnimatedContainer(
+      //         duration: const Duration(milliseconds: 500),
+      //         height: isExpanded ? calculateGridHeight() : 100, // Adjust as needed
+      //         child: const CategoriesItems(),
+      //       ),
+      //
+      //       const ListTile(
+      //         title: Text(
+      //           'Trending',
+      //           style: TextStyle(
+      //             fontSize: 16,
+      //             fontWeight: FontWeight.w500
+      //           ),
+      //         ),
+      //       ),
+      //
+      //       // Trending widget bellow this
+      //
+      //     ],
+      //   ),
     );
   }
 }

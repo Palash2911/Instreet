@@ -60,7 +60,6 @@ class Auth extends ChangeNotifier {
       final prefs = await SharedPreferences.getInstance();
       _token = _auth.currentUser!.uid;
       prefs.setString('UID', _auth.currentUser!.uid);
-      prefs.setBool('Profile', false);
       prefs.setString("FCMT", "");
       notifyListeners();
       return cred.user != null ? true : false;
@@ -74,6 +73,10 @@ class Auth extends ChangeNotifier {
     try {
       GoogleAuthProvider googleAuthProvider = GoogleAuthProvider();
       var user = await _auth.signInWithProvider(googleAuthProvider);
+      final prefs = await SharedPreferences.getInstance();
+      _token = _auth.currentUser!.uid;
+      prefs.setString('UID', _auth.currentUser!.uid);
+      prefs.setString("FCMT", "");
       return user;
     } catch(e) {
       rethrow;
@@ -116,7 +119,6 @@ class Auth extends ChangeNotifier {
       return;
     }
     _token = prefs.getString('UID')!;
-    _profileCreated = prefs.getBool('Profile')!;
     if (prefs.getString("FCMT") != null) {
       _fcmToken = prefs.getString("FCMT")!;
     }
