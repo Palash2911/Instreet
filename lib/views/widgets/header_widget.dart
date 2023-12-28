@@ -37,6 +37,7 @@ class _HeaderWidgetState extends State<HeaderWidget> {
                   )
                 : null,
           ),
+          // Put this in the HomeScreen and handle the container expansion there
           AnimatedContainer(
             duration: const Duration(milliseconds: 500),
             height: isExpanded ? calculateGridHeight() : 100,

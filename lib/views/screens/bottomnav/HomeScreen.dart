@@ -77,6 +77,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       const CarousalSlider(),
                       const HeaderWidget(expandedView: false, title: 'Categories'),
+                      const HeaderWidget(expandedView: false, title: 'Trending'),
                       Expanded(
                         child: ListView.builder(
                           itemCount: stalls.length,
