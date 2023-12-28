@@ -51,11 +51,11 @@ class _FavroiteScreenState extends State<FavroiteScreen> {
     }
   }
 
-  bool isExpanded = false;
-
   @override
   Widget build(BuildContext context) {
-    final favoriteStalls = currentUid.isNotEmpty ? Provider.of<StallProvider>(context).getFavoriteStalls(currentUid) : [];
+    final favoriteStalls = currentUid.isNotEmpty
+        ? Provider.of<StallProvider>(context).getFavoriteStalls(currentUid)
+        : [];
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -91,49 +91,6 @@ class _FavroiteScreenState extends State<FavroiteScreen> {
                 ),
               ),
       ),
-      // body: SingleChildScrollView(
-      //   child: Column(
-      //     children: <Widget>[
-      //       const CarousalSlider(),
-      //
-      //       ListTile(
-      //         title: const Text(
-      //           'Categories',
-      //           style: TextStyle(
-      //             fontSize: 16,
-      //             fontWeight: FontWeight.w500
-      //           ),
-      //         ),
-      //         trailing: IconButton(
-      //           icon: Icon(isExpanded ? Icons.remove : Icons.add),
-      //           onPressed: () {
-      //             setState(() {
-      //               isExpanded = !isExpanded;
-      //             });
-      //           },
-      //         ),
-      //       ),
-      //
-      //       AnimatedContainer(
-      //         duration: const Duration(milliseconds: 500),
-      //         height: isExpanded ? calculateGridHeight() : 100, // Adjust as needed
-      //         child: const CategoriesItems(),
-      //       ),
-      //
-      //       const ListTile(
-      //         title: Text(
-      //           'Trending',
-      //           style: TextStyle(
-      //             fontSize: 16,
-      //             fontWeight: FontWeight.w500
-      //           ),
-      //         ),
-      //       ),
-      //
-      //       // Trending widget bellow this
-      //
-      //     ],
-      //   ),
     );
   }
 }

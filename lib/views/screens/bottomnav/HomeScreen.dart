@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:instreet/providers/stallProvider.dart';
+import 'package:instreet/views/widgets/header_widget.dart';
 import 'package:instreet/views/widgets/homePageCard.dart';
 import 'package:instreet/views/widgets/shimmerSkeleton.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../widgets/app_bar_search.dart';
 import '../../widgets/carousal_slider.dart';
+import '../../widgets/categories_items.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -44,8 +46,6 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  bool isExpanded = false;
-
   @override
   Widget build(BuildContext context) {
     final stalls = Provider.of<StallProvider>(context).stalls;
@@ -76,6 +76,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Column(
                     children: [
                       const CarousalSlider(),
+                      const HeaderWidget(expandedView: false, title: 'Categories'),
                       Expanded(
                         child: ListView.builder(
                           itemCount: stalls.length,
@@ -91,49 +92,50 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
       ),
-      // body: SingleChildScrollView(
-      //   child: Column(
-      //     children: <Widget>[
-      //       const CarousalSlider(),
-      //
-      //       ListTile(
-      //         title: const Text(
-      //           'Categories',
-      //           style: TextStyle(
-      //             fontSize: 16,
-      //             fontWeight: FontWeight.w500
-      //           ),
-      //         ),
-      //         trailing: IconButton(
-      //           icon: Icon(isExpanded ? Icons.remove : Icons.add),
-      //           onPressed: () {
-      //             setState(() {
-      //               isExpanded = !isExpanded;
-      //             });
-      //           },
-      //         ),
-      //       ),
-      //
-      //       AnimatedContainer(
-      //         duration: const Duration(milliseconds: 500),
-      //         height: isExpanded ? calculateGridHeight() : 100, // Adjust as needed
-      //         child: const CategoriesItems(),
-      //       ),
-      //
-      //       const ListTile(
-      //         title: Text(
-      //           'Trending',
-      //           style: TextStyle(
-      //             fontSize: 16,
-      //             fontWeight: FontWeight.w500
-      //           ),
-      //         ),
-      //       ),
-      //
-      //       // Trending widget bellow this
-      //
-      //     ],
-      //   ),
     );
   }
 }
+
+// body: SingleChildScrollView(
+//   child: Column(
+//     children: <Widget>[
+//       const CarousalSlider(),
+//
+//       ListTile(
+//         title: const Text(
+//           'Categories',
+//           style: TextStyle(
+//             fontSize: 16,
+//             fontWeight: FontWeight.w500
+//           ),
+//         ),
+//         trailing: IconButton(
+//           icon: Icon(isExpanded ? Icons.remove : Icons.add),
+//           onPressed: () {
+//             setState(() {
+//               isExpanded = !isExpanded;
+//             });
+//           },
+//         ),
+//       ),
+//
+//       AnimatedContainer(
+//         duration: const Duration(milliseconds: 500),
+//         height: isExpanded ? calculateGridHeight() : 100, // Adjust as needed
+//         child: const CategoriesItems(),
+//       ),
+//
+//       const ListTile(
+//         title: Text(
+//           'Trending',
+//           style: TextStyle(
+//             fontSize: 16,
+//             fontWeight: FontWeight.w500
+//           ),
+//         ),
+//       ),
+//
+//       // Trending widget bellow this
+//
+//     ],
+//   ),

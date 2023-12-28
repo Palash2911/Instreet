@@ -28,14 +28,13 @@ class StallProvider extends ChangeNotifier {
       } else {
         _stalls[stallIndex].favoriteUsers.add(uid);
       }
+      notifyListeners();
       try {
         var stallDoc =
             FirebaseFirestore.instance.collection('stalls').doc(stallId);
         await stallDoc
             .update({'favoriteUsers': _stalls[stallIndex].favoriteUsers});
-        notifyListeners();
       } catch (e) {
-        notifyListeners();
         print(e);
         rethrow;
       }

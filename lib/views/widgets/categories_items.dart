@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:instreet/constants/constants.dart';
 import 'package:instreet/views/screens/postscreens/Categories.dart';
@@ -19,25 +20,27 @@ class _CategoriesListState extends State<CategoriesItems> {
       ),
       itemCount: categories.length,
       itemBuilder: (context, index) {
-        return Column(
-          children: [
-            GestureDetector(
-              onTap: () {
-                Navigator.of(context).pushReplacementNamed(Categories.routeName);
-              },
-              child: CircleAvatar(
-                backgroundImage: AssetImage(categories[index].imagePath),
-                radius: 35,
+        return Padding(
+          padding: const EdgeInsets.all(6.0),
+          child: Column(
+            children: [
+              GestureDetector(
+                onTap: () {
+                  Navigator.of(context).pushReplacementNamed(Categories.routeName);
+                },
+                child: CircleAvatar(
+                  backgroundImage: AssetImage(categories[index].imagePath),
+                  radius: 30,
+                ),
               ),
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            Text(
-              categories[index].name,
-              style: TextStyle(fontFamily: 'Poppins', fontSize: 14),
-            ),
-          ],
+              Expanded(
+                child: AutoSizeText(
+                  categories[index].name,
+                  style: kTextPopR14,
+                ),
+              ),
+            ],
+          ),
         );
       },
     );

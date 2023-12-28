@@ -90,7 +90,7 @@ class _HomePageCardState extends State<HomePageCard> {
                 height: 150,
                 width: 120,
               ),
-            ), // 6358854363 - Mahindra
+            ),
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.only(left: 9.0),
