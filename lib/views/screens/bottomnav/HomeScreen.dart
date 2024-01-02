@@ -55,47 +55,54 @@ class _HomeScreenState extends State<HomeScreen> {
         title: AppBarSearch(),
         backgroundColor: Colors.white,
       ),
-      body: SafeArea(
-        child: isLoading
-            ? ListView.builder(
-                itemCount: 5,
-                itemBuilder: (context, index) {
-                  return Shimmer.fromColors(
-                    baseColor: Colors.grey[300]!,
-                    highlightColor: Colors.grey[100]!,
-                    child: const ShimmerSkeleton(),
-                  );
-                },
-              )
-            : Container(
-                height: MediaQuery.of(context).size.height -
-                    kBottomNavigationBarHeight,
-                padding: const EdgeInsets.only(bottom: 20),
-                child: RefreshIndicator(
-                  onRefresh: () => loadStallsData(context),
-                  child: Column(
-                    children: [
-                      const CarousalSlider(),
-                      const HeaderWidget(expandedView: false, title: 'Categories'),
-                      const HeaderWidget(expandedView: false, title: 'Trending'),
-                      Expanded(
-                        child: ListView.builder(
-                          itemCount: stalls.length,
-                          itemBuilder: (context, index) {
-                            return HomePageCard(
-                              stall: stalls[index],
-                            );
-                          },
+      body: SingleChildScrollView(
+        physics: BouncingScrollPhysics(),
+        child: SafeArea(
+          child: isLoading
+              ? ListView.builder(
+                  itemCount: 5,
+                  itemBuilder: (context, index) {
+                    return Shimmer.fromColors(
+                      baseColor: Colors.grey[300]!,
+                      highlightColor: Colors.grey[100]!,
+                      child: const ShimmerSkeleton(),
+                    );
+                  },
+                )
+              : Container(
+                  height: MediaQuery.of(context).size.height -
+                      kBottomNavigationBarHeight,
+                  padding: const EdgeInsets.only(bottom: 20),
+                  child: RefreshIndicator(
+                    onRefresh: () => loadStallsData(context),
+                    child: Column(
+                      children: [
+                        const CarousalSlider(),
+                        const HeaderWidget(
+                            expandedView: true, title: 'Categories'),
+                        const HeaderWidget(
+                            expandedView: false, title: 'Trending'),
+                        Expanded(
+                          child: ListView.builder(
+                            itemCount: stalls.length,
+                            itemBuilder: (context, index) {
+                              return HomePageCard(
+                                stall: stalls[index],
+                              );
+                            },
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-              ),
+        ),
       ),
     );
   }
 }
+
+
 
 // body: SingleChildScrollView(
 //   child: Column(
