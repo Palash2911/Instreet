@@ -4,6 +4,7 @@ import 'package:instreet/views/screens/bottomnav/FavoriteScreen.dart';
 import 'package:instreet/views/screens/bottomnav/HomeScreen.dart';
 import 'package:instreet/views/screens/bottomnav/ProfileScreen.dart';
 import 'package:instreet/views/screens/bottomnav/ReviewScreen.dart';
+import 'package:instreet/views/screens/postscreens/Categories.dart';
 import 'package:instreet/views/screens/postscreens/PostScreenNav.dart';
 import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 
@@ -50,7 +51,7 @@ List<Widget> _buildScreens() {
     FavroiteScreen(),
     PostScreenNav(),
     ReviewScreen(),
-    ProfileScreen()
+    ProfileScreen(),
   ];
 }
 

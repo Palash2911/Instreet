@@ -4,17 +4,24 @@ import '../../constants/constants.dart';
 import 'categories_items.dart';
 
 class HeaderWidget extends StatefulWidget {
-  const HeaderWidget(
-      {super.key, required this.expandedView, required this.title});
+  const HeaderWidget({
+    super.key,
+    required this.expandedView,
+    required this.title,
+    required this.isExpanded,
+    this.onExpansionChanged,
+  });
+
   final bool expandedView;
   final String title;
+  final bool isExpanded;
+  final Function(bool)? onExpansionChanged;
 
   @override
   State<HeaderWidget> createState() => _HeaderWidgetState();
 }
 
 class _HeaderWidgetState extends State<HeaderWidget> {
-  bool isExpanded = false;
 
   @override
   Widget build(BuildContext context) {
@@ -28,21 +35,12 @@ class _HeaderWidgetState extends State<HeaderWidget> {
             ),
             trailing: widget.expandedView
                 ? IconButton(
-                    icon: Icon(isExpanded ? Icons.remove : Icons.add),
-                    onPressed: () {
-                      setState(() {
-                        isExpanded = !isExpanded;
-                      });
-                    },
-                  )
+              icon: Icon(widget.isExpanded ? Icons.remove : Icons.add),
+              onPressed: () {
+                widget.onExpansionChanged!(!widget.isExpanded); // Update this
+              },
+            )
                 : null,
-          ),
-          // Put this in the HomeScreen and handle the container expansion there
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 500),
-            height: isExpanded ? calculateGridHeight() : (widget.expandedView) ? 100 : 0,
-            // Adjust as needed
-            child: const CategoriesItems(),
           ),
         ],
       ),

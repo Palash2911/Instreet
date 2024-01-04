@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 class Categories extends StatefulWidget {
   const Categories({super.key});
-  static var routeName = "/categories";
+  static var routeName = "categories-screen";
 
   @override
   State<Categories> createState() => _CategoriesState();

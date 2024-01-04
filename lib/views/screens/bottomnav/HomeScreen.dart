@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:instreet/providers/stallProvider.dart';
+import 'package:instreet/views/screens/postscreens/Categories.dart';
 import 'package:instreet/views/widgets/header_widget.dart';
 import 'package:instreet/views/widgets/homePageCard.dart';
 import 'package:instreet/views/widgets/shimmerSkeleton.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
+import '../../../constants/constants.dart';
 import '../../widgets/app_bar_search.dart';
 import '../../widgets/carousal_slider.dart';
 import '../../widgets/categories_items.dart';
@@ -19,6 +21,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   var isLoading = true;
   var init = true;
+  bool isHeaderExpanded = false;
 
   @override
   void didChangeDependencies() {
@@ -27,6 +30,12 @@ class _HomeScreenState extends State<HomeScreen> {
       loadStallsData(context);
     }
     init = false;
+  }
+
+  void _handleHeaderExpansion(bool expanded) {
+    setState(() {
+      isHeaderExpanded = expanded;
+    });
   }
 
   Future<void> loadStallsData(BuildContext context) async {
@@ -46,104 +55,79 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  void navigateCategory(int index) {
+    Navigator.of(context, rootNavigator: true).push(
+      MaterialPageRoute(
+        builder: (context) => const Categories(),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final stalls = Provider.of<StallProvider>(context).stalls;
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
-        title: AppBarSearch(),
+        title: const AppBarSearch(),
         backgroundColor: Colors.white,
       ),
-      body: SingleChildScrollView(
-        physics: BouncingScrollPhysics(),
-        child: SafeArea(
-          child: isLoading
-              ? ListView.builder(
-                  itemCount: 5,
-                  itemBuilder: (context, index) {
-                    return Shimmer.fromColors(
-                      baseColor: Colors.grey[300]!,
-                      highlightColor: Colors.grey[100]!,
-                      child: const ShimmerSkeleton(),
-                    );
-                  },
-                )
-              : Container(
-                  height: MediaQuery.of(context).size.height -
-                      kBottomNavigationBarHeight,
-                  padding: const EdgeInsets.only(bottom: 20),
-                  child: RefreshIndicator(
-                    onRefresh: () => loadStallsData(context),
+      body: SafeArea(
+        child: isLoading
+            ? ListView.builder(
+                itemCount: 5,
+                itemBuilder: (context, index) {
+                  return Shimmer.fromColors(
+                    baseColor: Colors.grey[300]!,
+                    highlightColor: Colors.grey[100]!,
+                    child: const ShimmerSkeleton(),
+                  );
+                },
+              )
+            : Container(
+                height: MediaQuery.of(context).size.height -
+                    kBottomNavigationBarHeight,
+                padding: const EdgeInsets.only(bottom: 20),
+                child: RefreshIndicator(
+                  onRefresh: () => loadStallsData(context),
+                  child: SingleChildScrollView(
+                    // Replace with SingleChildScrollView
                     child: Column(
+                      // Use Column to hold all your widgets
                       children: [
                         const CarousalSlider(),
-                        const HeaderWidget(
-                            expandedView: true, title: 'Categories'),
-                        const HeaderWidget(
-                            expandedView: false, title: 'Trending'),
-                        Expanded(
-                          child: ListView.builder(
-                            itemCount: stalls.length,
-                            itemBuilder: (context, index) {
-                              return HomePageCard(
-                                stall: stalls[index],
-                              );
-                            },
+                        HeaderWidget(
+                          expandedView: true,
+                          title: 'Categories',
+                          isExpanded: isHeaderExpanded,
+                          onExpansionChanged: _handleHeaderExpansion,
+                        ),
+                        AnimatedContainer(
+                          duration: const Duration(milliseconds: 500),
+                          height: isHeaderExpanded
+                              ? calculateGridHeight()
+                              : (true)
+                                  ? 100
+                                  : 0,
+                          // Adjust as needed
+                          child: CategoriesItems(
+                            NavigateCategory: navigateCategory,
                           ),
                         ),
+                        const HeaderWidget(
+                          expandedView: false,
+                          title: 'Trending',
+                          isExpanded: false,
+                        ),
+                        ...stalls
+                            .map((stall) => HomePageCard(stall: stall))
+                            .toList(),
                       ],
                     ),
                   ),
                 ),
-        ),
+              ),
       ),
     );
   }
 }
-
-
-
-// body: SingleChildScrollView(
-//   child: Column(
-//     children: <Widget>[
-//       const CarousalSlider(),
-//
-//       ListTile(
-//         title: const Text(
-//           'Categories',
-//           style: TextStyle(
-//             fontSize: 16,
-//             fontWeight: FontWeight.w500
-//           ),
-//         ),
-//         trailing: IconButton(
-//           icon: Icon(isExpanded ? Icons.remove : Icons.add),
-//           onPressed: () {
-//             setState(() {
-//               isExpanded = !isExpanded;
-//             });
-//           },
-//         ),
-//       ),
-//
-//       AnimatedContainer(
-//         duration: const Duration(milliseconds: 500),
-//         height: isExpanded ? calculateGridHeight() : 100, // Adjust as needed
-//         child: const CategoriesItems(),
-//       ),
-//
-//       const ListTile(
-//         title: Text(
-//           'Trending',
-//           style: TextStyle(
-//             fontSize: 16,
-//             fontWeight: FontWeight.w500
-//           ),
-//         ),
-//       ),
-//
-//       // Trending widget bellow this
-//
-//     ],
-//   ),

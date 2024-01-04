@@ -20,5 +20,4 @@ var approutes = <String, WidgetBuilder>{
 
   // Categories Route
   Categories.routeName:(context)=>Categories(),
-
 };

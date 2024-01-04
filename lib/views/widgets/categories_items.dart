@@ -4,7 +4,8 @@ import 'package:instreet/constants/constants.dart';
 import 'package:instreet/views/screens/postscreens/Categories.dart';
 
 class CategoriesItems extends StatefulWidget {
-  const CategoriesItems({super.key});
+  const CategoriesItems({super.key, required this.NavigateCategory});
+  final Function(int) NavigateCategory;
 
   @override
   State<CategoriesItems> createState() => _CategoriesListState();
@@ -15,7 +16,7 @@ class _CategoriesListState extends State<CategoriesItems> {
   Widget build(BuildContext context) {
     return GridView.builder(
       physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const  SliverGridDelegateWithFixedCrossAxisCount(
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 4,
       ),
       itemCount: categories.length,
@@ -25,9 +26,7 @@ class _CategoriesListState extends State<CategoriesItems> {
           child: Column(
             children: [
               GestureDetector(
-                onTap: () {
-                  Navigator.of(context).pushReplacementNamed(Categories.routeName);
-                },
+                onTap: () => widget.NavigateCategory(index),
                 child: CircleAvatar(
                   backgroundImage: AssetImage(categories[index].imagePath),
                   radius: 30,

@@ -46,7 +46,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         elevation: 0,
         backgroundColor: Colors.white,
         leading: IconButton(
-          icon: const Icon(CupertinoIcons.back),
+          icon: Icon(CupertinoIcons.back),
           onPressed: null,
         ),
         title: Text(
