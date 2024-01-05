@@ -37,7 +37,8 @@ class _PermissionBtnState extends State<PermissionBtn> {
           await Navigator.pushReplacement(
             context,
             PageTransition(
-                type: PageTransitionType.fade, child: const LoginScreen(),
+              type: PageTransitionType.fade,
+              child: const LoginScreen(),
             ),
           );
         },

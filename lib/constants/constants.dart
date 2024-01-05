@@ -19,7 +19,6 @@ ThemeData instreetTheme = ThemeData(
   ),
 );
 
-
 BoxDecoration kfillbox10 = BoxDecoration(
   color: kinputColor,
   borderRadius: BorderRadius.circular(10),
@@ -29,20 +28,19 @@ BoxDecoration kfillbox20 = BoxDecoration(
   borderRadius: BorderRadius.circular(20),
 );
 
-
 TextStyle kTextPopB24 =
-GoogleFonts.poppins(fontSize: 24.0, fontWeight: FontWeight.bold);
+    GoogleFonts.poppins(fontSize: 24.0, fontWeight: FontWeight.bold);
 TextStyle kTextPopM16 =
-GoogleFonts.poppins(fontSize: 16.0, fontWeight: FontWeight.w600);
+    GoogleFonts.poppins(fontSize: 16.0, fontWeight: FontWeight.w600);
 TextStyle kTextPopB16 =
-GoogleFonts.poppins(fontSize: 16.0, fontWeight: FontWeight.bold);
+    GoogleFonts.poppins(fontSize: 16.0, fontWeight: FontWeight.bold);
 TextStyle kTextPopR16 =
-GoogleFonts.poppins(fontSize: 16.0, fontWeight: FontWeight.w400);
+    GoogleFonts.poppins(fontSize: 16.0, fontWeight: FontWeight.w400);
 TextStyle kTextPopR14 =
-GoogleFonts.poppins(fontSize: 14.0, fontWeight: FontWeight.w400);
+    GoogleFonts.poppins(fontSize: 14.0, fontWeight: FontWeight.w400);
 TextStyle kTextPopB14 =
-GoogleFonts.poppins(fontSize: 14.0, fontWeight: FontWeight.bold);
+    GoogleFonts.poppins(fontSize: 14.0, fontWeight: FontWeight.bold);
 TextStyle kTextPopR12 =
-GoogleFonts.poppins(fontSize: 12.0, fontWeight: FontWeight.w400);
+    GoogleFonts.poppins(fontSize: 12.0, fontWeight: FontWeight.w400);
 
 //MediaQuery
