@@ -1,14 +1,18 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Auth extends ChangeNotifier {
   var _token = "";
   final _auth = FirebaseAuth.instance;
   var verificationId = '';
-  var _profileCreated = false;
+  final _profileCreated = false;
   var _fcmToken = "";
+  var _userName = '';
+  var _isCreator = false;
+  var _joiningDate = '';
 
   bool get isAuth {
     return _auth.currentUser?.uid != null ? true : false;
@@ -20,6 +24,18 @@ class Auth extends ChangeNotifier {
 
   String get token {
     return _token;
+  }
+
+  String get userName {
+    return _userName;
+  }
+
+  bool get isCreator {
+    return _isCreator;
+  }
+
+  String get joiningDate {
+    return _joiningDate;
   }
 
   Future<void> authenticate(String phoneNo) async {
@@ -61,6 +77,9 @@ class Auth extends ChangeNotifier {
       _token = _auth.currentUser!.uid;
       prefs.setString('UID', _auth.currentUser!.uid);
       prefs.setString("FCMT", "");
+      prefs.setString("UserName", "");
+      prefs.setBool("IsCreator", false);
+      prefs.setString("JDate", "");
       notifyListeners();
       return cred.user != null ? true : false;
     } catch (e) {
@@ -77,22 +96,37 @@ class Auth extends ChangeNotifier {
       _token = _auth.currentUser!.uid;
       prefs.setString('UID', _auth.currentUser!.uid);
       prefs.setString("FCMT", "");
+      prefs.setString("UserName", "");
+      prefs.setBool("IsCreator", false);
+      prefs.setString("JDate", "");
       return user;
-    } catch(e) {
+    } catch (e) {
       rethrow;
     }
   }
 
   Future<bool> checkUser() async {
     try {
+      final prefs = await SharedPreferences.getInstance();
       var user = true;
       CollectionReference users =
-      FirebaseFirestore.instance.collection('users');
+          FirebaseFirestore.instance.collection('users');
       await users.doc(_auth.currentUser?.uid).get().then(
             (dataSnapshot) => {
-          if (!dataSnapshot.exists) {user = false}
-        },
-      );
+              if (!dataSnapshot.exists)
+                {user = false}
+              else
+                {
+                  print(dataSnapshot['Name']),
+                  prefs.setString("UserName", dataSnapshot['Name']),
+                  prefs.setBool("IsCreator", dataSnapshot['Creator']),
+                  prefs.setString(
+                      "JDate",
+                      DateFormat("dd MMM, yyyy")
+                          .format(dataSnapshot['CreatedAt'].toDate())),
+                }
+            },
+          );
       return user;
     } catch (e) {
       rethrow;
@@ -122,6 +156,9 @@ class Auth extends ChangeNotifier {
     if (prefs.getString("FCMT") != null) {
       _fcmToken = prefs.getString("FCMT")!;
     }
+    _userName = prefs.getString("UserName")!;
+    _isCreator = prefs.getBool("IsCreator")!;
+    _joiningDate = prefs.getString("JDate")!;
     notifyListeners();
   }
 }

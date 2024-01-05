@@ -85,8 +85,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
           dob: date,
           gender: gender,
           createdAt: DateTime.now(),
+          isCreator: false,
         ),
-      ).catchError((e) {
+      )
+          .catchError((e) {
         Fluttertoast.showToast(
           msg: "Something went wrong!",
           toastLength: Toast.LENGTH_SHORT,
@@ -311,7 +313,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         textStyle: const TextStyle(
                           fontSize: 18,
                         )),
-                    child: const Text('Enter In-Street'),
+                    child: const Text(
+                      'Enter In-Street',
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
                 ],
               ),

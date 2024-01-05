@@ -91,9 +91,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: RefreshIndicator(
                   onRefresh: () => loadStallsData(context),
                   child: SingleChildScrollView(
-                    // Replace with SingleChildScrollView
                     child: Column(
-                      // Use Column to hold all your widgets
                       children: [
                         const CarousalSlider(),
                         HeaderWidget(

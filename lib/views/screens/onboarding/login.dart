@@ -186,6 +186,7 @@ class _LoginScreenState extends State<LoginScreen> {
           //   const initin = 0;
           //
           // });
+          await authProvider.autoLogin();
           if(mounted){
             Navigator.of(ctx).pushReplacementNamed('bottom-nav');
           }
@@ -358,7 +359,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               textStyle: const TextStyle(
                                 fontSize: 18,
                               )),
-                          child: const Text('Start Exploring'),
+                          child: const Text('Start Exploring', style: TextStyle(color: Colors.white),),
                         ),
                       ),
                     ),

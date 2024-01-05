@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:instreet/models/userModel.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UserProvider extends ChangeNotifier {
@@ -8,7 +9,7 @@ class UserProvider extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     try {
       CollectionReference users =
-      FirebaseFirestore.instance.collection('users');
+          FirebaseFirestore.instance.collection('users');
       await users.doc(user.uid).set({
         'Name': user.uName,
         "CreatedAt": user.createdAt,
@@ -17,8 +18,12 @@ class UserProvider extends ChangeNotifier {
         "Email": user.uEmail,
         "Gender": user.gender,
         "DOB": user.dob,
+        "Creator": user.isCreator,
       });
       prefs.setString("UserName", user.uName);
+      prefs.setBool("IsCreator", user.isCreator);
+      prefs.setString(
+          "JDate", DateFormat("dd MMM, yyyy").format(user.createdAt));
       notifyListeners();
     } catch (e) {
       prefs.setString("UserName", "");
@@ -29,10 +34,8 @@ class UserProvider extends ChangeNotifier {
 
   Future getUser(String uid) async {
     try {
-      DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(uid)
-          .get();
+      DocumentSnapshot userSnapshot =
+          await FirebaseFirestore.instance.collection('users').doc(uid).get();
       if (userSnapshot.exists) {
         return userSnapshot;
       } else {
@@ -42,5 +45,4 @@ class UserProvider extends ChangeNotifier {
       throw Exception("Failed to fetch user data");
     }
   }
-
 }

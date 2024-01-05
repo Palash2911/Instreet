@@ -5,6 +5,7 @@ class UserModel {
   final String phoneNo;
   final String dob;
   final String gender;
+  final bool isCreator;
   final DateTime createdAt;
 
   UserModel({
@@ -15,5 +16,6 @@ class UserModel {
     required this.dob,
     required this.gender,
     required this.createdAt,
+    required this.isCreator,
   });
 }
