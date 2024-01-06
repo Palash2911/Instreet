@@ -8,10 +8,7 @@ Color ksecondaryColor = Color(0xff555C69);
 Color kinputColor = Colors.green.shade100;
 Color kpostColor = Color(0xfffCFEEE1);
 
-const kAnimationDuration = Duration(milliseconds: 200);
-
 ThemeData instreetTheme = ThemeData(
-  // textTheme: GoogleFonts.poppinsTextTheme(),
   scaffoldBackgroundColor: Colors.white,
   iconTheme: IconThemeData(color: Color(0xfff1BB273)),
   colorScheme: ColorScheme.fromSwatch().copyWith(
@@ -46,10 +43,8 @@ GoogleFonts.poppins(fontSize: 14.0, fontWeight: FontWeight.bold);
 TextStyle kTextPopR12 =
 GoogleFonts.poppins(fontSize: 12.0, fontWeight: FontWeight.w400);
 
-//MediaQuery
 
 
-// Category
 List<Category> categories = [
   Category('Books', 'assets/images/book.jpg'),
   Category('Electronics', 'assets/images/electronics.png'),
@@ -65,8 +60,8 @@ List<Category> categories = [
   Category('Other', 'assets/images/all.png')
 ];
 
-// calculate grid size 
+
 double calculateGridHeight() {
     int numberOfRows = (categories.length / 4).ceil();
-    return numberOfRows * 100.0; // Adjust the multiplier based on your item size
+    return numberOfRows * 100.0;
 }

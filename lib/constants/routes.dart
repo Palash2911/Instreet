@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:instreet/views/screens/bottomnav/bottomNav.dart';
+import 'package:instreet/views/screens/onboarding/editProfile.dart';
 import 'package:instreet/views/screens/onboarding/login.dart';
 import 'package:instreet/views/screens/onboarding/permission.dart';
 import 'package:instreet/views/screens/onboarding/register.dart';
@@ -11,13 +12,14 @@ var approutes = <String, WidgetBuilder>{
   '/': (context) => const SplashScreen(),
 
   // Onboarding Routes
-  PermissionScreen.routeName: (context) => PermissionScreen(),
-  LoginScreen.routeName: (context) => LoginScreen(),
-  RegisterScreen.routeName: (context) => RegisterScreen(),
+  PermissionScreen.routeName: (context) => const PermissionScreen(),
+  LoginScreen.routeName: (context) => const LoginScreen(),
+  RegisterScreen.routeName: (context) => const RegisterScreen(),
 
   //bottom nav
-  BottomNav.routeName: (context) => BottomNav(),
+  BottomNav.routeName: (context) => const BottomNav(),
 
-  // Categories Route
-  Categories.routeName:(context)=>Categories(),
+  // Other Routes
+  Categories.routeName:(context)=> const Categories(),
+  EditProfileScreen.routeName: (context) => const EditProfileScreen(),
 };

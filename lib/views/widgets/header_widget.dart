@@ -31,7 +31,7 @@ class _HeaderWidgetState extends State<HeaderWidget> {
           ListTile(
             title: Text(
               widget.title,
-              style: kTextPopR16,
+              style: kTextPopM16,
             ),
             trailing: widget.expandedView
                 ? IconButton(

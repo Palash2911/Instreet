@@ -18,8 +18,8 @@ class _ProfileCardState extends State<ProfileCard> {
   var jDate = '';
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
+  void initState() {
+    super.initState();
     getUser();
   }
 

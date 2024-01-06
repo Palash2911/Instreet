@@ -127,7 +127,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       body: SingleChildScrollView(
         child: SafeArea(
           child: Container(
-            height: MediaQuery.of(context).size.height * 0.9,
+            height: MediaQuery.of(context).size.height * 0.8,
             width: MediaQuery.of(context).size.width * 0.9,
             padding: const EdgeInsets.only(left: 21),
             child: Form(
@@ -187,6 +187,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       counterText: "",
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(15.0),
+                        borderSide: const BorderSide(color: Colors.black, width: 1.0),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                        borderSide: const BorderSide(color: Colors.black, width: 1.0),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                        borderSide: const BorderSide(color: Colors.black, width: 1.0),
                       ),
                       icon: const Icon(Icons.phone),
                     ),
@@ -262,7 +271,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             const SizedBox(width: 27.0),
                             SizedBox(
                               height: 54,
-                              width: MediaQuery.of(context).size.width * 0.6,
                               child: ListView.builder(
                                   scrollDirection: Axis.horizontal,
                                   shrinkWrap: true,

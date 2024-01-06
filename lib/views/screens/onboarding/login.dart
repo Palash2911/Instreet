@@ -335,7 +335,6 @@ class _LoginScreenState extends State<LoginScreen> {
                               fieldHeight: 50,
                               fieldWidth: 40,
                               activeFillColor: Colors.grey.withOpacity(0.1),
-                              // Adjust other styling properties as needed
                             ),
                           ),
                         ],

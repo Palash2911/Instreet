@@ -45,4 +45,31 @@ class UserProvider extends ChangeNotifier {
       throw Exception("Failed to fetch user data");
     }
   }
+
+  Future updateUser(UserModel user) async {
+    final prefs = await SharedPreferences.getInstance();
+    try {
+      CollectionReference users =
+          FirebaseFirestore.instance.collection('users');
+      await users.doc(user.uid).update({
+        'Name': user.uName,
+        "CreatedAt": user.createdAt,
+        "PhoneNo": user.phoneNo,
+        "UID": user.uid,
+        "Email": user.uEmail,
+        "Gender": user.gender,
+        "DOB": user.dob,
+        "Creator": user.isCreator,
+      });
+      prefs.setString("UserName", user.uName);
+      prefs.setBool("IsCreator", user.isCreator);
+      prefs.setString(
+          "JDate", DateFormat("dd MMM, yyyy").format(user.createdAt));
+      notifyListeners();
+    } catch (e) {
+      prefs.setString("UserName", "");
+      notifyListeners();
+      rethrow;
+    }
+  }
 }

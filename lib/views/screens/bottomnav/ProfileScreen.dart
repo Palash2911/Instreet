@@ -20,47 +20,55 @@ class _ProfileScreenState extends State<ProfileScreen> {
   var init = true;
   @override
   void didChangeDependencies() {
-    if(init) {
+    if (init) {
       onRefresh();
     }
     init = false;
     super.didChangeDependencies();
   }
+
   void onProfileListTap(ListName) async {
     switch (ListName) {
       case "My Stalls":
         print('hello');
         break;
       case "Edit Profile":
-        print("hello2");
+        if (mounted) {
+          Navigator.of(context, rootNavigator: true)
+              .pushNamed('edit-profile-screen');
+        }
         break;
       case "Help":
         print("Hello3");
         break;
       default:
-        await Provider.of<Auth>(context, listen: false).signOut().then((value) {
-          Fluttertoast.showToast(
-            msg: 'Off the streets for now. Catch you soon on InStreet!!',
-            toastLength: Toast.LENGTH_SHORT,
-            timeInSecForIosWeb: 1,
-            backgroundColor: kprimaryColor,
-            textColor: Colors.white,
-            fontSize: 16.0,
-          );
-          if (mounted) {
-            Navigator.of(context, rootNavigator: true)
-                .pushReplacementNamed('/');
-          }
-        }).catchError((e) {
-          print(e);
-        });
+        {
+          await Provider.of<Auth>(context, listen: false)
+              .signOut()
+              .then((value) {
+            Fluttertoast.showToast(
+              msg: 'Off the streets for now. Catch you soon on InStreet!!',
+              toastLength: Toast.LENGTH_SHORT,
+              timeInSecForIosWeb: 1,
+              backgroundColor: kprimaryColor,
+              textColor: Colors.white,
+              fontSize: 16.0,
+            );
+            if (mounted) {
+              Navigator.of(context, rootNavigator: true)
+                  .pushReplacementNamed('/');
+            }
+          }).catchError((e) {
+            print(e);
+          });
+        }
         break;
     }
   }
 
   Future onRefresh() async {
     isLoading = true;
-    await Future.delayed(Duration(seconds: 1), () {
+    await Future.delayed(const Duration(milliseconds: 500), () {
       setState(() {
         isLoading = false;
       });
@@ -73,7 +81,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.white,
-        leading: IconButton(
+        leading: const IconButton(
           icon: Icon(CupertinoIcons.back),
           onPressed: null,
         ),
@@ -84,45 +92,47 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ),
       ),
-      body: isLoading ? const ProfileSkeleton() :  SingleChildScrollView(
-        child: Container(
-          margin: const EdgeInsets.all(24),
-          child: RefreshIndicator(
-            onRefresh: onRefresh,
-            child: Column(
-              children: [
-                const ProfileCard(),
-                const SizedBox(
-                  height: 30,
+      body: isLoading
+          ? const ProfileSkeleton()
+          : SingleChildScrollView(
+              child: Container(
+                margin: const EdgeInsets.all(24),
+                child: RefreshIndicator(
+                  onRefresh: onRefresh,
+                  child: Column(
+                    children: [
+                      const ProfileCard(),
+                      const SizedBox(
+                        height: 30,
+                      ),
+                      ProfileList(
+                        icon: Icons.list,
+                        text: "My Stalls",
+                        ontap: onProfileListTap,
+                      ),
+                      const SizedBox(height: 18),
+                      ProfileList(
+                        icon: Icons.edit,
+                        text: "Edit Profile",
+                        ontap: onProfileListTap,
+                      ),
+                      const SizedBox(height: 18),
+                      ProfileList(
+                        icon: Icons.help,
+                        text: "Help",
+                        ontap: onProfileListTap,
+                      ),
+                      const SizedBox(height: 18),
+                      ProfileList(
+                        icon: Icons.logout_rounded,
+                        text: "Sign Out",
+                        ontap: onProfileListTap,
+                      ),
+                    ],
+                  ),
                 ),
-                ProfileList(
-                  icon: Icons.list,
-                  text: "My Stalls",
-                  ontap: onProfileListTap,
-                ),
-                const SizedBox(height: 18),
-                ProfileList(
-                  icon: Icons.edit,
-                  text: "Edit Profile",
-                  ontap: onProfileListTap,
-                ),
-                const SizedBox(height: 18),
-                ProfileList(
-                  icon: Icons.help,
-                  text: "Help",
-                  ontap: onProfileListTap,
-                ),
-                const SizedBox(height: 18),
-                ProfileList(
-                  icon: Icons.logout_rounded,
-                  text: "Sign Out",
-                  ontap: onProfileListTap,
-                ),
-              ],
+              ),
             ),
-          ),
-        ),
-      ),
     );
   }
 }
