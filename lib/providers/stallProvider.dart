@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import '../models/stallModel.dart';
 
 class StallProvider extends ChangeNotifier {
+  
   List<Stall> _stalls = [];
   List<Stall> get stalls => _stalls;
 

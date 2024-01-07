@@ -1,7 +1,6 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import '../../constants/constants.dart';
 import '../../providers/authProvider.dart';
 
@@ -31,13 +30,17 @@ class _ProfileCardState extends State<ProfileCard> {
         isCreator = auth.isCreator;
         jDate = auth.joiningDate;
       });
+
     } catch (e) {
       print(e);
     }
   }
 
+
+
   @override
   Widget build(BuildContext context) {
+    print(uName);
     return Card(
       elevation: 3,
       color: Colors.white,
@@ -64,6 +67,7 @@ class _ProfileCardState extends State<ProfileCard> {
                       uName,
                       style: kTextPopB16,
                       maxLines: 1,
+
                     ),
                     const SizedBox(
                       height: 10,
