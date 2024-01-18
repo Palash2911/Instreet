@@ -7,7 +7,7 @@ import 'package:instreet/views/widgets/shimmerSkeleton.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../../constants/constants.dart';
-import '../../widgets/app_bar_search.dart';
+import '../../widgets/appbar_widget.dart';
 import '../../widgets/carousal_slider.dart';
 import '../../widgets/categories_items.dart';
 
@@ -67,11 +67,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final stalls = Provider.of<StallProvider>(context).stalls;
     return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        title: const AppBarSearch(),
-        backgroundColor: Colors.white,
-      ),
+      appBar: AppBarWidget(isSearch: true, screenTitle: 'Home'),
       body: SafeArea(
         child: isLoading
             ? ListView.builder(

@@ -17,7 +17,6 @@ ThemeData instreetTheme = ThemeData(
   ),
 );
 
-
 BoxDecoration kfillbox10 = BoxDecoration(
   color: kinputColor,
   borderRadius: BorderRadius.circular(10),
