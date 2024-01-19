@@ -114,7 +114,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           isExpanded: false,
                         ),
                         ...stalls
-                            .map((stall) => HomePageCard(stall: stall))
+                            .map((stall) => HomePageCard(stall: stall, isReview: false,))
                             .toList(),
                       ],
                     ),

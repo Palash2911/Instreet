@@ -1,6 +1,7 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:instreet/constants/constants.dart';
+import 'package:instreet/models/reviewModel.dart';
 import 'package:instreet/models/stallModel.dart';
 import 'package:instreet/providers/authProvider.dart';
 import 'package:instreet/providers/stallProvider.dart';
@@ -9,8 +10,9 @@ import 'package:provider/provider.dart';
 
 class HomePageCard extends StatefulWidget {
   final Stall stall;
-  final bool? isReview;
-  const HomePageCard({super.key, required this.stall, this.isReview});
+  final bool isReview;
+  final ReviewModel? review;
+  HomePageCard({super.key, required this.stall, required this.isReview, this.review});
 
   @override
   State<HomePageCard> createState() => _HomePageCardState();
@@ -41,7 +43,6 @@ class _HomePageCardState extends State<HomePageCard> {
     }
   }
 
-  // function to create rating star 
   List<Widget> buildStars(double rating) {
     List<Widget> stars = [];
     int fullStars = rating.floor();
@@ -75,7 +76,7 @@ class _HomePageCardState extends State<HomePageCard> {
     return Column(
       children: [
         Container(
-          height: 120,
+          height: widget.isReview ? 100 : 120,
           width: MediaQuery.of(context).size.width - 20,
           margin: const EdgeInsets.all(10),
           child: Card(
@@ -102,13 +103,19 @@ class _HomePageCardState extends State<HomePageCard> {
                               right: Radius.circular(15))
                           : const BorderRadius.horizontal(
                               left: Radius.circular(15)),
-                  child: Image.network(
+                  child: widget.isReview ? Image.network(
+                    widget.stall.bannerImageUrl,
+                    fit: BoxFit.cover,
+                    height: 100,
+                    width: 90,
+                  ) : Image.network(
                     widget.stall.bannerImageUrl,
                     fit: BoxFit.cover,
                     height: 150,
                     width: 120,
                   ),
                 ),
+                widget.isReview ? SizedBox(width: 9,) : SizedBox(width: 0,),
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.only(left: 9.0),
@@ -116,11 +123,11 @@ class _HomePageCardState extends State<HomePageCard> {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        AutoSizeText(
+                        !widget.isReview ? AutoSizeText(
                           widget.stall.stallName,
                           style: kTextPopR16,
                           maxLines: 2,
-                        ),
+                        ) : const SizedBox(width: 0,),
                         SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
                           child: Row(
@@ -182,12 +189,12 @@ class _HomePageCardState extends State<HomePageCard> {
           ),
         ),
 
-        // this review will be shown only if it is review screen 
         if (widget.isReview != null && widget.isReview == true)
           ReviewCard(
-            rating: widget.stall.rating,
-            reviewText: "This is sample text here we are going to pass the actuall review which user has added",
-            buildStars: buildStars, // Passing the buildStars function
+            rating: widget.review!.rating,
+            reviewText: widget.review!.review,
+            buildStars: buildStars,
+            stallName: widget.stall.stallName,
           ),
       ],
     );

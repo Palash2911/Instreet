@@ -1,10 +1,15 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:instreet/models/reviewModel.dart';
+import 'package:instreet/providers/reviewProvider.dart';
 import 'package:instreet/providers/stallProvider.dart';
+import 'package:instreet/views/widgets/appbar_widget.dart';
 import 'package:instreet/views/widgets/homePageCard.dart';
 import 'package:instreet/views/widgets/shimmerSkeleton.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
+
+import '../../../providers/authProvider.dart';
 
 class ReviewScreen extends StatefulWidget {
   const ReviewScreen({super.key});
@@ -13,31 +18,33 @@ class ReviewScreen extends StatefulWidget {
   State<ReviewScreen> createState() => _ReviewScreenState();
 }
 
-
-
 class _ReviewScreenState extends State<ReviewScreen> {
   var isLoading = true;
   var init = true;
+  var currentUid = '';
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (init) {
-      loadStallsData(context);
+      currentUid = Provider.of<Auth>(context, listen: false).token;
+      loadReviewData(context);
     }
     init = false;
   }
 
-  Future<void> loadStallsData(BuildContext context) async {
+  Future<void> loadReviewData(BuildContext context) async {
     setState(() {
       isLoading = true;
     });
     try {
       Provider.of<StallProvider>(context, listen: false).fetchStalls();
+      await Provider.of<ReviewProvider>(context, listen: false)
+          .fetchReviews(currentUid);
     } catch (e) {
       print(e);
     } finally {
-      await Future.delayed(Duration(milliseconds: 300), () {
+      await Future.delayed(const Duration(milliseconds: 300), () {
         setState(() {
           isLoading = false;
         });
@@ -48,26 +55,23 @@ class _ReviewScreenState extends State<ReviewScreen> {
   @override
   Widget build(BuildContext context) {
     final stalls = Provider.of<StallProvider>(context).stalls;
+    final userReviews = currentUid.isNotEmpty
+        ? Provider.of<ReviewProvider>(context, listen: false).Reviews
+        : [];
+
+    final filteredStalls = stalls
+        .where((stall) => userReviews.any((review) => review.sid == stall.sId))
+        .toList();
 
     return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.white,
-        leading: const IconButton(
-          icon: Icon(CupertinoIcons.back),
-          onPressed: null,
-        ),
-        title: const Text(
-          "Review",
-          style: TextStyle(
-            color: Colors.grey,
-          ),
-        ),
+      appBar: const AppBarWidget(
+        isSearch: false,
+        screenTitle: 'Review',
       ),
       body: SafeArea(
         child: isLoading
             ? ListView.builder(
-                physics:BouncingScrollPhysics(),
+                physics: const BouncingScrollPhysics(),
                 itemCount: 5,
                 itemBuilder: (context, index) {
                   return Shimmer.fromColors(
@@ -78,14 +82,26 @@ class _ReviewScreenState extends State<ReviewScreen> {
                 },
               )
             : RefreshIndicator(
-              onRefresh:() => loadStallsData(context),
-               child: ListView.builder(
-                itemCount: stalls.length,
-                itemBuilder: (context, index) {
-                  return HomePageCard(stall: stalls[index],isReview: true);
-                },
+                onRefresh: () => loadReviewData(context),
+                child: ListView.builder(
+                  itemCount: filteredStalls.length,
+                  // In ReviewScreen, inside the ListView.builder:
+                  itemBuilder: (context, index) {
+                    var stall = filteredStalls[index];
+                    var review = userReviews.firstWhere(
+                        (r) => r.sid == stall.sId,
+                        orElse: () => ReviewModel(rid: '', sid: '', review: '', rating: 0));
+                    if (review.sid.toString().isNotEmpty) {
+                      return HomePageCard(
+                        stall: stall,
+                        isReview: true,
+                        review: review,
+                      );
+                    }
+                    return null;
+                  },
+                ),
               ),
-            )
       ),
     );
   }

@@ -81,6 +81,7 @@ class _FavroiteScreenState extends State<FavroiteScreen> {
                     itemBuilder: (context, index) {
                       return HomePageCard(
                         stall: favoriteStalls[index],
+                        isReview: false,
                       );
                     },
                   ),

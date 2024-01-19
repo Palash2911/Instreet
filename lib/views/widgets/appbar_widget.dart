@@ -24,28 +24,44 @@ class _AppBarWidgetState extends State<AppBarWidget> {
                 widget.screenTitle,
                 style: kTextPopB24.copyWith(color: Colors.white),
               )
-            : Container(
-                width: 300,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: Colors.white70,
-                  borderRadius: BorderRadius.circular(10.0),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.5),
-                      spreadRadius: 2,
-                      blurRadius: 7,
-                      offset: Offset(0, 3),
+            : Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Expanded(
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 10),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[300],
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      child: Row(
+                        children: [
+                          IconButton(
+                            icon: Icon(Icons.search, color: Colors.black),
+                            onPressed: () {
+                              // Handle search logic
+                            },
+                          ),
+                          const Expanded(
+                            child: TextField(
+                              decoration: InputDecoration(
+                                hintText: "Search here",
+                                border: InputBorder.none,
+                                hintStyle: TextStyle(color: Colors.black),
+                              ),
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ],
-                ),
-                child: TextFormField(
-                  decoration: InputDecoration(
-                    hintText: 'Search',
-                    border: InputBorder.none,
-                    prefixIcon: Icon(Icons.search, color: Colors.grey),
                   ),
-                ),
+                  const SizedBox(width: 10),
+                  const CircleAvatar(
+                    backgroundImage:
+                        NetworkImage('https://via.placeholder.com/150'),
+                  ),
+                ],
               ),
         backgroundColor: ksecondaryColor.withOpacity(0.8),
         elevation: 3,
