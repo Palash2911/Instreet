@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Stall {
-  final String sId;
+  String sId;
   final String ownerName;
   final double rating;
   final List<dynamic> stallCategories;
@@ -9,6 +9,11 @@ class Stall {
   final String stallName;
   String bannerImageUrl;
   final List<dynamic> favoriteUsers;
+  final String ownerContact;
+  final String location;
+  final List<dynamic> stallImages;
+  final List<dynamic> menuImages;
+  final String creatorUID;
 
   Stall({
     required this.sId,
@@ -19,6 +24,11 @@ class Stall {
     required this.stallDescription,
     required this.bannerImageUrl,
     required this.favoriteUsers,
+    required this.ownerContact,
+    required this.location,
+    required this.stallImages,
+    required this.menuImages,
+    required this.creatorUID,
   });
 
   Stall.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc)
@@ -29,5 +39,10 @@ class Stall {
         stallCategories = doc['stallCategory'],
         stallDescription = doc['stallDescription'],
         bannerImageUrl = doc['bannerImage'],
+        ownerContact = doc['ownerContact'],
+        location = doc['location'],
+        stallImages = doc['stallImages'],
+        creatorUID = doc['creatorUID'],
+        menuImages = doc['menuImages'],
         favoriteUsers = doc['favoriteUsers'];
 }

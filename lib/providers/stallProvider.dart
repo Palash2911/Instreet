@@ -1,16 +1,45 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:instreet/models/userModel.dart';
-import 'package:instreet/providers/authProvider.dart';
-import 'package:provider/provider.dart';
 import '../models/stallModel.dart';
 
 class StallProvider extends ChangeNotifier {
   
   List<Stall> _stalls = [];
   List<Stall> get stalls => _stalls;
+
+  Future<void> addStall(Stall stall) async {
+    try {
+
+      // Add Images to Firebase Logic Left
+
+      CollectionReference stallref =
+      FirebaseFirestore.instance.collection('stalls');
+      DocumentReference documentRef = stallref.doc();
+
+      await documentRef.set({
+        'stallName': stall.stallName,
+        'ownerName': stall.ownerName,
+        'rating': stall.rating,
+        'stallCategory': stall.stallCategories,
+        'stallDescription': stall.stallDescription,
+        'bannerImage': stall.bannerImageUrl,
+        'ownerContact': stall.ownerContact,
+        'location': stall.location,
+        'stallImages': stall.stallImages,
+        'creatorUID': stall.creatorUID,
+        'menuImages': stall.menuImages,
+        'favoriteUsers': stall.favoriteUsers,
+      });
+
+      stall.sId = documentRef.id;
+      _stalls.add(stall);
+
+      notifyListeners();
+    } catch (e) {
+      notifyListeners();
+      rethrow;
+    }
+  }
 
   Future<void> fetchStalls() async {
     var stallCollection = FirebaseFirestore.instance.collection('stalls');
@@ -44,5 +73,9 @@ class StallProvider extends ChangeNotifier {
 
   List<Stall> getFavoriteStalls(String uid) {
     return _stalls.where((stall) => stall.favoriteUsers.contains(uid)).toList();
+  }
+
+  List<Stall> getUserRegisteredStalls(String uid) {
+    return _stalls.where((stall) => stall.creatorUID == uid).toList();
   }
 }

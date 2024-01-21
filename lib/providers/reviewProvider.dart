@@ -31,9 +31,9 @@ class ReviewProvider extends ChangeNotifier {
       DocumentReference documentRef = reviews.doc();
 
       await documentRef.set({
-        'StallId': review.sid,
-        'Review': review.review,
-        'Rating': review.rating,
+        'stallId': review.sid,
+        'review': review.review,
+        'rating': review.rating,
       });
 
       review.rid = documentRef.id;

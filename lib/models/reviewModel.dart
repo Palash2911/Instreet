@@ -15,7 +15,7 @@ class ReviewModel {
 
   ReviewModel.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc)
       : rid = doc.id,
-        sid = doc['StallId'].toString(),
-        review = doc['Review'].toString(),
-        rating = doc['Rating'].toDouble();
+        sid = doc['stallId'].toString(),
+        review = doc['review'].toString(),
+        rating = doc['rating'].toDouble();
 }
