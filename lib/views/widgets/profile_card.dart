@@ -40,7 +40,6 @@ class _ProfileCardState extends State<ProfileCard> {
 
   @override
   Widget build(BuildContext context) {
-    print(uName);
     return Card(
       elevation: 3,
       color: Colors.white,

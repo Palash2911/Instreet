@@ -97,7 +97,6 @@ class _LoginScreenState extends State<LoginScreen> {
         );
         var user = await authProvider.checkUser();
         // var fcmT = await FirebaseNotification().getToken();
-        print(user);
         if (user) {
           // await Provider.of<UserProvider>(context, listen: false)
           //     .updateToken(fcmT.toString(), authProvider.token)
@@ -241,7 +240,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     const Text(
                       'Welcome Explorer',
                       style: TextStyle(
-                        fontSize: 35,
+                        fontSize: 33,
                         fontWeight: FontWeight.w500,
                       ),
                     ),

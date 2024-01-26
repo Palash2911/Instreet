@@ -7,7 +7,7 @@ import '../../../constants/constants.dart';
 import '../../../models/stallModel.dart';
 import '../../../providers/authProvider.dart';
 import '../../../providers/stallProvider.dart';
-import '../../widgets/app_bar_search.dart';
+import '../../widgets/appbar_widget.dart';
 import '../../widgets/carousal_slider.dart';
 import '../../widgets/homePageCard.dart';
 import '../../widgets/shimmerSkeleton.dart';
@@ -57,11 +57,7 @@ class _FavroiteScreenState extends State<FavroiteScreen> {
         ? Provider.of<StallProvider>(context).getFavoriteStalls(currentUid)
         : [];
     return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        title: AppBarSearch(),
-        backgroundColor: Colors.white,
-      ),
+      appBar: AppBarWidget(isSearch: false, screenTitle: 'Favorites'),
       body: SafeArea(
         child: isLoading
             ? ListView.builder(
@@ -85,6 +81,7 @@ class _FavroiteScreenState extends State<FavroiteScreen> {
                     itemBuilder: (context, index) {
                       return HomePageCard(
                         stall: favoriteStalls[index],
+                        isReview: false,
                       );
                     },
                   ),

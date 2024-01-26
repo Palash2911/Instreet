@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:instreet/constants/constants.dart';
 import 'package:instreet/providers/authProvider.dart';
+import 'package:instreet/views/widgets/appbar_widget.dart';
 import 'package:instreet/views/widgets/profile_card.dart';
 import 'package:instreet/views/widgets/profile_list.dart';
 import 'package:instreet/views/widgets/shimmerSkeleton.dart';
@@ -78,19 +79,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.white,
-        leading: const IconButton(
-          icon: Icon(CupertinoIcons.back),
-          onPressed: null,
-        ),
-        title: const Text(
-          "Profile",
-          style: TextStyle(
-            color: Colors.grey,
-          ),
-        ),
+      appBar: const AppBarWidget(
+        isSearch: false,
+        screenTitle: 'Profile',
       ),
       body: isLoading
           ? const ProfileSkeleton()

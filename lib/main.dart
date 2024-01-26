@@ -3,6 +3,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:instreet/providers/authProvider.dart';
+import 'package:instreet/providers/reviewProvider.dart';
 import 'package:instreet/providers/stallProvider.dart';
 import 'package:instreet/providers/userProvider.dart';
 import 'package:instreet/views/screens/onboarding/login.dart';
@@ -48,6 +49,9 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           create: (BuildContext context) => UserProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (BuildContext context) => ReviewProvider(),
         ),
       ],
       child: MaterialApp(

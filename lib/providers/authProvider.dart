@@ -117,7 +117,6 @@ class Auth extends ChangeNotifier {
                 {user = false}
               else
                 {
-                  print(dataSnapshot['Name']),
                   prefs.setString("UserName", dataSnapshot['Name']),
                   prefs.setBool("IsCreator", dataSnapshot['Creator']),
                   prefs.setString(
