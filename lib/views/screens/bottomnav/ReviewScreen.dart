@@ -47,6 +47,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
 
   @override
   Widget build(BuildContext context) {
+    
     final stalls = Provider.of<StallProvider>(context).stalls;
 
     return Scaffold(
