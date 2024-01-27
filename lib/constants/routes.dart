@@ -6,9 +6,10 @@ import 'package:instreet/views/screens/onboarding/permission.dart';
 import 'package:instreet/views/screens/onboarding/register.dart';
 import 'package:instreet/views/screens/onboarding/splashScreen.dart';
 import 'package:instreet/views/screens/postscreens/Categories.dart';
+import 'package:instreet/views/screens/stallscreen/StallScreen.dart';
 
 var approutes = <String, WidgetBuilder>{
-   // Inital Route
+  // Inital Route
   '/': (context) => const SplashScreen(),
 
   // Onboarding Routes
@@ -20,6 +21,7 @@ var approutes = <String, WidgetBuilder>{
   BottomNav.routeName: (context) => const BottomNav(),
 
   // Other Routes
-  Categories.routeName:(context)=> const Categories(),
+  Categories.routeName: (context) => const Categories(),
   EditProfileScreen.routeName: (context) => const EditProfileScreen(),
+  StallScreen.routeName: (context) => const StallScreen(),
 };
