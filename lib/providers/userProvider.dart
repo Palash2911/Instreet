@@ -5,11 +5,14 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UserProvider extends ChangeNotifier {
+
   Future registerUser(UserModel user) async {
+
     final prefs = await SharedPreferences.getInstance();
     try {
       CollectionReference users =
           FirebaseFirestore.instance.collection('users');
+
       await users.doc(user.uid).set({
         'Name': user.uName,
         "CreatedAt": user.createdAt,
@@ -20,6 +23,7 @@ class UserProvider extends ChangeNotifier {
         "DOB": user.dob,
         "Creator": user.isCreator,
       });
+      
       prefs.setString("UserName", user.uName);
       prefs.setBool("IsCreator", user.isCreator);
       prefs.setString(

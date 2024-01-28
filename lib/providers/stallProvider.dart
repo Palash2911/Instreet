@@ -12,8 +12,7 @@ class StallProvider extends ChangeNotifier {
 
       // Add Images to Firebase Logic Left
 
-      CollectionReference stallref =
-      FirebaseFirestore.instance.collection('stalls');
+      CollectionReference stallref = FirebaseFirestore.instance.collection('stalls');
       DocumentReference documentRef = stallref.doc();
 
       await documentRef.set({

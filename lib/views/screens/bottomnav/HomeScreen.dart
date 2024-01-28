@@ -65,7 +65,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+
     final stalls = Provider.of<StallProvider>(context).stalls;
+    
     return Scaffold(
       appBar: AppBarWidget(isSearch: true, screenTitle: 'Home'),
       body: SafeArea(
