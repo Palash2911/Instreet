@@ -56,11 +56,12 @@ class _ReviewScreenState extends State<ReviewScreen> {
   Widget build(BuildContext context) {
     final stalls = Provider.of<StallProvider>(context).stalls;
     final userReviews = currentUid.isNotEmpty
-        ? Provider.of<ReviewProvider>(context, listen: false).Reviews
+        ? Provider.of<ReviewProvider>(context, listen: false).allReviews
         : [];
 
     final filteredStalls = stalls
-        .where((stall) => userReviews.any((review) => review.sid == stall.sId))
+        .where((stall) => userReviews.any(
+            (review) => (review.sid == stall.sId && review.uid == currentUid)))
         .toList();
 
     return Scaffold(
@@ -85,12 +86,12 @@ class _ReviewScreenState extends State<ReviewScreen> {
                 onRefresh: () => loadReviewData(context),
                 child: ListView.builder(
                   itemCount: filteredStalls.length,
-                  // In ReviewScreen, inside the ListView.builder:
                   itemBuilder: (context, index) {
                     var stall = filteredStalls[index];
                     var review = userReviews.firstWhere(
                         (r) => r.sid == stall.sId,
-                        orElse: () => ReviewModel(rid: '', sid: '', review: '', rating: 0));
+                        orElse: () => ReviewModel(
+                            rid: '', sid: '', review: '', rating: 0, uid: ''));
                     if (review.sid.toString().isNotEmpty) {
                       return HomePageCard(
                         stall: stall,

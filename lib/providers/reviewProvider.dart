@@ -3,19 +3,22 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:instreet/models/reviewModel.dart';
 
 class ReviewProvider extends ChangeNotifier {
-  List<ReviewModel> _Reviews = [];
-  List<ReviewModel> get Reviews => _Reviews;
+  List<ReviewModel> _allReviews = [];
+  List<ReviewModel> get allReviews => _allReviews;
 
   Future<void> fetchReviews(String uid) async {
     try {
-      var reviewCollection = FirebaseFirestore.instance.collection('users').doc(uid).collection('Reviews');
+      var reviewCollection = FirebaseFirestore.instance
+          .collection('users')
+          .doc(uid)
+          .collection('reviews');
       var querySnapshot = await reviewCollection.get();
       if (querySnapshot.docs.isNotEmpty) {
-        _Reviews = querySnapshot.docs
+        _allReviews = querySnapshot.docs
             .map((doc) => ReviewModel.fromFirestore(doc))
             .toList();
       } else {
-        _Reviews = [];
+        _allReviews = [];
       }
       notifyListeners();
     } catch (e) {
@@ -26,18 +29,18 @@ class ReviewProvider extends ChangeNotifier {
 
   Future<void> addReview(ReviewModel review, String uid) async {
     try {
-      CollectionReference reviews =
-          FirebaseFirestore.instance.collection('users').doc(uid).collection('Reviews');
+      CollectionReference reviews = FirebaseFirestore.instance.collection('reviews');
       DocumentReference documentRef = reviews.doc();
 
       await documentRef.set({
         'stallId': review.sid,
         'review': review.review,
         'rating': review.rating,
+        'uid': review.uid,
       });
 
       review.rid = documentRef.id;
-      _Reviews.add(review);
+      _allReviews.add(review);
 
       notifyListeners();
     } catch (e) {
