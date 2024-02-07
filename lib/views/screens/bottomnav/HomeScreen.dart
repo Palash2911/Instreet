@@ -7,6 +7,7 @@ import 'package:instreet/views/widgets/shimmerSkeleton.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../../constants/constants.dart';
+import '../../../providers/authProvider.dart';
 import '../../widgets/appbar_widget.dart';
 import '../../widgets/carousal_slider.dart';
 import '../../widgets/categories_items.dart';
@@ -22,11 +23,13 @@ class _HomeScreenState extends State<HomeScreen> {
   var isLoading = true;
   var init = true;
   bool isHeaderExpanded = false;
+  var currentUid = '';
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (init) {
+      currentUid = Provider.of<Auth>(context, listen: false).token;
       loadStallsData(context);
     }
     init = false;
@@ -47,7 +50,7 @@ class _HomeScreenState extends State<HomeScreen> {
     } catch (e) {
       print(e);
     } finally {
-      await Future.delayed(Duration(milliseconds: 300), () {
+      await Future.delayed(const Duration(milliseconds: 500), () {
         setState(() {
           isLoading = false;
         });
@@ -65,11 +68,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final stalls = currentUid.isNotEmpty
+        ? Provider.of<StallProvider>(context).getAllStalls(currentUid)
+        : [];
 
-    final stalls = Provider.of<StallProvider>(context).stalls;
-    
     return Scaffold(
-      appBar: AppBarWidget(isSearch: true, screenTitle: 'Home'),
+      appBar: const AppBarWidget(isSearch: true, screenTitle: 'Home'),
       body: SafeArea(
         child: isLoading
             ? ListView.builder(

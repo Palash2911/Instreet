@@ -73,6 +73,7 @@ class Auth extends ChangeNotifier {
           smsCode: otp,
         ),
       );
+
       final prefs = await SharedPreferences.getInstance();
       _token = _auth.currentUser!.uid;
       prefs.setString('UID', _auth.currentUser!.uid);
@@ -99,11 +100,28 @@ class Auth extends ChangeNotifier {
       prefs.setString("UserName", "");
       prefs.setBool("IsCreator", false);
       prefs.setString("JDate", "");
+      notifyListeners();
       return user;
     } catch (e) {
       rethrow;
     }
   }
+
+  // Future linkCredentials(String type, String? otp) async {
+  //   try {
+  //     if(type == 'Google') {
+  //     } else {
+  //       var phoneCred = PhoneAuthProvider.credential(
+  //         verificationId: verificationId,
+  //         smsCode: otp,
+  //       );
+  //       await _auth.currentUser!.linkWithCredential(phoneCred);
+  //
+  //     }
+  //   } catch(e) {
+  //     rethrow;
+  //   }
+  // }
 
   Future<bool> checkUser() async {
     try {
@@ -135,11 +153,8 @@ class Auth extends ChangeNotifier {
   Future<void> signOut() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      await prefs.clear().then((value) async {
-        if (value) {
-          await _auth.signOut();
-        }
-      });
+      await prefs.clear();
+      await _auth.signOut();
     } catch (e) {
       print(e);
     }

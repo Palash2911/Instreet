@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:instreet/constants/constants.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class StallDescWidget extends StatefulWidget {
   final String stallDesc;
@@ -19,6 +20,15 @@ class StallDescWidget extends StatefulWidget {
 }
 
 class _StallDescWidgetState extends State<StallDescWidget> {
+  void _launchDialer(String number) async {
+    final url = 'tel:$number';
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      print('Could not launch the dialer');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -54,15 +64,22 @@ class _StallDescWidgetState extends State<StallDescWidget> {
           const SizedBox(
             height: 15,
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                widget.ownerContact,
-                style: kTextPopM16.copyWith(color: Colors.black38, fontSize: 14),
-              ),
-              const Icon(Icons.phone),
-            ],
+          InkWell(
+            onTap: () => _launchDialer(widget.ownerContact),
+            child: Row(
+              children: [
+                const Icon(
+                  Icons.phone,
+                  size: 26,
+                ),
+                const SizedBox(width: 9),
+                Text(
+                  widget.ownerContact,
+                  style:
+                      kTextPopM16.copyWith(color: Colors.black38, fontSize: 14),
+                ),
+              ],
+            ),
           ),
         ],
       ),

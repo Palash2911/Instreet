@@ -5,7 +5,6 @@ import '../models/stallModel.dart';
 class StallProvider extends ChangeNotifier {
   
   List<Stall> _stalls = [];
-  List<Stall> get stalls => _stalls;
 
   Future<void> addStall(Stall stall) async {
     try {
@@ -76,5 +75,9 @@ class StallProvider extends ChangeNotifier {
 
   List<Stall> getUserRegisteredStalls(String uid) {
     return _stalls.where((stall) => stall.creatorUID == uid).toList();
+  }
+
+  List<Stall> getAllStalls(String uid) {
+    return _stalls.where((stall) => stall.creatorUID != 'jv46QAi6sWQ4wHq1P2xh7fuklr62').toList();
   }
 }

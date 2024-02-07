@@ -6,12 +6,9 @@ class ReviewProvider extends ChangeNotifier {
   List<ReviewModel> _allReviews = [];
   List<ReviewModel> get allReviews => _allReviews;
 
-  Future<void> fetchReviews(String uid) async {
+  Future<void> fetchReviews() async {
     try {
-      var reviewCollection = FirebaseFirestore.instance
-          .collection('users')
-          .doc(uid)
-          .collection('reviews');
+      var reviewCollection = FirebaseFirestore.instance.collection('reviews');
       var querySnapshot = await reviewCollection.get();
       if (querySnapshot.docs.isNotEmpty) {
         _allReviews = querySnapshot.docs
@@ -27,9 +24,10 @@ class ReviewProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> addReview(ReviewModel review, String uid) async {
+  Future<void> addReview(ReviewModel review) async {
     try {
-      CollectionReference reviews = FirebaseFirestore.instance.collection('reviews');
+      CollectionReference reviews =
+          FirebaseFirestore.instance.collection('reviews');
       DocumentReference documentRef = reviews.doc();
 
       await documentRef.set({
@@ -37,6 +35,7 @@ class ReviewProvider extends ChangeNotifier {
         'review': review.review,
         'rating': review.rating,
         'uid': review.uid,
+        'userName': review.userName,
       });
 
       review.rid = documentRef.id;
@@ -47,5 +46,9 @@ class ReviewProvider extends ChangeNotifier {
       notifyListeners();
       rethrow;
     }
+  }
+
+  List<ReviewModel> getStallReview(String sId) {
+    return _allReviews.where((review) => review.sid == sId).toList();
   }
 }

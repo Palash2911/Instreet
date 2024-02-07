@@ -6,6 +6,7 @@ class ReviewModel {
   final String review;
   final double rating;
   final String uid;
+  final String userName;
 
   ReviewModel({
     required this.rid,
@@ -13,6 +14,7 @@ class ReviewModel {
     required this.review,
     required this.rating,
     required this.uid,
+    required this.userName,
   });
 
   ReviewModel.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc)
@@ -20,5 +22,6 @@ class ReviewModel {
         sid = doc['stallId'].toString(),
         review = doc['review'].toString(),
         uid = doc['uid'].toString(),
+        userName = doc['userName'].toString(),
         rating = doc['rating'].toDouble();
 }

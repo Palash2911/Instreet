@@ -43,7 +43,7 @@ class _FavroiteScreenState extends State<FavroiteScreen> {
     } catch (e) {
       print(e);
     } finally {
-      await Future.delayed(Duration(milliseconds: 500), () {
+      await Future.delayed(const Duration(milliseconds: 500), () {
         setState(() {
           isLoading = false;
         });
@@ -56,8 +56,9 @@ class _FavroiteScreenState extends State<FavroiteScreen> {
     final favoriteStalls = currentUid.isNotEmpty
         ? Provider.of<StallProvider>(context).getFavoriteStalls(currentUid)
         : [];
+
     return Scaffold(
-      appBar: AppBarWidget(isSearch: false, screenTitle: 'Favorites'),
+      appBar: const AppBarWidget(isSearch: false, screenTitle: 'Favorites'),
       body: SafeArea(
         child: isLoading
             ? ListView.builder(

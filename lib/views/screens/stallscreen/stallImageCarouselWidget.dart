@@ -23,11 +23,12 @@ class _StallImageCarouselWidgetState extends State<StallImageCarouselWidget> {
           children: [
             CarouselSlider(
               options: CarouselOptions(
-                autoPlay: true,
+                autoPlay: widget.stallImages.length > 1 ? true : false,
                 autoPlayInterval: const Duration(seconds: 3),
                 autoPlayAnimationDuration: const Duration(milliseconds: 1800),
                 height: 300,
                 viewportFraction: 1.0,
+                enableInfiniteScroll: widget.stallImages.length > 1 ? true : false,
                 onPageChanged: (index, reason) {
                   setState(() {
                     _currentIndex = index;

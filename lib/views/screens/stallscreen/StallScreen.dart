@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:instreet/constants/constants.dart';
+import 'package:instreet/providers/reviewProvider.dart';
 import 'package:instreet/providers/stallProvider.dart';
+import 'package:instreet/views/screens/stallscreen/menuImagesWidget.dart';
 import 'package:instreet/views/screens/stallscreen/reviewsWidget.dart';
 import 'package:instreet/views/screens/stallscreen/stallDescriptionWidget.dart';
 import 'package:instreet/views/screens/stallscreen/stallImageCarouselWidget.dart';
+import 'package:instreet/views/widgets/shimmerSkeleton.dart';
 import 'package:provider/provider.dart';
+import 'package:shimmer/shimmer.dart';
 
+import '../../../models/reviewModel.dart';
 import '../../../models/stallModel.dart';
 
 class StallScreen extends StatefulWidget {
@@ -20,6 +26,7 @@ class _StallScreenState extends State<StallScreen> {
   var isInit = false;
   var isLoading = true;
   late Stall stall;
+  List<ReviewModel> reviews = [];
 
   @override
   void didChangeDependencies() {
@@ -38,15 +45,21 @@ class _StallScreenState extends State<StallScreen> {
       isLoading = true;
     });
     var stallProvider = Provider.of<StallProvider>(context, listen: false);
+    var reviewProvider = Provider.of<ReviewProvider>(context, listen: false);
     if (sId.isNotEmpty) {
       await stallProvider.fetchStalls();
+      await reviewProvider.fetchReviews();
       if (mounted) {
-        stall = stallProvider.stalls.firstWhere((stall) => stall.sId == sId);
+        stall = stallProvider
+            .getAllStalls('jv46QAi6sWQ4wHq1P2xh7fuklr62')
+            .firstWhere((stall) => stall.sId == sId);
+        reviews = reviewProvider.getStallReview(sId);
+        print(reviews);
       }
     } else {
       print('Some Error Occurred');
     }
-    Future.delayed(const Duration(seconds: 1), () {
+    Future.delayed(const Duration(milliseconds: 1100), () {
       setState(() {
         isLoading = false;
       });
@@ -60,15 +73,18 @@ class _StallScreenState extends State<StallScreen> {
         title: !isLoading ? Text(stall.stallName) : const Text(''),
       ),
       body: isLoading
-          ? const Center(
-              child: CircularProgressIndicator(),
+          ? Shimmer.fromColors(
+              baseColor: Colors.grey[300]!,
+              highlightColor: Colors.grey[100]!,
+              child: const StallShimmerSkeleton(),
             )
           : SafeArea(
               child: RefreshIndicator(
                 onRefresh: getStallFromID,
                 child: SingleChildScrollView(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 18),
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 3, horizontal: 18),
                     child: Column(
                       children: [
                         StallImageCarouselWidget(
@@ -80,7 +96,46 @@ class _StallScreenState extends State<StallScreen> {
                           ownerName: stall.ownerName,
                           ownerContact: stall.ownerContact,
                         ),
-                        ReviewsWidget(),
+                        stall.menuImages.length > 0
+                            ? Padding(
+                                padding: const EdgeInsets.all(9.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const SizedBox(height: 10),
+                                    Text(
+                                      'Menu / Services',
+                                      style: kTextPopM16.copyWith(
+                                          fontSize: 17,
+                                          color: const Color(0xff39434F)),
+                                    ),
+                                    const SizedBox(height: 15),
+                                    StallMenuImages(
+                                        menuImages: stall.menuImages),
+                                  ],
+                                ),
+                              )
+                            : Padding(
+                                padding:
+                                    const EdgeInsets.only(top: 30, bottom: 10),
+                                child: Text(
+                                  'No Services / Menu !',
+                                  style: kTextPopB16,
+                                ),
+                              ),
+                        reviews.isNotEmpty
+                            ? ReviewsWidget(
+                                stallReviews: reviews,
+                                sId: sId,
+                              )
+                            : Padding(
+                                padding:
+                                    const EdgeInsets.only(top: 30, bottom: 10),
+                                child: Text(
+                                  'No Reviews Yet',
+                                  style: kTextPopB16,
+                                ),
+                              ),
                       ],
                     ),
                   ),

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:instreet/constants/constants.dart';
 import 'package:instreet/providers/authProvider.dart';
+import 'package:instreet/views/screens/onboarding/splashScreen.dart';
 import 'package:instreet/views/widgets/appbar_widget.dart';
 import 'package:instreet/views/widgets/profile_card.dart';
 import 'package:instreet/views/widgets/profile_list.dart';
@@ -46,22 +47,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
         {
           await Provider.of<Auth>(context, listen: false)
               .signOut()
-              .then((value) {
-            Fluttertoast.showToast(
-              msg: 'Off the streets for now. Catch you soon on InStreet!!',
-              toastLength: Toast.LENGTH_SHORT,
-              timeInSecForIosWeb: 1,
-              backgroundColor: kprimaryColor,
-              textColor: Colors.white,
-              fontSize: 16.0,
-            );
-            if (mounted) {
-              Navigator.of(context, rootNavigator: true)
-                  .pushReplacementNamed('/');
-            }
-          }).catchError((e) {
+              .catchError((e) {
             print(e);
           });
+          if (mounted) {
+            Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (context) => const SplashScreen()),
+              (Route<dynamic> route) => false,
+            );
+          }
+          Fluttertoast.showToast(
+            msg: 'Off the streets for now. Catch you soon on InStreet!!',
+            toastLength: Toast.LENGTH_SHORT,
+            timeInSecForIosWeb: 1,
+            backgroundColor: kprimaryColor,
+            textColor: Colors.white,
+            fontSize: 16.0,
+          );
         }
         break;
     }

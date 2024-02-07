@@ -29,6 +29,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   bool otpBtn = false;
   var isOtpEnable = false;
+  var isPhoneFilled = false;
 
   @override
   void initState() {
@@ -76,7 +77,7 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() {
       isLoading = true;
     });
-    await Provider.of<Auth>(ctx, listen: false).signInGoogle().catchError((e) {
+    authProvider.signInGoogle().catchError((e) {
       Fluttertoast.showToast(
         msg: e.toString(),
         toastLength: Toast.LENGTH_SHORT,
@@ -104,6 +105,7 @@ class _LoginScreenState extends State<LoginScreen> {
           //   const initin = 0;
           //
           // });
+          await authProvider.autoLogin();
           if(mounted){
             Navigator.of(ctx).pushReplacementNamed('bottom-nav');
           }
@@ -230,7 +232,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       color: Colors.black.withOpacity(0.7),
                       child: const Center(child: CircularProgressIndicator()),
                     )
-                  : SizedBox(width: 0),
+                  : const SizedBox(width: 0),
               Container(
                 height: MediaQuery.of(context).size.height * 0.81,
                 padding: const EdgeInsets.only(left: 35, right: 35, top: 50),
@@ -284,20 +286,29 @@ class _LoginScreenState extends State<LoginScreen> {
                               labelText: 'Phone Number',
                               counterText: "",
                               border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(15.0),
+                                borderRadius: BorderRadius.circular(10.0),
+                                borderSide: const BorderSide(width: 1, color: Colors.black),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10.0),
+                                borderSide:
+                                const BorderSide(color: Colors.black, width: 1.0),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10.0),
+                                borderSide:
+                                BorderSide(color: kprimaryColor, width: 2.0),
                               ),
                               suffixIcon: Container(
                                 margin: const EdgeInsets.all(9.0),
+                                height: 40,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: isOtpEnable ? Colors.grey : kprimaryColor.withOpacity(0.9),
+                                  color: isOtpEnable || !isPhoneFilled ? Colors.grey : kprimaryColor.withOpacity(0.9),
                                 ),
                                 child: IconButton(
-                                  icon: Icon(Icons.arrow_forward),
-                                  onPressed: isOtpEnable ? null : () {
-                                    setState(() {
-                                      // isFinished = true;
-                                    });
+                                  icon: const Icon(Icons.arrow_forward),
+                                  onPressed: isOtpEnable || !isPhoneFilled ? null  : () {
                                     _sendOtP(context);
                                   },
                                   color: Colors.white,
@@ -312,8 +323,10 @@ class _LoginScreenState extends State<LoginScreen> {
                             },
                             initialCountryCode: 'IN',
                             onChanged: (phone) {
+                              bool phoneFilled = phone.number.isNotEmpty;
                               setState(() {
                                 phoneNo = phone.completeNumber.toString();
+                                isPhoneFilled = phoneFilled;
                               });
                             },
                           ),

@@ -29,7 +29,7 @@ class _AppBarWidgetState extends State<AppBarWidget> {
                 children: <Widget>[
                   Expanded(
                     child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 10),
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
                       decoration: BoxDecoration(
                         color: Colors.grey[300],
                         borderRadius: BorderRadius.circular(30),
@@ -37,7 +37,7 @@ class _AppBarWidgetState extends State<AppBarWidget> {
                       child: Row(
                         children: [
                           IconButton(
-                            icon: Icon(Icons.search, color: Colors.black),
+                            icon: const Icon(Icons.search, color: Colors.black),
                             onPressed: () {
                               // Handle search logic
                             },

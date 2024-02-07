@@ -76,7 +76,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     var authId = Provider.of<Auth>(context, listen: false).token;
     final isValid = _form.currentState!.validate();
     if (isValid) {
-      await userProvider
+      userProvider
           .registerUser(
         UserModel(
           uid: authId,
@@ -98,8 +98,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
           textColor: Colors.white,
           fontSize: 16.0,
         );
-      }).then((_) async {
-        await Provider.of<Auth>(context, listen: false)
+      }).then((_) {
+        Provider.of<Auth>(context, listen: false)
             .autoLogin()
             .then((value) {
           Fluttertoast.showToast(

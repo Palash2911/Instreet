@@ -39,8 +39,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
     });
     try {
       Provider.of<StallProvider>(context, listen: false).fetchStalls();
-      await Provider.of<ReviewProvider>(context, listen: false)
-          .fetchReviews(currentUid);
+      await Provider.of<ReviewProvider>(context, listen: false).fetchReviews();
     } catch (e) {
       print(e);
     } finally {
@@ -54,8 +53,10 @@ class _ReviewScreenState extends State<ReviewScreen> {
 
   @override
   Widget build(BuildContext context) {
-    
-    final stalls = Provider.of<StallProvider>(context).stalls;
+    final stalls = currentUid.isNotEmpty
+        ? Provider.of<StallProvider>(context, listen: false)
+            .getAllStalls(currentUid)
+        : [];
     final userReviews = currentUid.isNotEmpty
         ? Provider.of<ReviewProvider>(context, listen: false).allReviews
         : [];
@@ -89,10 +90,16 @@ class _ReviewScreenState extends State<ReviewScreen> {
                   itemCount: filteredStalls.length,
                   itemBuilder: (context, index) {
                     var stall = filteredStalls[index];
-                    var review = userReviews.firstWhere(
-                        (r) => r.sid == stall.sId,
-                        orElse: () => ReviewModel(
-                            rid: '', sid: '', review: '', rating: 0, uid: ''));
+                    var review =
+                        userReviews.firstWhere((r) => r.sid == stall.sId,
+                            orElse: () => ReviewModel(
+                                  rid: '',
+                                  sid: '',
+                                  review: '',
+                                  rating: 0,
+                                  uid: '',
+                                  userName: '',
+                                ));
                     if (review.sid.toString().isNotEmpty) {
                       return HomePageCard(
                         stall: stall,
