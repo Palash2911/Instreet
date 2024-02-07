@@ -25,6 +25,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _phoneController = TextEditingController();
   final _emailController = TextEditingController();
   final _dateController = TextEditingController();
+  
   String get name => _nameController.text;
   String get email => _emailController.text;
   String get date => _dateController.text;
@@ -187,15 +188,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       counterText: "",
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(15.0),
-                        borderSide: const BorderSide(color: Colors.black, width: 1.0),
+                        borderSide:
+                            const BorderSide(color: Colors.black, width: 1.0),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10.0),
-                        borderSide: const BorderSide(color: Colors.black, width: 1.0),
+                        borderSide:
+                            const BorderSide(color: Colors.black, width: 1.0),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10.0),
-                        borderSide: const BorderSide(color: Colors.black, width: 1.0),
+                        borderSide:
+                            const BorderSide(color: Colors.black, width: 1.0),
                       ),
                       icon: const Icon(Icons.phone),
                     ),

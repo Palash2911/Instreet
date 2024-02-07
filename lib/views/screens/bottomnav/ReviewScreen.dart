@@ -54,6 +54,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
 
   @override
   Widget build(BuildContext context) {
+    
     final stalls = Provider.of<StallProvider>(context).stalls;
     final userReviews = currentUid.isNotEmpty
         ? Provider.of<ReviewProvider>(context, listen: false).allReviews
