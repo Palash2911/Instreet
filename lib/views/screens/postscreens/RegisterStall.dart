@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:instreet/constants/constants.dart';
@@ -17,138 +16,56 @@ class RegisterStall extends StatefulWidget {
 }
 
 class _RegisterStallState extends State<RegisterStall> {
-  
   final _form = GlobalKey<FormState>();
 
-  String? selectedRole;
+  String selectedRole = '';
 
   final _nameController = TextEditingController();
   final _phoneController = TextEditingController();
-  final _ownernameController = TextEditingController();
+  final _ownerNameController = TextEditingController();
 
-  final _otpController = TextEditingController();
-  bool otpBtn = false;
-  var isOtpEnable = false;
-  var isLoading = false;
   String get name => _nameController.text;
   String get phone => _phoneController.text;
-  String get ownername => _ownernameController.text;
+  String get ownerName => _ownerNameController.text;
   String phoneNo = "";
-  String otp = "";
+
+  bool isLoading = false;
+  bool isOtpEnable = false;
   bool isNextButtonEnabled = false;
+  bool isPhoneFilled = false;
 
   @override
   void dispose() {
     _nameController.dispose();
     _phoneController.dispose();
-    _ownernameController.dispose();
+    _ownerNameController.dispose();
     super.dispose();
   }
 
   Widget setTitle(String title) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 20),
+      padding: const EdgeInsets.only(top: 20, bottom: 11),
       child: Text(
         title,
-        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+        style: kTextPopM16,
       ),
     );
   }
 
-  Future _sendOtP(BuildContext ctx) async {
-    if (_form.currentState!.validate()) {
-      isLoading = true;
-      _form.currentState!.save();
-      await Provider.of<Auth>(ctx, listen: false)
-          .authenticate(phoneNo)
-          .catchError((e) {
-        Fluttertoast.showToast(
-          msg: e,
-          toastLength: Toast.LENGTH_SHORT,
-          timeInSecForIosWeb: 1,
-          backgroundColor: kprimaryColor,
-          textColor: Colors.white,
-          fontSize: 16.0,
-        );
-      }).then((_) {
-        Fluttertoast.showToast(
-          msg: "OTP Sent Successfully !",
-          toastLength: Toast.LENGTH_SHORT,
-          timeInSecForIosWeb: 1,
-          backgroundColor: kprimaryColor,
-          textColor: Colors.white,
-          fontSize: 16.0,
-        );
-        setState(() {
-          otpBtn = true;
-          isOtpEnable = true;
-          isNextButtonEnabled = true;
-        });
-      });
-    } else {
-      Fluttertoast.showToast(
-        msg: "Please fill in all the required fields!",
-        toastLength: Toast.LENGTH_SHORT,
-        timeInSecForIosWeb: 1,
-        backgroundColor: Colors.green,
-        textColor: Colors.white,
-        fontSize: 16.0,
-      );
-    }
-
-    setState(() {
-      isLoading = false;
-    });
-  }
-
-  Future _verifyOtp(BuildContext ctx) async {
+  Future _nextPage() async {
     isLoading = true;
-    var isValid = false;
-    var authProvider = Provider.of<Auth>(ctx, listen: false);
-    otp = _otpController.text;
-    if (otp.length == 6) {
-      isValid = await authProvider.verifyOtp(otp).catchError((e) {
-        return false;
-      });
-      if (isValid) {
-        var user = await authProvider.checkUser();
-        if (user) {
-          // Navigator.of(ctx).pushReplacementNamed('bottom-nav');
-          // Navigator.of(context).push(
-          //   MaterialPageRoute(
-          //     builder: (context) => const StallImages(),
-          //   ),
-          // );
-        } else {
-          Navigator.of(ctx).pushReplacementNamed('register-screen');
-        }
-      } else {
-        setState(() {
-          isLoading = false;
-        });
-        Fluttertoast.showToast(
-          msg: "Invalid OTP!",
-          toastLength: Toast.LENGTH_SHORT,
-          timeInSecForIosWeb: 1,
-          backgroundColor: const Color(0xFFFF4500),
-          textColor: Colors.white,
-          fontSize: 16.0,
-        );
-      }
-    } else {
-      setState(() {
-        isLoading = false;
-      });
-      Fluttertoast.showToast(
-        msg: "Invalid OTP!",
-        toastLength: Toast.LENGTH_SHORT,
-        timeInSecForIosWeb: 1,
-        backgroundColor: const Color(0xFFFF4500),
-        textColor: Colors.white,
-        fontSize: 16.0,
-      );
-    }
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => StallImages(
+          role: selectedRole.toString(),
+          name: name,
+          ownerName: ownerName,
+          contactNumber: phone,
+        ),
+      ),
+    );
     setState(() {
+      isOtpEnable = false;
       isLoading = false;
     });
   }
@@ -158,7 +75,7 @@ class _RegisterStallState extends State<RegisterStall> {
     return Scaffold(
       appBar: const AppBarWidget(
         isSearch: false,
-        screenTitle: 'My Posts',
+        screenTitle: 'Enter Details',
       ),
       body: SingleChildScrollView(
         child: SafeArea(
@@ -170,32 +87,47 @@ class _RegisterStallState extends State<RegisterStall> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  setTitle("Describe Your Self"),
+                  setTitle("Select Your Role"),
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      Radio<String>(
-                        value: 'owner',
-                        groupValue: selectedRole,
-                        onChanged: (value) {
-                          setState(() {
-                            selectedRole = value;
-                          });
-                        },
-                        activeColor: kprimaryColor,
+                      Row(
+                        children: [
+                          Radio<String>(
+                            value: 'owner',
+                            groupValue: selectedRole,
+                            onChanged: (value) {
+                              setState(() {
+                                selectedRole = value!;
+                              });
+                            },
+                            activeColor: kprimaryColor,
+                          ),
+                          Text(
+                            'Owner',
+                            style: kTextPopR16,
+                          ),
+                        ],
                       ),
-                      const Text('Owner'),
-                      SizedBox(width: MediaQuery.of(context).size.width * 0.3),
-                      Radio<String>(
-                        value: 'creator',
-                        groupValue: selectedRole,
-                        onChanged: (value) {
-                          setState(() {
-                            selectedRole = value;
-                          });
-                        },
-                        activeColor: kprimaryColor,
+                      const SizedBox(width: 18),
+                      Row(
+                        children: [
+                          Radio<String>(
+                            value: 'creator',
+                            groupValue: selectedRole,
+                            onChanged: (value) {
+                              setState(() {
+                                selectedRole = value!;
+                              });
+                            },
+                            activeColor: kprimaryColor,
+                          ),
+                          Text(
+                            'Creator',
+                            style: kTextPopR16,
+                          ),
+                        ],
                       ),
-                      const Text('Creator'),
                     ],
                   ),
                   setTitle("Stall Name"),
@@ -223,7 +155,7 @@ class _RegisterStallState extends State<RegisterStall> {
                   ),
                   setTitle("Owner's Name"),
                   TextFormField(
-                    controller: _ownernameController,
+                    controller: _ownerNameController,
                     keyboardType: TextInputType.name,
                     decoration: InputDecoration(
                       hintText: "Enter owner's name",
@@ -244,12 +176,13 @@ class _RegisterStallState extends State<RegisterStall> {
                     },
                     textInputAction: TextInputAction.next,
                   ),
-                  setTitle("Contact Number"),
+                  setTitle("Owner Contact Number"),
                   IntlPhoneField(
                     controller: _phoneController,
                     decoration: InputDecoration(
                       hintText: "Phone Number",
                       hintStyle: kTextPopR14,
+                      counterText: "",
                       filled: true,
                       fillColor: Colors.transparent,
                       border: OutlineInputBorder(
@@ -271,93 +204,39 @@ class _RegisterStallState extends State<RegisterStall> {
                       });
                     },
                   ),
-                  setTitle("Enter OTP"),
-                  PinCodeTextField(
-                    appContext: context,
-                    length: 6,
-                    controller: _otpController,
-                    enabled: isOtpEnable,
-                    onChanged: (otp) {
-                      setState(() {
-                        otp = otp.toString();
-                      });
-                    },
-                    pinTheme: PinTheme(
-                      shape: PinCodeFieldShape.box,
-                      borderRadius: BorderRadius.circular(5),
-                      fieldHeight: 50,
-                      fieldWidth: 40,
-                      activeFillColor: Colors.grey.withOpacity(0.1),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          if (_form.currentState!.validate() &&
-                              phone.isNotEmpty) {
-                            _sendOtP(context);
-                            
-                          } else {
-                            Fluttertoast.showToast(
-                              msg: "Please fill the blank fields !",
-                              toastLength: Toast.LENGTH_SHORT,
-                              timeInSecForIosWeb: 1,
-                              backgroundColor: kprimaryColor,
-                              textColor: Colors.white,
-                              fontSize: 16.0,
-                            );
-                          }
-                        },
+                  const SizedBox(height: 20),
+                  Center(
+                    child: GestureDetector(
+                      onTap: () {
+                        if (_form.currentState!.validate() &&
+                            phone.isNotEmpty &&
+                            selectedRole.isNotEmpty) {
+                          _nextPage();
+                        }
+                      },
+                      child: Opacity(
+                        opacity: phone.isNotEmpty &&
+                                selectedRole.isNotEmpty &&
+                                _nameController.text.isNotEmpty &&
+                                _ownerNameController.text.isNotEmpty
+                            ? 1
+                            : 0.6,
                         child: Container(
                           width: MediaQuery.of(context).size.width * 0.4,
-                          padding: EdgeInsets.all(15),
-                          child: Text(
-                            "Send OTP",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(color: Colors.white),
-                          ),
+                          padding: const EdgeInsets.all(15),
                           decoration: BoxDecoration(
                               color: kprimaryColor,
-                              borderRadius: BorderRadius.circular(50)),
-                        ),
-                      ),
-                      // this next button will only activate when otp is successfully verified   ---> as of now i have directly navigate to next screen i.e StallImages
-                      GestureDetector(
-                        onTap: () {
-                          // if (isNextButtonEnabled) {
-                          //   _verifyOtp(context);
-                          // }
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => StallImages(role : selectedRole.toString() , name :name,ownername: ownername,contactnumber:phone),
-                            ),
-                          );
-                        },
-                        child: Container(
-                          width: MediaQuery.of(context).size.width * 0.4,
-                          padding: EdgeInsets.all(15),
+                              borderRadius: BorderRadius.circular(20)),
                           child: Text(
                             "Next",
                             textAlign: TextAlign.center,
-                            style: TextStyle(
-                                color: isNextButtonEnabled
-                                    ? Colors.white
-                                    : Colors.grey),
+                            style: kTextPopM16.copyWith(color: Colors.white),
                           ),
-                          decoration: BoxDecoration(
-                              color: isNextButtonEnabled
-                                  ? kprimaryColor
-                                  : Colors.grey.withOpacity(0.7),
-                              borderRadius: BorderRadius.circular(50)),
                         ),
                       ),
-                    ],
-                  )
+                    ),
+                  ),
+                  const SizedBox(height: 15),
                 ],
               ),
             ),

@@ -9,33 +9,36 @@ import 'package:instreet/views/screens/postscreens/DescribeTheStall.dart';
 import 'package:instreet/views/widgets/appbar_widget.dart';
 
 class StallImages extends StatefulWidget {
-  String role;
-  String name;
-  String ownername;
-  String contactnumber;
-  StallImages(
-      {super.key,
-      required this.role,
-      required this.name,
-      required this.ownername,
-      required this.contactnumber});
+  final String role;
+  final String name;
+  final String ownerName;
+  final String contactNumber;
+
+  const StallImages({
+    super.key,
+    required this.role,
+    required this.name,
+    required this.ownerName,
+    required this.contactNumber,
+  });
 
   @override
   State<StallImages> createState() => _StallImagesState();
 }
 
 class _StallImagesState extends State<StallImages> {
-  TextEditingController _locationController = TextEditingController();
+  final TextEditingController _locationController = TextEditingController();
   String currentLocation = '';
+
   bool useCurrentLocation = false;
   bool isLoading = false;
 
   Widget setTitle(String title) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 20),
+      padding: const EdgeInsets.only(top: 20, bottom: 11),
       child: Text(
         title,
-        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+        style: kTextPopM16,
       ),
     );
   }
@@ -44,10 +47,8 @@ class _StallImagesState extends State<StallImages> {
     bool serviceEnabled;
     LocationPermission permission;
 
-    // Check if location services are enabled
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      // Request location services if not enabled
       serviceEnabled = await Geolocator.openLocationSettings();
       if (!serviceEnabled) {
         Fluttertoast.showToast(
@@ -62,10 +63,8 @@ class _StallImagesState extends State<StallImages> {
       }
     }
 
-    // Check location permissions
     permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
-      // Request location permissions
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
         return;
@@ -98,18 +97,25 @@ class _StallImagesState extends State<StallImages> {
 
   Future<String?> uploadImage(File image) async {
     try {
+      String imageType = image.path.split('.').last;
       firebase_storage.Reference ref = firebase_storage.FirebaseStorage.instance
           .ref()
-          .child('Stalls/${DateTime.now().millisecondsSinceEpoch}.png');
+          .child('Stalls/${DateTime.now().millisecondsSinceEpoch}.$imageType');
 
-      firebase_storage.UploadTask uploadTask = ref.putFile(image);
+      firebase_storage.SettableMetadata metadata =
+          firebase_storage.SettableMetadata(
+        contentType: 'image/$imageType',
+      );
+
+      firebase_storage.UploadTask uploadTask = ref.putFile(image, metadata);
       firebase_storage.TaskSnapshot storageTaskSnapshot = await uploadTask;
       String downloadURL = await storageTaskSnapshot.ref.getDownloadURL();
 
       return downloadURL;
     } catch (e) {
       Fluttertoast.showToast(
-        msg: "Error uploading image",
+        msg:
+            "Error uploading image: $e", // Include error message for better debugging
         toastLength: Toast.LENGTH_SHORT,
         timeInSecForIosWeb: 1,
         backgroundColor: kprimaryColor,
@@ -148,7 +154,8 @@ class _StallImagesState extends State<StallImages> {
 
   @override
   Widget build(BuildContext context) {
-    print("this is printed from stallimage scree: ${widget.role + widget.name + widget.ownername + widget.contactnumber}");
+    print(
+        "this is printed from stallimage scree: ${widget.role + widget.name + widget.ownerName + widget.contactNumber}");
     return Scaffold(
       appBar: const AppBarWidget(
         isSearch: false,
@@ -232,15 +239,17 @@ class _StallImagesState extends State<StallImages> {
                                   ),
                                 ),
                               if (imageUrls[index] != null)
-                              ClipRRect(
-                                child: Image.network(
-                                  height:MediaQuery.of(context).size.width * 0.24,
-                                  width: MediaQuery.of(context).size.width * 0.25,
-                                  imageUrls[index]!,
-                                  fit: BoxFit.cover,
-                                ),
-                                borderRadius: BorderRadius.circular(10),
-                              )
+                                ClipRRect(
+                                  child: Image.network(
+                                    height: MediaQuery.of(context).size.width *
+                                        0.24,
+                                    width: MediaQuery.of(context).size.width *
+                                        0.25,
+                                    imageUrls[index]!,
+                                    fit: BoxFit.cover,
+                                  ),
+                                  borderRadius: BorderRadius.circular(10),
+                                )
                             ],
                           ),
                         );
@@ -301,6 +310,37 @@ class _StallImagesState extends State<StallImages> {
                     SizedBox(
                       height: 20,
                     ),
+                    Center(
+                      child: GestureDetector(
+                        onTap: () {
+                          if (_form.currentState!.validate() &&
+                              phone.isNotEmpty &&
+                              selectedRole.isNotEmpty) {
+                            _nextPage();
+                          }
+                        },
+                        child: Opacity(
+                          opacity: phone.isNotEmpty &&
+                              selectedRole.isNotEmpty &&
+                              _nameController.text.isNotEmpty &&
+                              _ownerNameController.text.isNotEmpty
+                              ? 1
+                              : 0.6,
+                          child: Container(
+                            width: MediaQuery.of(context).size.width * 0.4,
+                            padding: const EdgeInsets.all(15),
+                            decoration: BoxDecoration(
+                                color: kprimaryColor,
+                                borderRadius: BorderRadius.circular(20)),
+                            child: Text(
+                              "Next",
+                              textAlign: TextAlign.center,
+                              style: kTextPopM16.copyWith(color: Colors.white),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
                     Container(
                       alignment: Alignment.center,
                       child: GestureDetector(
@@ -313,14 +353,18 @@ class _StallImagesState extends State<StallImages> {
                                   location: currentLocation,
                                   role: widget.role,
                                   name: widget.name,
-                                  ownername: widget.ownername,
-                                  contactnumber: widget.contactnumber),
+                                  ownername: widget.ownerName,
+                                  contactnumber: widget.contactNumber),
                             ),
                           );
                         },
                         child: Container(
                           width: MediaQuery.of(context).size.width * 0.4,
                           padding: EdgeInsets.all(15),
+                          decoration: BoxDecoration(
+                            color: kprimaryColor,
+                            borderRadius: BorderRadius.circular(50),
+                          ),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -334,10 +378,6 @@ class _StallImagesState extends State<StallImages> {
                                 color: Colors.white,
                               )
                             ],
-                          ),
-                          decoration: BoxDecoration(
-                            color: kprimaryColor,
-                            borderRadius: BorderRadius.circular(50),
                           ),
                         ),
                       ),

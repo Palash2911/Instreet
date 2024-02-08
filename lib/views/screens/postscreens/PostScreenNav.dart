@@ -19,7 +19,7 @@ class PostScreenNav extends StatefulWidget {
 }
 
 class _PostScreenNavState extends State<PostScreenNav> {
-  List<Stall> getStalls = [];
+  List<Stall> userStalls = [];
   var isLoading = false;
   var init = true;
   var currentUid = '';
@@ -39,14 +39,11 @@ class _PostScreenNavState extends State<PostScreenNav> {
       isLoading = true;
     });
     try {
-      print('this is current user id : ' + currentUid);
-      getStalls = Provider.of<StallProvider>(context, listen: false)
-          .getUserRegisteredStalls(currentUid);
-      print(getStalls.length);
+      await Provider.of<StallProvider>(context, listen: false).fetchStalls();
     } catch (e) {
       print(e);
     } finally {
-      await Future.delayed(Duration(milliseconds: 300), () {
+      await Future.delayed(Duration(milliseconds: 700), () {
         setState(() {
           isLoading = false;
         });
@@ -56,6 +53,10 @@ class _PostScreenNavState extends State<PostScreenNav> {
 
   @override
   Widget build(BuildContext context) {
+    userStalls = currentUid.isNotEmpty
+        ? Provider.of<StallProvider>(context)
+            .getUserRegisteredStalls(currentUid)
+        : [];
     return Scaffold(
       appBar: const AppBarWidget(
         isSearch: false,
@@ -73,7 +74,7 @@ class _PostScreenNavState extends State<PostScreenNav> {
                 );
               },
             )
-          : getStalls.isEmpty
+          : userStalls.isEmpty
               ? Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -92,11 +93,10 @@ class _PostScreenNavState extends State<PostScreenNav> {
                           color: kprimaryColor,
                         ),
                       ),
-                      SizedBox(height: 16),
+                      const SizedBox(height: 16),
                       Text(
                         "Creat Post",
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold),
+                        style: kTextPopM16,
                       )
                     ],
                   ),
@@ -104,14 +104,14 @@ class _PostScreenNavState extends State<PostScreenNav> {
               : RefreshIndicator(
                   onRefresh: () => loadAddedStalls(context),
                   child: ListView.builder(
-                    itemCount: getStalls.length,
+                    itemCount: userStalls.length,
                     itemBuilder: (context, index) {
-                      final stall = getStalls[index];
+                      final stall = userStalls[index];
                       return HomePageCard(stall: stall, isReview: false);
                     },
                   ),
                 ),
-      floatingActionButton: getStalls.length == 0
+      floatingActionButton: userStalls.isEmpty
           ? Container()
           : FloatingActionButton(
               backgroundColor: kprimaryColor,

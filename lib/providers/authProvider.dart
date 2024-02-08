@@ -42,9 +42,7 @@ class Auth extends ChangeNotifier {
     try {
       await _auth.verifyPhoneNumber(
         phoneNumber: phoneNo,
-        verificationCompleted: (PhoneAuthCredential credential) async {
-          // await _auth.signInWithCredential(credential).then((value) {});
-        },
+        verificationCompleted: (PhoneAuthCredential credential) async {},
         verificationFailed: (FirebaseAuthException e) {
           if (e.code == 'invalid-phone-number') {
             print("Invalid Number");
