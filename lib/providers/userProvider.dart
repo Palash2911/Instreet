@@ -49,6 +49,7 @@ class UserProvider extends ChangeNotifier {
       throw Exception("Failed to fetch user data");
     }
   }
+  
 
   Future updateUser(UserModel user) async {
     final prefs = await SharedPreferences.getInstance();

@@ -13,6 +13,7 @@ class StallProvider extends ChangeNotifier {
       // Add Images to Firebase Logic Left
 
       CollectionReference stallref = FirebaseFirestore.instance.collection('stalls');
+
       DocumentReference documentRef = stallref.doc();
 
       await documentRef.set({
@@ -40,6 +41,48 @@ class StallProvider extends ChangeNotifier {
     }
   }
 
+  Future getStall(String sId) async {
+    try {
+      DocumentSnapshot userSnapshot =
+          await FirebaseFirestore.instance.collection('stalls').doc(sId).get();
+      if (userSnapshot.exists) {
+        return userSnapshot;
+      } else {
+        throw Exception("Stall not found");
+      }
+    } catch (e) {
+      throw Exception("Failed to fetch stall data");
+    }
+  }
+
+   Future updateStall(Stall stall) async {
+
+    try {
+      String sId = stall.sId;
+      
+      CollectionReference users =
+          FirebaseFirestore.instance.collection('stalls');
+      await users.doc(sId).update({
+        'stallName': stall.stallName,
+        'ownerName': stall.ownerName,
+        'rating': stall.rating,
+        'stallCategory': stall.stallCategories,
+        'stallDescription': stall.stallDescription,
+        'bannerImage': stall.bannerImageUrl,
+        'ownerContact': stall.ownerContact,
+        'location': stall.location,
+        'stallImages': stall.stallImages,
+        'creatorUID': stall.creatorUID,
+        'menuImages': stall.menuImages,
+        'favoriteUsers': stall.favoriteUsers,
+      });
+      notifyListeners();
+    } catch (e) {
+      notifyListeners();
+      rethrow;
+    }
+  }
+
   Future<void> fetchStalls() async {
     var stallCollection = FirebaseFirestore.instance.collection('stalls');
     var querySnapshot = await stallCollection.get();
@@ -59,8 +102,7 @@ class StallProvider extends ChangeNotifier {
       }
       notifyListeners();
       try {
-        var stallDoc =
-            FirebaseFirestore.instance.collection('stalls').doc(stallId);
+        var stallDoc =FirebaseFirestore.instance.collection('stalls').doc(stallId);
         await stallDoc
             .update({'favoriteUsers': _stalls[stallIndex].favoriteUsers});
       } catch (e) {

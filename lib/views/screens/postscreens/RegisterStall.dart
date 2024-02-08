@@ -2,7 +2,9 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:instreet/constants/constants.dart';
+import 'package:instreet/models/stallModel.dart';
 import 'package:instreet/providers/authProvider.dart';
+import 'package:instreet/providers/stallProvider.dart';
 import 'package:instreet/views/screens/postscreens/StalImages.dart';
 import 'package:instreet/views/widgets/appbar_widget.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
@@ -10,7 +12,8 @@ import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:provider/provider.dart';
 
 class RegisterStall extends StatefulWidget {
-  const RegisterStall({Key? key}) : super(key: key);
+  final String? sId;
+  const RegisterStall({Key? key,this.sId}) : super(key: key);
 
   @override
   State<RegisterStall> createState() => _RegisterStallState();
@@ -44,6 +47,42 @@ class _RegisterStallState extends State<RegisterStall> {
     _ownernameController.dispose();
     super.dispose();
   }
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.sId != null) {
+      fetchStallDetails();
+    }
+  }
+
+  // Fetch stall details when sId is provided
+  Future<void> fetchStallDetails() async {
+
+    var existingStall = await Provider.of<StallProvider>(context, listen: false).getStall(widget.sId!);
+
+    if (existingStall != null) {
+      // Set existing stall details to the respective controllers
+      setState(() {
+        _nameController.text = existingStall['stallName'];
+        _ownernameController.text = existingStall['ownerName'];
+        _phoneController.text = existingStall['ownerContact'];
+        // ... other fields
+      });
+    }
+    else{
+      Fluttertoast.showToast(
+        msg: "Error while fetching stall details please file the blank spaces",
+        toastLength: Toast.LENGTH_SHORT,
+        timeInSecForIosWeb: 1,
+        backgroundColor: kprimaryColor,
+        textColor: Colors.white,
+        fontSize: 16.0,
+    );
+    }
+  }
+  
+
 
   Widget setTitle(String title) {
     return Padding(
@@ -290,7 +329,7 @@ class _RegisterStallState extends State<RegisterStall> {
                       activeFillColor: Colors.grey.withOpacity(0.1),
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 20,
                   ),
                   Row(
@@ -334,7 +373,7 @@ class _RegisterStallState extends State<RegisterStall> {
                           // }
                           Navigator.of(context).push(
                             MaterialPageRoute(
-                              builder: (context) => StallImages(role : selectedRole.toString() , name :name,ownername: ownername,contactnumber:phone),
+                              builder: (context) => StallImages(role : selectedRole.toString() , name :name,ownername: ownername,contactnumber:phone,sId: widget.sId,),
                             ),
                           );
                         },

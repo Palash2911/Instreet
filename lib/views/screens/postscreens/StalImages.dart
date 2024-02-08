@@ -5,20 +5,25 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:instreet/constants/constants.dart';
+import 'package:instreet/providers/stallProvider.dart';
 import 'package:instreet/views/screens/postscreens/DescribeTheStall.dart';
 import 'package:instreet/views/widgets/appbar_widget.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:provider/provider.dart';
 
 class StallImages extends StatefulWidget {
   String role;
   String name;
   String ownername;
   String contactnumber;
+  String? sId;
   StallImages(
       {super.key,
       required this.role,
       required this.name,
       required this.ownername,
-      required this.contactnumber});
+      required this.contactnumber,
+      this.sId});
 
   @override
   State<StallImages> createState() => _StallImagesState();
@@ -29,6 +34,92 @@ class _StallImagesState extends State<StallImages> {
   String currentLocation = '';
   bool useCurrentLocation = false;
   bool isLoading = false;
+  String? bannerImageUrl;
+  final picker = ImagePicker();
+  List<String?> imageUrls = [null, null, null];
+  List<String?> menuImages = [];
+
+  // Function to remove an image at a specific index
+  void _removeImage(int index, bool isStall, bool isMenu, bool isBanner) {
+    setState(() {
+      // if (!isMenu) {
+      //   imageUrls[index] = null;
+      // } else {
+      //   menuImages.removeAt(index);
+      // }
+      // if (isBanner) {
+      //   bannerImageUrl = null;
+      // }
+
+      if (isBanner) {
+        bannerImageUrl = null;
+      } else {
+        if (!isMenu) {
+          imageUrls[index] = null;
+        } else {
+          menuImages.removeAt(index);
+        }
+      }
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.sId != null) {
+      fetchStallDetails();
+    }
+  }
+
+  Future<void> fetchStallDetails() async {
+    try {
+      var existingStall =
+          await Provider.of<StallProvider>(context, listen: false)
+              .getStall(widget.sId!);
+
+      if (existingStall != null) {
+        setState(() {
+          _locationController.text = existingStall['location'];
+          currentLocation = existingStall['location'];
+          isLoading = false;
+
+          // Handle stallImages
+          if (existingStall['stallImages'] is List<dynamic>) {
+            imageUrls = List<String?>.from(existingStall['stallImages']);
+          }
+
+          // Handle menuImages
+          if (existingStall['menuImages'] is List<dynamic>) {
+            menuImages = List<String?>.from(existingStall['menuImages']);
+          }
+
+          // Handle bannerImageUrl
+          bannerImageUrl = existingStall['bannerImage'];
+        });
+      } else {
+        Fluttertoast.showToast(
+          msg:
+              "Error while fetching stall details, please fill in the blank spaces",
+          toastLength: Toast.LENGTH_SHORT,
+          timeInSecForIosWeb: 1,
+          backgroundColor: kprimaryColor,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
+      }
+    } catch (e) {
+      print(e);
+      Fluttertoast.showToast(
+        msg:
+            "Error while fetching stall details, please fill in the blank spaces",
+        toastLength: Toast.LENGTH_SHORT,
+        timeInSecForIosWeb: 1,
+        backgroundColor: kprimaryColor,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+    }
+  }
 
   Widget setTitle(String title) {
     return Padding(
@@ -78,12 +169,27 @@ class _StallImagesState extends State<StallImages> {
       });
       Position position = await Geolocator.getCurrentPosition(
           desiredAccuracy: LocationAccuracy.high);
-      setState(() {
-        currentLocation =
-            'Lat: ${position.latitude}, Lng: ${position.longitude}';
-        _locationController.text = currentLocation;
-        isLoading = false;
-      });
+
+      List<Placemark> placemarks =
+          await placemarkFromCoordinates(position.latitude, position.longitude);
+
+      if (placemarks.isNotEmpty) {
+        Placemark placemark = placemarks.first;
+
+        setState(() {
+          String address =
+              "${placemark.street}, ${placemark.subLocality}, ${placemark.locality}, ${placemark.subAdministrativeArea}, ${placemark.administrativeArea}, ";
+          currentLocation = address ?? 'Unknown Address';
+          _locationController.text = currentLocation;
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          currentLocation = 'Unknown Address';
+          _locationController.text = currentLocation;
+          isLoading = false;
+        });
+      }
     } catch (e) {
       print(e);
       setState(() {
@@ -91,10 +197,6 @@ class _StallImagesState extends State<StallImages> {
       });
     }
   }
-
-  final picker = ImagePicker();
-  List<String?> imageUrls = [null, null, null];
-  List<String?> menuImages = [];
 
   Future<String?> uploadImage(File image) async {
     try {
@@ -120,35 +222,91 @@ class _StallImagesState extends State<StallImages> {
     }
   }
 
-  Future<void> _pickImage(int index, bool isMenu) async {
-    final pickedFile = await picker.getImage(source: ImageSource.camera);
+  Future<void> _pickImage(
+      int index, bool isStall, bool isMenu, bool isBanner) async {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Select Image Source"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                title: Text("Camera"),
+                onTap: () {
+                  Navigator.pop(context);
+                  _getImageFromSource(
+                      index, isStall, isMenu, isBanner, ImageSource.camera);
+                },
+              ),
+              ListTile(
+                title: Text("Gallery"),
+                onTap: () {
+                  Navigator.pop(context);
+                  _getImageFromSource(
+                      index, isStall, isMenu, isBanner, ImageSource.gallery);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _getImageFromSource(int index, bool isStall, bool isMenu,
+      bool isBanner, ImageSource source) async {
+    final pickedFile = await picker.getImage(source: source);
+
     setState(() {
       isLoading = true;
     });
-    if (pickedFile != null) {
-      File image = File(pickedFile.path);
 
-      String? imageUrl = await uploadImage(image);
-
-      print("this is uploaded image url : ${imageUrl}");
-
+    if (pickedFile == null) {
+      // User canceled the image picking
       setState(() {
-        if (!isMenu) {
-          imageUrls[index] = imageUrl;
-        } else {
-          menuImages.add(imageUrl);
-        }
         isLoading = false;
       });
+      return;
     }
+
+    File image = File(pickedFile.path);
+    String? imageUrl = await uploadImage(image);
+
+    if (imageUrl == null) {
+      // Handle the case when image upload fails
+      setState(() {
+        isLoading = false;
+      });
+      return;
+    }
+
+    // Handle the case when image upload is successful
+    print("this is uploaded image url: $imageUrl");
+
     setState(() {
+      if (isBanner) {
+        bannerImageUrl = imageUrl;
+        isLoading = false;
+        return;
+      }
+
+      if (!isMenu) {
+        imageUrls[index] = imageUrl;
+      } else {
+        menuImages.add(imageUrl);
+      }
+
       isLoading = false;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    print("this is printed from stallimage scree: ${widget.role + widget.name + widget.ownername + widget.contactnumber}");
+    print(
+        "this is printed from stallimage scree: ${widget.role + widget.name + widget.ownername + widget.contactnumber}");
+
     return Scaffold(
       appBar: const AppBarWidget(
         isSearch: false,
@@ -205,7 +363,7 @@ class _StallImagesState extends State<StallImages> {
                         return Container(
                           width: MediaQuery.of(context).size.width * 0.25,
                           height: MediaQuery.of(context).size.width * 0.25,
-                          margin: EdgeInsets.all(8),
+                          margin: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
                             color: (imageUrls[index] == null)
                                 ? Colors.grey
@@ -223,49 +381,146 @@ class _StallImagesState extends State<StallImages> {
                               if (imageUrls[index] == null)
                                 GestureDetector(
                                   onTap: () {
-                                    _pickImage(index, false);
+                                    _pickImage(index, true, false, false);
                                   },
-                                  child: Icon(
+                                  child: const Icon(
                                     Icons.add_circle,
                                     size: 30,
                                     color: Colors.white,
                                   ),
                                 ),
                               if (imageUrls[index] != null)
-                              ClipRRect(
-                                child: Image.network(
-                                  height:MediaQuery.of(context).size.width * 0.24,
-                                  width: MediaQuery.of(context).size.width * 0.25,
-                                  imageUrls[index]!,
-                                  fit: BoxFit.cover,
+                                Stack(
+                                  children: [
+                                    ClipRRect(
+                                      child: Image.network(
+                                        height:
+                                            MediaQuery.of(context).size.width *
+                                                0.24,
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.25,
+                                        imageUrls[index]!,
+                                        fit: BoxFit.cover,
+                                      ),
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    Positioned(
+                                      top: 5,
+                                      right: 5,
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          _removeImage(
+                                              index, true, false, false);
+                                        },
+                                        child: Container(
+                                          padding: EdgeInsets.all(4),
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color: kprimaryColor,
+                                          ),
+                                          child: Icon(
+                                            Icons.close,
+                                            size: 16,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                borderRadius: BorderRadius.circular(10),
-                              )
                             ],
                           ),
                         );
                       }),
                     ),
-                    setTitle("Uploaded Menu Images Images"),
+                    setTitle("Upload Stall Banner"),
+                    Container(
+                      width: MediaQuery.of(context).size.width,
+                      height: MediaQuery.of(context).size.width * 0.40,
+                      margin: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                          color: Colors.black,
+                        ),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          if (bannerImageUrl == null)
+                            GestureDetector(
+                              onTap: () {
+                                _pickImage(0, false, false, true);
+                              },
+                              child: Icon(
+                                Icons.add_circle,
+                                size: 30,
+                                color: kprimaryColor,
+                              ),
+                            ),
+                          if (bannerImageUrl != null)
+                            Stack(
+                              children: [
+                                ClipRRect(
+                                  child: Image.network(
+                                    height: MediaQuery.of(context).size.width *
+                                        0.39,
+                                    width: MediaQuery.of(context).size.width,
+                                    bannerImageUrl!,
+                                    fit: BoxFit.cover,
+                                  ),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                Positioned(
+                                  top: 5,
+                                  right: 5,
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      _removeImage(0, false, false, true);
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.all(4),
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: kprimaryColor,
+                                      ),
+                                      child: Icon(
+                                        Icons.close,
+                                        size: 16,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                        ],
+                      ),
+                    ),
+                    setTitle("Upload Menu Images"),
                     Container(
                       height: MediaQuery.of(context).size.width * 0.25,
                       child: ListView.builder(
-                        physics: BouncingScrollPhysics(),
+                        physics: const BouncingScrollPhysics(),
                         scrollDirection: Axis.horizontal,
                         itemCount: menuImages.length + 1,
                         itemBuilder: (context, index) {
                           if (index == menuImages.length) {
                             return GestureDetector(
                               onTap: () {
-                                _pickImage(index, true);
+                                _pickImage(index, false, true, false);
                               },
                               child: Container(
                                 width: MediaQuery.of(context).size.width * 0.25,
                                 height:
                                     MediaQuery.of(context).size.width * 0.25,
-                                margin: EdgeInsets.all(8),
+                                margin: const EdgeInsets.all(8),
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(
+                                    color: Colors.black,
+                                  ),
                                 ),
                                 child: Icon(
                                   Icons.add_circle,
@@ -275,30 +530,57 @@ class _StallImagesState extends State<StallImages> {
                               ),
                             );
                           } else {
-                            return Container(
-                              width: MediaQuery.of(context).size.width * 0.25,
-                              height: MediaQuery.of(context).size.width * 0.25,
-                              margin: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(
-                                  color: Colors.black,
+                            return Stack(
+                              children: [
+                                Container(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.25,
+                                  height:
+                                      MediaQuery.of(context).size.width * 0.25,
+                                  margin: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                  child: ClipRRect(
+                                    child: Image.network(
+                                      menuImages[index]!,
+                                      fit: BoxFit.cover,
+                                    ),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
                                 ),
-                              ),
-                              child: ClipRRect(
-                                child: Image.network(
-                                  menuImages[index]!,
-                                  fit: BoxFit.cover,
+                                Positioned(
+                                  top: 10,
+                                  right: 10,
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      _removeImage(index, false, true, false);
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.all(4),
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: kprimaryColor,
+                                      ),
+                                      child: Icon(
+                                        Icons.close,
+                                        size: 16,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
                                 ),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
+                              ],
                             );
                           }
                         },
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 20,
                     ),
                     Container(
@@ -314,13 +596,15 @@ class _StallImagesState extends State<StallImages> {
                                   role: widget.role,
                                   name: widget.name,
                                   ownername: widget.ownername,
-                                  contactnumber: widget.contactnumber),
+                                  contactnumber: widget.contactnumber,
+                                  bannerImageUrl: bannerImageUrl.toString(),
+                                  sId: widget.sId),
                             ),
                           );
                         },
                         child: Container(
                           width: MediaQuery.of(context).size.width * 0.4,
-                          padding: EdgeInsets.all(15),
+                          padding: const EdgeInsets.all(15),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
