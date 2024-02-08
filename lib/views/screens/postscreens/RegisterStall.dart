@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:instreet/constants/constants.dart';
-import 'package:instreet/models/stallModel.dart';
-import 'package:instreet/providers/authProvider.dart';
 import 'package:instreet/providers/stallProvider.dart';
 import 'package:instreet/views/screens/postscreens/StalImages.dart';
 import 'package:instreet/views/widgets/appbar_widget.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
-import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:provider/provider.dart';
 
 class RegisterStall extends StatefulWidget {
@@ -53,7 +50,6 @@ class _RegisterStallState extends State<RegisterStall> {
     }
   }
 
-  // Fetch stall details when sId is provided
   Future<void> fetchStallDetails() async {
 
     var existingStall = await Provider.of<StallProvider>(context, listen: false).getStall(widget.sId!);
@@ -172,6 +168,7 @@ class _RegisterStallState extends State<RegisterStall> {
                   TextFormField(
                     controller: _nameController,
                     keyboardType: TextInputType.name,
+                    textCapitalization: TextCapitalization.sentences,
                     decoration: InputDecoration(
                       hintText: "Enter stall name",
                       hintStyle: kTextPopR14,
@@ -195,6 +192,7 @@ class _RegisterStallState extends State<RegisterStall> {
                   TextFormField(
                     controller: _ownerNameController,
                     keyboardType: TextInputType.name,
+                    textCapitalization: TextCapitalization.sentences,
                     decoration: InputDecoration(
                       hintText: "Enter owner's name",
                       hintStyle: kTextPopR14,

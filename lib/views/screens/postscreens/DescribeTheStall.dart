@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:gradient_borders/box_borders/gradient_box_border.dart';
@@ -12,8 +14,8 @@ import 'package:provider/provider.dart';
 
 // ignore: must_be_immutable
 class DescribeStallPage extends StatefulWidget {
-  List<dynamic> stallImagesList = [];
-  List<dynamic> menuImagesList = [];
+  List<File> stallImagesList = [];
+  List<File> menuImagesList = [];
   String location;
   String role;
   String name;
@@ -40,12 +42,11 @@ class DescribeStallPage extends StatefulWidget {
 }
 
 class _DescribeStallPageState extends State<DescribeStallPage> {
-  
   TextEditingController _descriptionController = TextEditingController();
 
   final MultiSelectController _controller = MultiSelectController();
 
-  List<String> selectedCategories = [];
+  List<dynamic> selectedCategories = [];
 
   List<String> allCategories = [
     'Books',
@@ -107,7 +108,6 @@ class _DescribeStallPageState extends State<DescribeStallPage> {
     }
   }
 
-
   void _openAIDescriptionWidget() {
     showDialog(
       context: context,
@@ -117,7 +117,6 @@ class _DescribeStallPageState extends State<DescribeStallPage> {
     );
   }
 
-  // not yet implement
   Widget AIDescriptionWidget() {
     return Dialog(
       shape: const RoundedRectangleBorder(
@@ -126,7 +125,7 @@ class _DescribeStallPageState extends State<DescribeStallPage> {
         ),
       ),
       child: Container(
-        padding: const  EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -164,15 +163,17 @@ class _DescribeStallPageState extends State<DescribeStallPage> {
                 onTap: null,
                 child: Container(
                   width: MediaQuery.of(context).size.width * 0.4,
-                  padding: const  EdgeInsets.all(15),
-                  child:  Row(
+                  padding: const EdgeInsets.all(15),
+                  child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const Icon(
                         Icons.create,
                         color: Colors.white,
                       ),
-                      const SizedBox(width: 10,),
+                      const SizedBox(
+                        width: 10,
+                      ),
                       Text(
                         "Create",
                         textAlign: TextAlign.center,
@@ -217,44 +218,43 @@ class _DescribeStallPageState extends State<DescribeStallPage> {
       ),
     );
   }
-  
+
   /* Submit Stall Function*/
   Future<void> _submitStall() async {
-
-    // Check if any required field is empty
-    if (widget.name.isEmpty ||
-        widget.bannerImageUrl.isEmpty ||
-        selectedCategories.isEmpty || widget.location.isEmpty || widget.stallImagesList.isEmpty || widget.menuImagesList.isEmpty || widget.ownername.isEmpty || widget.contactnumber.isEmpty || widget.location.isEmpty) {
-      showToast("Please fill in all required fields.");
-      return; // Stop execution if any field is empty
-    }
+    // if (widget.name.isEmpty ||
+    //     selectedCategories.isEmpty || widget.location.isEmpty || widget.stallImagesList.isEmpty || widget.menuImagesList.isEmpty || widget.ownername.isEmpty || widget.contactnumber.isEmpty || widget.location.isEmpty) {
+    //   showToast("Please fill in all required fields.");
+    //   return;
+    // }
 
     setState(() {
       isSubmitting = true;
     });
-
 
     var stallProvider = Provider.of<StallProvider>(context, listen: false);
 
     var authId = Provider.of<Auth>(context, listen: false).token;
 
     try {
-      await stallProvider.addStall(Stall(
+      await stallProvider.addStall(
+        Stall(
           sId: "",
           stallName: widget.name,
           ownerName: widget.ownername,
-          // hardcorded
-          rating: 5.0,
+          rating: 0.0,
           stallCategories: selectedCategories,
           stallDescription: _descriptionController.text,
           bannerImageUrl: widget.bannerImageUrl,
           favoriteUsers: [],
           ownerContact: widget.contactnumber,
           location: widget.location,
-          stallImages: widget.stallImagesList,
-          menuImages: widget.menuImagesList,
-          creatorUID: authId
-        ),);
+          stallImages: [],
+          menuImages: [],
+          creatorUID: authId,
+        ),
+        widget.stallImagesList,
+        widget.menuImagesList,
+      );
 
       Fluttertoast.showToast(
         msg: "Stall Added successfully",
@@ -264,16 +264,13 @@ class _DescribeStallPageState extends State<DescribeStallPage> {
         textColor: Colors.white,
         fontSize: 16.0,
       );
-
-      // ignore: use_build_context_synchronously
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (context) => const PostScreenNav(),
-        ),
-      );
-
+      if (mounted) {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => const PostScreenNav()),
+          (Route<dynamic> route) => false,
+        );
+      }
     } catch (error) {
-
       print("Error submitting stall: $error");
 
       Fluttertoast.showToast(
@@ -282,9 +279,8 @@ class _DescribeStallPageState extends State<DescribeStallPage> {
         timeInSecForIosWeb: 1,
         backgroundColor: Colors.red,
         textColor: Colors.white,
-        fontSize: 16.0,
+        fontSize: 10.0,
       );
-      
     } finally {
       setState(() {
         isSubmitting = false;
@@ -292,14 +288,10 @@ class _DescribeStallPageState extends State<DescribeStallPage> {
     }
   }
 
-  /* stall update */
   Future<void> _updateStall() async {
     if (widget.sId == null) {
-      // No need to update, as it's a new stall
       return;
     }
-
-    // Check if any required field is empty
     if (widget.name.isEmpty ||
         widget.bannerImageUrl.isEmpty ||
         selectedCategories.isEmpty ||
@@ -324,8 +316,7 @@ class _DescribeStallPageState extends State<DescribeStallPage> {
         sId: widget.sId.toString(),
         stallName: widget.name,
         ownerName: widget.ownername,
-        // hardcorded
-        rating: 5.0,
+        rating: 0.0,
         stallCategories: selectedCategories,
         stallDescription: _descriptionController.text,
         bannerImageUrl: widget.bannerImageUrl,
@@ -369,14 +360,14 @@ class _DescribeStallPageState extends State<DescribeStallPage> {
     }
   }
 
-  void showToast(String message){
+  void showToast(String message) {
     Fluttertoast.showToast(
-        msg: message,
-        toastLength: Toast.LENGTH_SHORT,
-        timeInSecForIosWeb: 1,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-        fontSize: 16.0,
+      msg: message,
+      toastLength: Toast.LENGTH_SHORT,
+      timeInSecForIosWeb: 1,
+      backgroundColor: Colors.red,
+      textColor: Colors.white,
+      fontSize: 16.0,
     );
   }
 
@@ -401,12 +392,24 @@ class _DescribeStallPageState extends State<DescribeStallPage> {
                     TextField(
                       controller: _descriptionController,
                       maxLines: 5,
+                      textCapitalization: TextCapitalization.sentences,
                       decoration: InputDecoration(
                         border: OutlineInputBorder(
-                          borderSide: const BorderSide(color: Colors.green),
-                          borderRadius: BorderRadius.circular(10.0),
+                          borderRadius: BorderRadius.circular(15.0),
+                          borderSide:
+                              const BorderSide(color: Colors.black, width: 1.0),
                         ),
-                        labelText: 'Type a large description...',
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                          borderSide:
+                              const BorderSide(color: Colors.black, width: 1.0),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                          borderSide:
+                              BorderSide(color: kprimaryColor, width: 1.0),
+                        ),
+                        labelText: 'Describe The Stall....',
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -418,9 +421,6 @@ class _DescribeStallPageState extends State<DescribeStallPage> {
                         ),
                       ],
                     ),
-                    /*Stall description end*/
-
-                    /*Stall Catgeory start*/
                     setTitle("Stall Category", false),
                     MultiSelectDropDown(
                       controller: _controller,
@@ -433,28 +433,30 @@ class _DescribeStallPageState extends State<DescribeStallPage> {
                       },
                       options: allCategories.map((category) {
                         return ValueItem(
-                            label: category as String,
-                            value: category as String );
+                          label: category.toString(),
+                          value: category.toString(),
+                        );
                       }).toList(),
                       selectionType: SelectionType.multi,
-                      chipConfig: ChipConfig(wrapType: WrapType.scroll,backgroundColor: kprimaryColor),
+                      chipConfig: ChipConfig(
+                          wrapType: WrapType.scroll,
+                          backgroundColor: kprimaryColor),
                       dropdownHeight: 300,
-                      optionTextStyle: TextStyle(fontSize: 16),
+                      optionTextStyle: const TextStyle(fontSize: 16),
                       selectedOptionIcon: const Icon(Icons.check_circle),
                       selectedOptionTextColor: kprimaryColor,
                     ),
-                    /*Stall Catgeory end*/
-
-                    /*Stall Submit Start*/
-                    const SizedBox(
-                      height: 20,
-                    ),
+                    const SizedBox(height: 20),
                     Container(
                       alignment: Alignment.center,
                       child: GestureDetector(
-                        onTap: isSubmitting ? null : (widget.sId != null ? _updateStall : _submitStall),
+                        onTap: isSubmitting
+                            ? null
+                            : (widget.sId != null
+                                ? _updateStall
+                                : _submitStall),
                         child: Container(
-                          width: MediaQuery.of(context).size.width * 0.4,
+                          width: MediaQuery.of(context).size.width * 0.5,
                           padding: const EdgeInsets.all(15),
                           decoration: BoxDecoration(
                             color: kprimaryColor,
@@ -464,18 +466,20 @@ class _DescribeStallPageState extends State<DescribeStallPage> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                isSubmitting ? "Submitting..." : (widget.sId != null ? "Update Stall" : "Submit Stall"),
+                                isSubmitting
+                                    ? "Submitting..."
+                                    : (widget.sId != null
+                                        ? "Update Stall"
+                                        : "Submit Stall"),
                                 textAlign: TextAlign.center,
                                 style: const TextStyle(color: Colors.white),
                               ),
-                              if (isSubmitting)
-                                const SizedBox(
-                                  width: 10,
-                                ),
+                              const SizedBox(width: 10),
                               if (isSubmitting)
                                 const CircularProgressIndicator(
                                   valueColor: AlwaysStoppedAnimation<Color>(
-                                      Colors.white),
+                                    Colors.white,
+                                  ),
                                 )
                               else
                                 const Icon(
@@ -486,8 +490,8 @@ class _DescribeStallPageState extends State<DescribeStallPage> {
                           ),
                         ),
                       ),
-                    )
-                    /*Stall Submit end*/
+                    ),
+                    const SizedBox(height: 20),
                   ],
                 ),
               ),

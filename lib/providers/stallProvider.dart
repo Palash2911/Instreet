@@ -1,19 +1,33 @@
+import 'dart:io';
+
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import '../constants/constants.dart';
 import '../models/stallModel.dart';
 
 class StallProvider extends ChangeNotifier {
-  
   List<Stall> _stalls = [];
 
-  Future<void> addStall(Stall stall) async {
+  Future<void> addStall(Stall stall, List<File> preSI, List<File> preMI) async {
     try {
 
-      // Add Images to Firebase Logic Left
-
-      CollectionReference stallref = FirebaseFirestore.instance.collection('stalls');
+      CollectionReference stallref =
+      FirebaseFirestore.instance.collection('stalls');
 
       DocumentReference documentRef = stallref.doc();
+      for (File image in preSI) {
+        String si = await uploadStallImages(image, documentRef.id, 'StallImages');
+        stall.stallImages.add(si);
+      }
+
+      for (File image in preMI) {
+        String mi = await uploadStallImages(image, documentRef.id, 'MenuImages');
+        stall.menuImages.add(mi);
+      }
+
+      stall.bannerImageUrl = stall.stallImages.isNotEmpty ? stall.stallImages[0] : "";
 
       await documentRef.set({
         'stallName': stall.stallName,
@@ -40,6 +54,35 @@ class StallProvider extends ChangeNotifier {
     }
   }
 
+  Future<String> uploadStallImages(File image, String sId, String type) async {
+    try {
+      String imageType = image.path.split('.').last;
+
+      var storage = FirebaseStorage.instance
+          .ref()
+          .child('Stalls/$sId/$type/${DateTime.now().millisecondsSinceEpoch}.$imageType');
+
+      var metadata = SettableMetadata(
+        contentType: 'image/$imageType',
+      );
+
+      TaskSnapshot taskSnapshot = await storage.putFile(image, metadata);
+      String downloadURL = await taskSnapshot.ref.getDownloadURL();
+
+      return downloadURL;
+    } catch (e) {
+      Fluttertoast.showToast(
+        msg: "Error uploading image: $e",
+        toastLength: Toast.LENGTH_SHORT,
+        timeInSecForIosWeb: 1,
+        backgroundColor: kprimaryColor,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+    }
+    return '';
+  }
+
   Future getStall(String sId) async {
     try {
       DocumentSnapshot userSnapshot =
@@ -54,11 +97,10 @@ class StallProvider extends ChangeNotifier {
     }
   }
 
-   Future updateStall(Stall stall) async {
-
+  Future updateStall(Stall stall) async {
     try {
       String sId = stall.sId;
-      
+
       CollectionReference users =
           FirebaseFirestore.instance.collection('stalls');
       await users.doc(sId).update({
@@ -101,7 +143,8 @@ class StallProvider extends ChangeNotifier {
       }
       notifyListeners();
       try {
-        var stallDoc =FirebaseFirestore.instance.collection('stalls').doc(stallId);
+        var stallDoc =
+            FirebaseFirestore.instance.collection('stalls').doc(stallId);
         await stallDoc
             .update({'favoriteUsers': _stalls[stallIndex].favoriteUsers});
       } catch (e) {
@@ -120,6 +163,8 @@ class StallProvider extends ChangeNotifier {
   }
 
   List<Stall> getAllStalls(String uid) {
-    return _stalls.where((stall) => stall.creatorUID != 'jv46QAi6sWQ4wHq1P2xh7fuklr62').toList();
+    return _stalls
+        .where((stall) => stall.creatorUID != 'jv46QAi6sWQ4wHq1P2xh7fuklr62')
+        .toList();
   }
 }
