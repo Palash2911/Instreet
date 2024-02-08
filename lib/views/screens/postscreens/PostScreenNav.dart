@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:instreet/constants/constants.dart';
 import 'package:instreet/models/stallModel.dart';
@@ -6,7 +5,7 @@ import 'package:instreet/providers/authProvider.dart';
 import 'package:instreet/providers/stallProvider.dart';
 import 'package:instreet/views/screens/postscreens/RegisterStall.dart';
 import 'package:instreet/views/widgets/appbar_widget.dart';
-import 'package:instreet/views/widgets/homePageCard.dart';
+import 'package:instreet/views/widgets/myPostCard.dart';
 import 'package:instreet/views/widgets/shimmerSkeleton.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
@@ -23,6 +22,9 @@ class _PostScreenNavState extends State<PostScreenNav> {
   var isLoading = false;
   var init = true;
   var currentUid = '';
+
+
+  
 
   @override
   void didChangeDependencies() {
@@ -107,7 +109,8 @@ class _PostScreenNavState extends State<PostScreenNav> {
                     itemCount: userStalls.length,
                     itemBuilder: (context, index) {
                       final stall = userStalls[index];
-                      return HomePageCard(stall: stall, isReview: false);
+                      print("printed stalliDS ${stall.sId}");
+                      return MyPostCard(stall: stall, isReview: false,sId: stall.sId);
                     },
                   ),
                 ),

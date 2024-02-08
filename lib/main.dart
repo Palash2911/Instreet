@@ -7,7 +7,6 @@ import 'package:instreet/providers/reviewProvider.dart';
 import 'package:instreet/providers/stallProvider.dart';
 import 'package:instreet/providers/userProvider.dart';
 import 'package:provider/provider.dart';
-
 import 'constants/constants.dart';
 import 'constants/routes.dart';
 
