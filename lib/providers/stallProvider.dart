@@ -186,8 +186,7 @@ class StallProvider extends ChangeNotifier {
   List<Stall> getCategoryStalls(String category, String uid) {
     return _stalls
         .where((stall) =>
-            stall.stallCategories.contains(category) &&
-            stall.creatorUID != uid)
+            stall.stallCategories.contains(category) && stall.creatorUID != uid)
         .toList();
   }
 
@@ -196,8 +195,14 @@ class StallProvider extends ChangeNotifier {
   }
 
   List<Stall> getAllStalls(String uid) {
-    return _stalls
-        .where((stall) => stall.creatorUID != 'jv46QAi6sWQ4wHq1P2xh7fuklr62')
+    return _stalls.where((stall) => stall.creatorUID != uid).toList();
+  }
+
+  List<Stall> getSearchStalls(String query, String uid) {
+    return _stalls = _stalls
+        .where((stall) =>
+            stall.stallName.toLowerCase().contains(query.toLowerCase()) &&
+            stall.creatorUID != uid)
         .toList();
   }
 }

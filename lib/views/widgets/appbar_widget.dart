@@ -1,21 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:instreet/constants/constants.dart';
+import 'package:instreet/providers/stallProvider.dart';
+import 'package:provider/provider.dart';
 
 class AppBarWidget extends StatefulWidget implements PreferredSizeWidget {
   final bool isSearch;
   final String screenTitle;
-  const AppBarWidget(
-      {super.key, required this.isSearch, required this.screenTitle});
+  final Function(String)? onSearch;
+
+  const AppBarWidget({
+    super.key,
+    required this.isSearch,
+    required this.screenTitle,
+    this.onSearch,
+  });
 
   @override
   State<AppBarWidget> createState() => _AppBarWidgetState();
 
   @override
   Size get preferredSize => const Size.fromHeight(
-      kToolbarHeight); // Increased height for bottom curve
+        kToolbarHeight,
+      );
 }
 
 class _AppBarWidgetState extends State<AppBarWidget> {
+
   @override
   Widget build(BuildContext context) {
     return AppBar(
@@ -34,19 +44,20 @@ class _AppBarWidgetState extends State<AppBarWidget> {
                       color: Colors.grey[300],
                       borderRadius: BorderRadius.circular(30),
                     ),
-                    child: const Row(
+                    child: Row(
                       children: [
-                        SizedBox(width: 10),
+                        const SizedBox(width: 10),
                         Icon(Icons.search, color: Colors.black),
-                        SizedBox(width: 10),
+                        const SizedBox(width: 10),
                         Flexible(
                           child: TextField(
-                            decoration: InputDecoration(
-                              hintText: "Search here",
+                            decoration: const InputDecoration(
+                              hintText: "Search Stall Name",
                               border: InputBorder.none,
                               hintStyle: TextStyle(color: Colors.black),
                             ),
-                            style: TextStyle(color: Colors.white),
+                            style: const TextStyle(color: Colors.black),
+                            onChanged: widget.onSearch,
                           ),
                         ),
                       ],

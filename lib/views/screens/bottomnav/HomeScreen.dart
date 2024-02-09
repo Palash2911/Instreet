@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:instreet/providers/stallProvider.dart';
 import 'package:instreet/views/screens/bottomnav/Categories.dart';
@@ -41,6 +43,15 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  void loadSearchStalls(String query) {
+    if (query.isEmpty) {
+      Provider.of<StallProvider>(context, listen: false).fetchStalls();
+    } else {
+      Provider.of<StallProvider>(context, listen: false)
+          .getSearchStalls(query, currentUid);
+    }
+  }
+
   Future<void> loadStallsData(BuildContext context) async {
     setState(() {
       isLoading = true;
@@ -75,7 +86,13 @@ class _HomeScreenState extends State<HomeScreen> {
         : [];
 
     return Scaffold(
-      appBar: const AppBarWidget(isSearch: true, screenTitle: 'Home'),
+      appBar: AppBarWidget(
+        isSearch: true,
+        screenTitle: 'Home',
+        onSearch: (query) {
+          loadSearchStalls(query);
+        },
+      ),
       body: SafeArea(
         child: isLoading
             ? ListView.builder(
