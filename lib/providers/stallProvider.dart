@@ -54,6 +54,29 @@ class StallProvider extends ChangeNotifier {
     }
   }
 
+  Future<void> deleteStall(String sId) async {
+    try {
+      DocumentReference documentReference = FirebaseFirestore.instance.collection('stalls').doc(sId);
+      String folderPath = 'Stalls/$sId/MenuImages/';
+      String folderPath2 = 'Stalls/$sId/StallImages/';
+      final storageRef = FirebaseStorage.instance.ref().child(folderPath);
+      final listResult = await storageRef.listAll();
+      for (var item in listResult.items) {
+        await item.delete();
+      }
+      final storageRef2 = FirebaseStorage.instance.ref().child(folderPath2);
+      final listResult2 = await storageRef2.listAll();
+      for (var item in listResult2.items) {
+        await item.delete();
+      }
+      _stalls.removeWhere((stall) => stall.sId == sId);
+      await documentReference.delete();
+    } catch (e) {
+      print(e);
+      rethrow;
+    }
+  }
+
   Future<String> uploadStallImages(File image, String sId, String type) async {
     try {
       String imageType = image.path.split('.').last;

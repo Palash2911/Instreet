@@ -30,7 +30,7 @@ class StallImages extends StatefulWidget {
 
 class _StallImagesState extends State<StallImages> {
   final TextEditingController _locationController = TextEditingController();
-  String currentLocation = '';
+  String get currentLocation => _locationController.text;
 
   bool useCurrentLocation = false;
   bool isLoading = false;
@@ -54,15 +54,12 @@ class _StallImagesState extends State<StallImages> {
       if (existingStall != null) {
         setState(() {
           _locationController.text = existingStall['location'];
-          currentLocation = existingStall['location'];
           isLoading = false;
 
-          // Handle stallImages
           if (existingStall['stallImages'] is List<dynamic>) {
             // imageUrls = List<String>.from(existingStall['stallImages']);
           }
 
-          // Handle menuImages
           if (existingStall['menuImages'] is List<dynamic>) {
             // menuImages = List<String>.from(existingStall['menuImages']);
           }
@@ -146,14 +143,12 @@ class _StallImagesState extends State<StallImages> {
         setState(() {
           String address =
               "${placemark.street}, ${placemark.subLocality}, ${placemark.locality}, ${placemark.subAdministrativeArea}, ${placemark.administrativeArea}, ";
-          currentLocation = address ?? 'Unknown Address';
-          _locationController.text = currentLocation;
+          _locationController.text = address ?? 'Unknown Address';
           isLoading = false;
         });
       } else {
         setState(() {
-          currentLocation = 'Unknown Address';
-          _locationController.text = currentLocation;
+          _locationController.text = 'Unknown Address';
           isLoading = false;
         });
       }
@@ -239,8 +234,9 @@ class _StallImagesState extends State<StallImages> {
   }
 
   void _shiftPage() {
-    if (currentLocation.isNotEmpty ||
-        menuImages.isNotEmpty ||
+    print(currentLocation);
+    if (currentLocation.isNotEmpty &&
+        menuImages.isNotEmpty &&
         stallImages.isNotEmpty) {
       Navigator.of(context).push(
         MaterialPageRoute(
@@ -489,8 +485,8 @@ class _StallImagesState extends State<StallImages> {
                       child: GestureDetector(
                         onTap: _shiftPage,
                         child: Opacity(
-                          opacity: currentLocation.isNotEmpty ||
-                                  menuImages.isNotEmpty ||
+                          opacity: currentLocation.isNotEmpty &&
+                                  menuImages.isNotEmpty &&
                                   stallImages.isNotEmpty
                               ? 1
                               : 0.7,

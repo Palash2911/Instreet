@@ -221,11 +221,10 @@ class _DescribeStallPageState extends State<DescribeStallPage> {
 
   /* Submit Stall Function*/
   Future<void> _submitStall() async {
-    // if (widget.name.isEmpty ||
-    //     selectedCategories.isEmpty || widget.location.isEmpty || widget.stallImagesList.isEmpty || widget.menuImagesList.isEmpty || widget.ownername.isEmpty || widget.contactnumber.isEmpty || widget.location.isEmpty) {
-    //   showToast("Please fill in all required fields.");
-    //   return;
-    // }
+    if (selectedCategories.isEmpty && _descriptionController.text.isNotEmpty) {
+      showToast("Please Fill All Fields !");
+      return;
+    }
 
     setState(() {
       isSubmitting = true;
@@ -289,9 +288,6 @@ class _DescribeStallPageState extends State<DescribeStallPage> {
   }
 
   Future<void> _updateStall() async {
-    if (widget.sId == null) {
-      return;
-    }
     if (widget.name.isEmpty ||
         widget.bannerImageUrl.isEmpty ||
         selectedCategories.isEmpty ||
@@ -302,7 +298,7 @@ class _DescribeStallPageState extends State<DescribeStallPage> {
         widget.contactnumber.isEmpty ||
         widget.location.isEmpty) {
       showToast("Please fill in all required fields.");
-      return; // Stop execution if any field is empty
+      return;
     }
 
     setState(() {
@@ -312,21 +308,23 @@ class _DescribeStallPageState extends State<DescribeStallPage> {
     var stallProvider = Provider.of<StallProvider>(context, listen: false);
 
     try {
-      await stallProvider.updateStall(Stall(
-        sId: widget.sId.toString(),
-        stallName: widget.name,
-        ownerName: widget.ownername,
-        rating: 0.0,
-        stallCategories: selectedCategories,
-        stallDescription: _descriptionController.text,
-        bannerImageUrl: widget.bannerImageUrl,
-        favoriteUsers: [],
-        ownerContact: widget.contactnumber,
-        location: widget.location,
-        stallImages: widget.stallImagesList,
-        menuImages: widget.menuImagesList,
-        creatorUID: Provider.of<Auth>(context, listen: false).token,
-      ));
+      await stallProvider.updateStall(
+        Stall(
+          sId: widget.sId.toString(),
+          stallName: widget.name,
+          ownerName: widget.ownername,
+          rating: 0.0,
+          stallCategories: selectedCategories,
+          stallDescription: _descriptionController.text,
+          bannerImageUrl: widget.bannerImageUrl,
+          favoriteUsers: [],
+          ownerContact: widget.contactnumber,
+          location: widget.location,
+          stallImages: widget.stallImagesList,
+          menuImages: widget.menuImagesList,
+          creatorUID: Provider.of<Auth>(context, listen: false).token,
+        ),
+      );
 
       Fluttertoast.showToast(
         msg: "Stall Updated successfully",

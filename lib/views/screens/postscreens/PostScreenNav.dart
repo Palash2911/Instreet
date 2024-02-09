@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:instreet/constants/constants.dart';
 import 'package:instreet/models/stallModel.dart';
 import 'package:instreet/providers/authProvider.dart';
@@ -23,9 +24,6 @@ class _PostScreenNavState extends State<PostScreenNav> {
   var init = true;
   var currentUid = '';
 
-
-  
-
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -49,6 +47,38 @@ class _PostScreenNavState extends State<PostScreenNav> {
         setState(() {
           isLoading = false;
         });
+      });
+    }
+  }
+
+  Future<void> deleteStall(String sId) async {
+    try {
+      setState(() {
+        isLoading = true;
+      });
+      await Provider.of<StallProvider>(context, listen: false).deleteStall(sId);
+      Fluttertoast.showToast(
+        msg: "Stall Deleted Successfully",
+        toastLength: Toast.LENGTH_SHORT,
+        timeInSecForIosWeb: 1,
+        backgroundColor: kprimaryColor,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+      if (mounted) {
+        loadAddedStalls(context);
+      }
+    } catch (error) {
+      Fluttertoast.showToast(
+        msg: "Error while deleting stall",
+        toastLength: Toast.LENGTH_SHORT,
+        timeInSecForIosWeb: 1,
+        backgroundColor: kprimaryColor,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+      setState(() {
+        isLoading = false;
       });
     }
   }
@@ -109,8 +139,12 @@ class _PostScreenNavState extends State<PostScreenNav> {
                     itemCount: userStalls.length,
                     itemBuilder: (context, index) {
                       final stall = userStalls[index];
-                      print("printed stalliDS ${stall.sId}");
-                      return MyPostCard(stall: stall, isReview: false,sId: stall.sId);
+                      return MyPostCard(
+                        stall: stall,
+                        isReview: false,
+                        sId: stall.sId,
+                        onDelete: deleteStall,
+                      );
                     },
                   ),
                 ),

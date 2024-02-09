@@ -11,8 +11,13 @@ import '../../../models/reviewModel.dart';
 class ReviewsWidget extends StatefulWidget {
   final List<ReviewModel> stallReviews;
   final String sId;
-  const ReviewsWidget(
-      {super.key, required this.stallReviews, required this.sId});
+  final String creatorUid;
+  const ReviewsWidget({
+    super.key,
+    required this.stallReviews,
+    required this.sId,
+    required this.creatorUid,
+  });
 
   @override
   State<ReviewsWidget> createState() => _ReviewsWidgetState();
@@ -22,6 +27,18 @@ class _ReviewsWidgetState extends State<ReviewsWidget> {
   void _showAddReviewDialog(BuildContext context) {
     final TextEditingController _reviewController = TextEditingController();
     int _currentRating = 0;
+    var authToken = Provider.of<Auth>(context, listen: false).token;
+    if (widget.creatorUid == authToken) {
+      Fluttertoast.showToast(
+        msg: "Creators Can't Review !",
+        toastLength: Toast.LENGTH_SHORT,
+        timeInSecForIosWeb: 1,
+        backgroundColor: const Color(0xFFFF4500),
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+      return;
+    }
 
     showDialog(
       context: context,
@@ -172,20 +189,31 @@ class _ReviewsWidgetState extends State<ReviewsWidget> {
             ],
           ),
           const SizedBox(height: 15),
-          SizedBox(
-            height: 300,
-            child: ListView.builder(
-              itemCount: widget.stallReviews.length,
-              itemBuilder: (context, index) {
-                final review = widget.stallReviews[index];
-                return StallReviewCard(
-                  userName: review.userName,
-                  rating: review.rating.roundToDouble(),
-                  review: review.review,
-                );
-              },
-            ),
-          ),
+          widget.stallReviews.isEmpty
+              ? Align(
+                  alignment: Alignment.center,
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 10, bottom: 10),
+                    child: Text(
+                      'No Reviews Yet',
+                      style: kTextPopB16,
+                    ),
+                  ),
+                )
+              : SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.25,
+                  child: ListView.builder(
+                    itemCount: widget.stallReviews.length,
+                    itemBuilder: (context, index) {
+                      final review = widget.stallReviews[index];
+                      return StallReviewCard(
+                        userName: review.userName,
+                        rating: review.rating.roundToDouble(),
+                        review: review.review,
+                      );
+                    },
+                  ),
+                ),
         ],
       ),
     );
