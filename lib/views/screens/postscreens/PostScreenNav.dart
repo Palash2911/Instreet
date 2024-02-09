@@ -113,7 +113,7 @@ class _PostScreenNavState extends State<PostScreenNav> {
                     children: [
                       GestureDetector(
                         onTap: () {
-                          Navigator.of(context).push(
+                          Navigator.of(context, rootNavigator: true).push(
                             MaterialPageRoute(
                               builder: (context) => const RegisterStall(),
                             ),
@@ -153,7 +153,7 @@ class _PostScreenNavState extends State<PostScreenNav> {
           : FloatingActionButton(
               backgroundColor: kprimaryColor,
               onPressed: () {
-                Navigator.of(context).push(
+                Navigator.of(context, rootNavigator: true).push(
                   MaterialPageRoute(
                     builder: (context) => const RegisterStall(),
                   ),

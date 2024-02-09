@@ -12,22 +12,24 @@ class StallProvider extends ChangeNotifier {
 
   Future<void> addStall(Stall stall, List<File> preSI, List<File> preMI) async {
     try {
-
       CollectionReference stallref =
-      FirebaseFirestore.instance.collection('stalls');
+          FirebaseFirestore.instance.collection('stalls');
 
       DocumentReference documentRef = stallref.doc();
       for (File image in preSI) {
-        String si = await uploadStallImages(image, documentRef.id, 'StallImages');
+        String si =
+            await uploadStallImages(image, documentRef.id, 'StallImages');
         stall.stallImages.add(si);
       }
 
       for (File image in preMI) {
-        String mi = await uploadStallImages(image, documentRef.id, 'MenuImages');
+        String mi =
+            await uploadStallImages(image, documentRef.id, 'MenuImages');
         stall.menuImages.add(mi);
       }
 
-      stall.bannerImageUrl = stall.stallImages.isNotEmpty ? stall.stallImages[0] : "";
+      stall.bannerImageUrl =
+          stall.stallImages.isNotEmpty ? stall.stallImages[0] : "";
 
       await documentRef.set({
         'stallName': stall.stallName,
@@ -56,7 +58,8 @@ class StallProvider extends ChangeNotifier {
 
   Future<void> deleteStall(String sId) async {
     try {
-      DocumentReference documentReference = FirebaseFirestore.instance.collection('stalls').doc(sId);
+      DocumentReference documentReference =
+          FirebaseFirestore.instance.collection('stalls').doc(sId);
       String folderPath = 'Stalls/$sId/MenuImages/';
       String folderPath2 = 'Stalls/$sId/StallImages/';
       final storageRef = FirebaseStorage.instance.ref().child(folderPath);
@@ -81,9 +84,8 @@ class StallProvider extends ChangeNotifier {
     try {
       String imageType = image.path.split('.').last;
 
-      var storage = FirebaseStorage.instance
-          .ref()
-          .child('Stalls/$sId/$type/${DateTime.now().millisecondsSinceEpoch}.$imageType');
+      var storage = FirebaseStorage.instance.ref().child(
+          'Stalls/$sId/$type/${DateTime.now().millisecondsSinceEpoch}.$imageType');
 
       var metadata = SettableMetadata(
         contentType: 'image/$imageType',
@@ -179,6 +181,14 @@ class StallProvider extends ChangeNotifier {
 
   List<Stall> getFavoriteStalls(String uid) {
     return _stalls.where((stall) => stall.favoriteUsers.contains(uid)).toList();
+  }
+
+  List<Stall> getCategoryStalls(String category, String uid) {
+    return _stalls
+        .where((stall) =>
+            stall.stallCategories.contains(category) &&
+            stall.creatorUID != uid)
+        .toList();
   }
 
   List<Stall> getUserRegisteredStalls(String uid) {

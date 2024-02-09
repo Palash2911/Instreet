@@ -5,7 +5,7 @@ import 'package:instreet/views/screens/onboarding/login.dart';
 import 'package:instreet/views/screens/onboarding/permission.dart';
 import 'package:instreet/views/screens/onboarding/register.dart';
 import 'package:instreet/views/screens/onboarding/splashScreen.dart';
-import 'package:instreet/views/screens/postscreens/Categories.dart';
+import 'package:instreet/views/screens/bottomnav/Categories.dart';
 import 'package:instreet/views/screens/stallscreen/StallScreen.dart';
 
 var approutes = <String, WidgetBuilder>{
@@ -21,7 +21,6 @@ var approutes = <String, WidgetBuilder>{
   BottomNav.routeName: (context) => const BottomNav(),
 
   // Other Routes
-  Categories.routeName: (context) => const Categories(),
   EditProfileScreen.routeName: (context) => const EditProfileScreen(),
   StallScreen.routeName: (context) => const StallScreen(),
 };

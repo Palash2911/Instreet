@@ -1,11 +1,11 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:instreet/constants/constants.dart';
-import 'package:instreet/views/screens/postscreens/Categories.dart';
+import 'package:instreet/views/screens/bottomnav/Categories.dart';
 
 class CategoriesItems extends StatefulWidget {
   const CategoriesItems({super.key, required this.NavigateCategory});
-  final Function(int) NavigateCategory;
+  final Function(String) NavigateCategory;
 
   @override
   State<CategoriesItems> createState() => _CategoriesListState();
@@ -26,7 +26,7 @@ class _CategoriesListState extends State<CategoriesItems> {
           child: Column(
             children: [
               GestureDetector(
-                onTap: () => widget.NavigateCategory(index),
+                onTap: () => widget.NavigateCategory(categories[index].name),
                 child: CircleAvatar(
                   backgroundImage: AssetImage(categories[index].imagePath),
                   radius: 30,

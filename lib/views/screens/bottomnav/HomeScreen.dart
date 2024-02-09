@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:instreet/providers/stallProvider.dart';
-import 'package:instreet/views/screens/postscreens/Categories.dart';
+import 'package:instreet/views/screens/bottomnav/Categories.dart';
 import 'package:instreet/views/widgets/header_widget.dart';
 import 'package:instreet/views/widgets/homePageCard.dart';
 import 'package:instreet/views/widgets/shimmerSkeleton.dart';
@@ -58,10 +58,12 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  void navigateCategory(int index) {
-    Navigator.of(context, rootNavigator: true).push(
+  void navigateCategory(String category) {
+    Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => const Categories(),
+        builder: (context) => Categories(
+          category: category,
+        ),
       ),
     );
   }

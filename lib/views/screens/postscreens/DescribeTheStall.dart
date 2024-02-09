@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -63,7 +64,7 @@ class _DescribeStallPageState extends State<DescribeStallPage> {
     'Other'
   ];
 
-  bool isSubmitting = false;
+  bool isLoading = false;
 
   @override
   void initState() {
@@ -219,15 +220,14 @@ class _DescribeStallPageState extends State<DescribeStallPage> {
     );
   }
 
-  /* Submit Stall Function*/
   Future<void> _submitStall() async {
-    if (selectedCategories.isEmpty && _descriptionController.text.isNotEmpty) {
+    if (selectedCategories.isEmpty && _descriptionController.text.isEmpty) {
       showToast("Please Fill All Fields !");
       return;
     }
 
     setState(() {
-      isSubmitting = true;
+      isLoading = true;
     });
 
     var stallProvider = Provider.of<StallProvider>(context, listen: false);
@@ -264,10 +264,7 @@ class _DescribeStallPageState extends State<DescribeStallPage> {
         fontSize: 16.0,
       );
       if (mounted) {
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => const PostScreenNav()),
-          (Route<dynamic> route) => false,
-        );
+        Navigator.of(context).pushReplacementNamed('bottom-nav');
       }
     } catch (error) {
       print("Error submitting stall: $error");
@@ -282,7 +279,7 @@ class _DescribeStallPageState extends State<DescribeStallPage> {
       );
     } finally {
       setState(() {
-        isSubmitting = false;
+        isLoading = false;
       });
     }
   }
@@ -302,7 +299,7 @@ class _DescribeStallPageState extends State<DescribeStallPage> {
     }
 
     setState(() {
-      isSubmitting = true;
+      isLoading = true;
     });
 
     var stallProvider = Provider.of<StallProvider>(context, listen: false);
@@ -334,12 +331,9 @@ class _DescribeStallPageState extends State<DescribeStallPage> {
         textColor: Colors.white,
         fontSize: 16.0,
       );
-
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (context) => const PostScreenNav(),
-        ),
-      );
+      if (mounted) {
+        Navigator.of(context).pushReplacementNamed('bottom-nav');
+      }
     } catch (error) {
       print("Error updating stall: $error");
 
@@ -353,7 +347,7 @@ class _DescribeStallPageState extends State<DescribeStallPage> {
       );
     } finally {
       setState(() {
-        isSubmitting = false;
+        isLoading = false;
       });
     }
   }
@@ -382,6 +376,7 @@ class _DescribeStallPageState extends State<DescribeStallPage> {
             child: SafeArea(
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
+                height: MediaQuery.of(context).size.height * 0.96,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -444,46 +439,38 @@ class _DescribeStallPageState extends State<DescribeStallPage> {
                       selectedOptionIcon: const Icon(Icons.check_circle),
                       selectedOptionTextColor: kprimaryColor,
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 40),
                     Container(
                       alignment: Alignment.center,
                       child: GestureDetector(
-                        onTap: isSubmitting
+                        onTap: isLoading
                             ? null
                             : (widget.sId != null
                                 ? _updateStall
                                 : _submitStall),
                         child: Container(
-                          width: MediaQuery.of(context).size.width * 0.5,
+                          width: MediaQuery.of(context).size.width,
                           padding: const EdgeInsets.all(15),
                           decoration: BoxDecoration(
                             color: kprimaryColor,
-                            borderRadius: BorderRadius.circular(50),
+                            borderRadius: BorderRadius.circular(10),
                           ),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                isSubmitting
-                                    ? "Submitting..."
-                                    : (widget.sId != null
-                                        ? "Update Stall"
-                                        : "Submit Stall"),
+                                (widget.sId != null
+                                    ? "Update Stall"
+                                    : "Let's Add Stall"),
                                 textAlign: TextAlign.center,
-                                style: const TextStyle(color: Colors.white),
+                                style:
+                                    kTextPopM16.copyWith(color: Colors.white),
                               ),
                               const SizedBox(width: 10),
-                              if (isSubmitting)
-                                const CircularProgressIndicator(
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                    Colors.white,
-                                  ),
-                                )
-                              else
-                                const Icon(
-                                  Icons.arrow_forward,
-                                  color: Colors.white,
-                                ),
+                              const Icon(
+                                Icons.arrow_forward,
+                                color: Colors.white,
+                              ),
                             ],
                           ),
                         ),
@@ -495,6 +482,18 @@ class _DescribeStallPageState extends State<DescribeStallPage> {
               ),
             ),
           ),
+          if (isLoading)
+            Positioned.fill(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
+                child: Container(
+                  color: Colors.black.withOpacity(0.1),
+                  child: const Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                ),
+              ),
+            ),
         ],
       ),
     );

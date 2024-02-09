@@ -41,8 +41,6 @@ TextStyle kTextPopB14 =
 TextStyle kTextPopR12 =
     GoogleFonts.poppins(fontSize: 12.0, fontWeight: FontWeight.w400);
 
-
-
 List<Category> categories = [
   Category('Books', 'assets/images/book.jpg'),
   Category('Electronics', 'assets/images/electronics.png'),
@@ -58,8 +56,7 @@ List<Category> categories = [
   Category('Other', 'assets/images/all.png')
 ];
 
-
 double calculateGridHeight() {
-    int numberOfRows = (categories.length / 4).ceil();
-    return numberOfRows * 100.0;
+  int numberOfRows = (categories.length / 4).ceil();
+  return numberOfRows * 100.0;
 }
