@@ -1,41 +1,46 @@
 import 'dart:io';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:instreet/constants/constants.dart';
 import 'package:instreet/providers/stallProvider.dart';
-import 'package:instreet/views/screens/postscreens/DescribeTheStall.dart';
+import 'package:instreet/views/screens/postscreens/RegisterStall3.dart';
 import 'package:instreet/views/widgets/appbar_widget.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:provider/provider.dart';
 
-class StallImages extends StatefulWidget {
-  String role;
-  String name;
-  String ownerName;
-  String contactNumber;
-  String? sId;
-  StallImages(
-      {super.key,
-      required this.role,
-      required this.name,
-      required this.ownerName,
-      required this.contactNumber,
-      this.sId});
+import '../../../models/stallModel.dart';
+import '../../../providers/authProvider.dart';
+
+class RegisterStall2 extends StatefulWidget {
+  final String role;
+  final String name;
+  final String ownerName;
+  final String contactNumber;
+  final String? sId;
+  const RegisterStall2({
+    super.key,
+    required this.role,
+    required this.name,
+    required this.ownerName,
+    required this.contactNumber,
+    this.sId,
+  });
 
   @override
-  State<StallImages> createState() => _StallImagesState();
+  State<RegisterStall2> createState() => _RegisterStall2State();
 }
 
-class _StallImagesState extends State<StallImages> {
+class _RegisterStall2State extends State<RegisterStall2> {
   final TextEditingController _locationController = TextEditingController();
   String get currentLocation => _locationController.text;
 
   bool useCurrentLocation = false;
   bool isLoading = false;
-  List<File> stallImages = [];
-  List<File> menuImages = [];
+  List<dynamic> stallImages = [];
+  List<dynamic> menuImages = [];
 
   @override
   void initState() {
@@ -47,34 +52,16 @@ class _StallImagesState extends State<StallImages> {
 
   Future<void> fetchStallDetails() async {
     try {
-      var existingStall =
-          await Provider.of<StallProvider>(context, listen: false)
-              .getStall(widget.sId!);
-
-      if (existingStall != null) {
-        setState(() {
-          _locationController.text = existingStall['location'];
-          isLoading = false;
-
-          if (existingStall['stallImages'] is List<dynamic>) {
-            // imageUrls = List<String>.from(existingStall['stallImages']);
-          }
-
-          if (existingStall['menuImages'] is List<dynamic>) {
-            // menuImages = List<String>.from(existingStall['menuImages']);
-          }
-        });
-      } else {
-        Fluttertoast.showToast(
-          msg:
-              "Error while fetching stall details, please fill in the blank spaces",
-          toastLength: Toast.LENGTH_SHORT,
-          timeInSecForIosWeb: 1,
-          backgroundColor: kprimaryColor,
-          textColor: Colors.white,
-          fontSize: 16.0,
-        );
-      }
+      var authToken = Provider.of<Auth>(context, listen: false).token;
+      Stall existingStall = Provider.of<StallProvider>(context, listen: false)
+          .getUserRegisteredStalls(authToken)
+          .firstWhere((stall) => stall.sId == widget.sId);
+      setState(() {
+        _locationController.text = existingStall.location;
+        isLoading = false;
+        stallImages = existingStall.stallImages;
+        menuImages = existingStall.menuImages;
+      });
     } catch (e) {
       print(e);
       Fluttertoast.showToast(
@@ -234,21 +221,19 @@ class _StallImagesState extends State<StallImages> {
   }
 
   void _shiftPage() {
-    print(currentLocation);
     if (currentLocation.isNotEmpty &&
         menuImages.isNotEmpty &&
         stallImages.isNotEmpty) {
       Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (context) => DescribeStallPage(
+          builder: (context) => RegisterStall3(
             stallImagesList: stallImages,
             menuImagesList: menuImages,
             location: currentLocation,
             role: widget.role,
             name: widget.name,
-            ownername: widget.ownerName,
-            contactnumber: widget.contactNumber,
-            bannerImageUrl: '',
+            ownerName: widget.ownerName,
+            contactNumber: widget.contactNumber,
             sId: widget.sId,
           ),
         ),
@@ -365,19 +350,22 @@ class _StallImagesState extends State<StallImages> {
                                   ),
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(10),
-                                    child: Image.file(
-                                      stallImages[index]!,
-                                      fit: BoxFit.cover,
-                                    ),
+                                    child: stallImages[index] is! String
+                                        ? Image.file(
+                                            stallImages[index]!,
+                                            fit: BoxFit.cover,
+                                          )
+                                        : Image.network(
+                                            stallImages[index]!,
+                                            fit: BoxFit.cover,
+                                          ),
                                   ),
                                 ),
                                 Positioned(
                                   top: 10,
                                   right: 10,
                                   child: GestureDetector(
-                                    onTap: () {
-                                      _removeImage(index, false);
-                                    },
+                                    onTap: () => _removeImage(index, false),
                                     child: Container(
                                       padding: const EdgeInsets.all(4),
                                       decoration: BoxDecoration(
@@ -447,10 +435,15 @@ class _StallImagesState extends State<StallImages> {
                                   ),
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(10),
-                                    child: Image.file(
-                                      menuImages[index],
-                                      fit: BoxFit.cover,
-                                    ),
+                                    child: menuImages[index] is! String
+                                        ? Image.file(
+                                            menuImages[index],
+                                            fit: BoxFit.cover,
+                                          )
+                                        : Image.network(
+                                            menuImages[index],
+                                            fit: BoxFit.cover,
+                                          ),
                                   ),
                                 ),
                                 Positioned(

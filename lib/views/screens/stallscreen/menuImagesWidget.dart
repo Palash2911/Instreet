@@ -19,7 +19,7 @@ class _StallMenuImagesState extends State<StallMenuImages> {
           behavior: HitTestBehavior.opaque,
           child: Dialog(
             backgroundColor: Colors.transparent,
-            insetPadding: EdgeInsets.all(10),
+            insetPadding: const EdgeInsets.all(10),
             child: GestureDetector(
               onTap: () {},
               child: InteractiveViewer(
@@ -51,7 +51,7 @@ class _StallMenuImagesState extends State<StallMenuImages> {
         return GestureDetector(
           onTap: () => _showImageDialog(widget.menuImages[index]),
           child: ClipRRect(
-            borderRadius: BorderRadius.horizontal(
+            borderRadius: const BorderRadius.horizontal(
               left: Radius.circular(10),
               right: Radius.circular(10),
             ),

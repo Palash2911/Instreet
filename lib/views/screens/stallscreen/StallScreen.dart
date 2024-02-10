@@ -24,6 +24,7 @@ class StallScreen extends StatefulWidget {
 
 class _StallScreenState extends State<StallScreen> {
   var sId = '';
+  var isCreator = '';
   var isInit = false;
   var isLoading = true;
   late Stall stall;
@@ -33,7 +34,9 @@ class _StallScreenState extends State<StallScreen> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (!isInit) {
-      sId = ModalRoute.of(context)?.settings.arguments as String;
+      final args = ModalRoute.of(context)?.settings.arguments as List<dynamic>;
+      sId = args[0] as String;
+      isCreator = args[1] as String;
       getStallFromID();
     }
     setState(() {
@@ -52,9 +55,15 @@ class _StallScreenState extends State<StallScreen> {
       await stallProvider.fetchStalls();
       await reviewProvider.fetchReviews();
       if (mounted) {
-        stall = stallProvider
-            .getAllStalls(authToken)
-            .firstWhere((stall) => stall.sId == sId);
+        if (isCreator=='user') {
+          stall = stallProvider
+              .getAllStalls(authToken)
+              .firstWhere((stall) => stall.sId == sId);
+        } else {
+          stall = stallProvider
+              .getUserRegisteredStalls(authToken)
+              .firstWhere((stall) => stall.sId == sId);
+        }
         reviews = reviewProvider.getStallReview(sId);
       }
     } else {
@@ -97,7 +106,7 @@ class _StallScreenState extends State<StallScreen> {
                           ownerName: stall.ownerName,
                           ownerContact: stall.ownerContact,
                         ),
-                        stall.menuImages.length > 0
+                        stall.menuImages.isNotEmpty
                             ? Padding(
                                 padding: const EdgeInsets.all(9.0),
                                 child: Column(

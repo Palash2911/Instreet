@@ -10,28 +10,48 @@ import '../models/stallModel.dart';
 class StallProvider extends ChangeNotifier {
   List<Stall> _stalls = [];
 
-  Future<void> addStall(Stall stall, List<File> preSI, List<File> preMI) async {
+  Future<void> addStall(Stall stall, List<dynamic> preSI, List<dynamic> preMI,
+      String type) async {
     try {
-      CollectionReference stallref =
-          FirebaseFirestore.instance.collection('stalls');
+      var stallRef;
+      var docRef;
+      List<dynamic> preSICopy = List<dynamic>.from(preSI);
+      List<dynamic> preMICopy = List<dynamic>.from(preMI);
 
-      DocumentReference documentRef = stallref.doc();
-      for (File image in preSI) {
-        String si =
-            await uploadStallImages(image, documentRef.id, 'StallImages');
-        stall.stallImages.add(si);
+      if (type == 'add') {
+        stallRef = FirebaseFirestore.instance.collection('stalls');
+        docRef = stallRef.doc();
+      } else {
+        stallRef = FirebaseFirestore.instance.collection('stalls');
+        docRef = stallRef.doc(stall.sId);
+        await updateImages(stall.stallImages, stall.sId, 'StallImages');
+        await updateImages(stall.menuImages, stall.sId, 'MenuImages');
+        stall.stallImages.clear();
+        stall.menuImages.clear();
       }
 
-      for (File image in preMI) {
-        String mi =
-            await uploadStallImages(image, documentRef.id, 'MenuImages');
-        stall.menuImages.add(mi);
+      for (var image in preSICopy) {
+        if (image is String) {
+          stall.stallImages.add(image);
+        } else {
+          String si = await uploadStallImages(image, docRef.id, 'StallImages');
+          stall.stallImages.add(si);
+        }
+      }
+
+      for (var image in preMICopy) {
+        if (image is String) {
+          stall.menuImages.add(image);
+        } else {
+          String mi = await uploadStallImages(image, docRef.id, 'MenuImages');
+          stall.menuImages.add(mi);
+        }
       }
 
       stall.bannerImageUrl =
           stall.stallImages.isNotEmpty ? stall.stallImages[0] : "";
 
-      await documentRef.set({
+      await docRef.set({
         'stallName': stall.stallName,
         'ownerName': stall.ownerName,
         'rating': stall.rating,
@@ -44,9 +64,10 @@ class StallProvider extends ChangeNotifier {
         'creatorUID': stall.creatorUID,
         'menuImages': stall.menuImages,
         'favoriteUsers': stall.favoriteUsers,
+        'isOwner': stall.isOwner,
       });
 
-      stall.sId = documentRef.id;
+      stall.sId = docRef.id;
       _stalls.add(stall);
 
       notifyListeners();
@@ -60,23 +81,35 @@ class StallProvider extends ChangeNotifier {
     try {
       DocumentReference documentReference =
           FirebaseFirestore.instance.collection('stalls').doc(sId);
-      String folderPath = 'Stalls/$sId/MenuImages/';
-      String folderPath2 = 'Stalls/$sId/StallImages/';
-      final storageRef = FirebaseStorage.instance.ref().child(folderPath);
-      final listResult = await storageRef.listAll();
-      for (var item in listResult.items) {
-        await item.delete();
-      }
-      final storageRef2 = FirebaseStorage.instance.ref().child(folderPath2);
-      final listResult2 = await storageRef2.listAll();
-      for (var item in listResult2.items) {
-        await item.delete();
-      }
+      deleteImages(sId, 'MenuImages');
+      deleteImages(sId, 'StallImages');
       _stalls.removeWhere((stall) => stall.sId == sId);
       await documentReference.delete();
     } catch (e) {
       print(e);
       rethrow;
+    }
+  }
+
+  Future<void> deleteImages(String sId, String type) async {
+    String path = 'Stalls/$sId/$type';
+    final storageRef = FirebaseStorage.instance.ref().child(path);
+    final listResult = await storageRef.listAll();
+    for (var item in listResult.items) {
+      await item.delete();
+    }
+  }
+
+  Future<void> updateImages(
+      List<dynamic> demoUrl, String sId, String type) async {
+    String path = 'Stalls/$sId/$type';
+    final storageRef = FirebaseStorage.instance.ref().child(path);
+    final listResult = await storageRef.listAll();
+    for (var item in listResult.items) {
+      var url = await item.getDownloadURL();
+      if (!demoUrl.contains(url)) {
+        await item.delete();
+      }
     }
   }
 
@@ -106,47 +139,6 @@ class StallProvider extends ChangeNotifier {
       );
     }
     return '';
-  }
-
-  Future getStall(String sId) async {
-    try {
-      DocumentSnapshot userSnapshot =
-          await FirebaseFirestore.instance.collection('stalls').doc(sId).get();
-      if (userSnapshot.exists) {
-        return userSnapshot;
-      } else {
-        throw Exception("Stall not found");
-      }
-    } catch (e) {
-      throw Exception("Failed to fetch stall data");
-    }
-  }
-
-  Future updateStall(Stall stall) async {
-    try {
-      String sId = stall.sId;
-
-      CollectionReference users =
-          FirebaseFirestore.instance.collection('stalls');
-      await users.doc(sId).update({
-        'stallName': stall.stallName,
-        'ownerName': stall.ownerName,
-        'rating': stall.rating,
-        'stallCategory': stall.stallCategories,
-        'stallDescription': stall.stallDescription,
-        'bannerImage': stall.bannerImageUrl,
-        'ownerContact': stall.ownerContact,
-        'location': stall.location,
-        'stallImages': stall.stallImages,
-        'creatorUID': stall.creatorUID,
-        'menuImages': stall.menuImages,
-        'favoriteUsers': stall.favoriteUsers,
-      });
-      notifyListeners();
-    } catch (e) {
-      notifyListeners();
-      rethrow;
-    }
   }
 
   Future<void> fetchStalls() async {

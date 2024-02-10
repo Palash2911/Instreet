@@ -1,21 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:instreet/constants/constants.dart';
+import 'package:instreet/models/stallModel.dart';
+import 'package:instreet/providers/authProvider.dart';
 import 'package:instreet/providers/stallProvider.dart';
-import 'package:instreet/views/screens/postscreens/StalImages.dart';
+import 'package:instreet/views/screens/postscreens/RegisterStall2.dart';
 import 'package:instreet/views/widgets/appbar_widget.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:provider/provider.dart';
 
-class RegisterStall extends StatefulWidget {
+class RegisterStall1 extends StatefulWidget {
   final String? sId;
-  const RegisterStall({Key? key,this.sId}) : super(key: key);
+  const RegisterStall1({Key? key, this.sId}) : super(key: key);
 
   @override
-  State<RegisterStall> createState() => _RegisterStallState();
+  State<RegisterStall1> createState() => _RegisterStall1State();
 }
 
-class _RegisterStallState extends State<RegisterStall> {
+class _RegisterStall1State extends State<RegisterStall1> {
   final _form = GlobalKey<FormState>();
 
   String selectedRole = '';
@@ -51,30 +53,22 @@ class _RegisterStallState extends State<RegisterStall> {
   }
 
   Future<void> fetchStallDetails() async {
+    var authToken = Provider.of<Auth>(context, listen: false).token;
+    Stall existingStall = Provider.of<StallProvider>(context, listen: false)
+        .getUserRegisteredStalls(authToken)
+        .firstWhere((stall) => stall.sId == widget.sId);
 
-    var existingStall = await Provider.of<StallProvider>(context, listen: false).getStall(widget.sId!);
-
-    if (existingStall != null) {
-      setState(() {
-        _nameController.text = existingStall['stallName'];
-        _ownerNameController.text = existingStall['ownerName'];
-        _phoneController.text = existingStall['ownerContact'];
-        // ... other fields
-      });
+    setState(() {
+      _nameController.text = existingStall.stallName;
+      _ownerNameController.text = existingStall.ownerName;
+      _phoneController.text = existingStall.ownerContact;
+      if (existingStall.isOwner) {
+        selectedRole = 'owner';
+      } else {
+        selectedRole = 'creator';
+      }
+    });
     }
-    else{
-      Fluttertoast.showToast(
-        msg: "Error while fetching stall details please file the blank spaces",
-        toastLength: Toast.LENGTH_SHORT,
-        timeInSecForIosWeb: 1,
-        backgroundColor: kprimaryColor,
-        textColor: Colors.white,
-        fontSize: 16.0,
-    );
-    }
-  }
-  
-
 
   Widget setTitle(String title) {
     return Padding(
@@ -90,11 +84,12 @@ class _RegisterStallState extends State<RegisterStall> {
     isLoading = true;
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => StallImages(
-          role: selectedRole.toString(),
+        builder: (context) => RegisterStall2(
+          role: selectedRole,
           name: name,
           ownerName: ownerName,
           contactNumber: phone,
+          sId: widget.sId,
         ),
       ),
     );

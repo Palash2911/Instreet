@@ -3,8 +3,9 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:instreet/constants/constants.dart';
 import 'package:instreet/models/stallModel.dart';
 import 'package:instreet/providers/authProvider.dart';
+import 'package:instreet/providers/reviewProvider.dart';
 import 'package:instreet/providers/stallProvider.dart';
-import 'package:instreet/views/screens/postscreens/RegisterStall.dart';
+import 'package:instreet/views/screens/postscreens/RegisterStall1.dart';
 import 'package:instreet/views/widgets/appbar_widget.dart';
 import 'package:instreet/views/widgets/myPostCard.dart';
 import 'package:instreet/views/widgets/shimmerSkeleton.dart';
@@ -56,7 +57,12 @@ class _PostScreenNavState extends State<PostScreenNav> {
       setState(() {
         isLoading = true;
       });
-      await Provider.of<StallProvider>(context, listen: false).deleteStall(sId);
+      await Provider.of<ReviewProvider>(context, listen: false)
+          .deleteReviews(sId);
+      if (mounted) {
+        await Provider.of<StallProvider>(context, listen: false)
+            .deleteStall(sId);
+      }
       Fluttertoast.showToast(
         msg: "Stall Deleted Successfully",
         toastLength: Toast.LENGTH_SHORT,
@@ -115,7 +121,7 @@ class _PostScreenNavState extends State<PostScreenNav> {
                         onTap: () {
                           Navigator.of(context, rootNavigator: true).push(
                             MaterialPageRoute(
-                              builder: (context) => const RegisterStall(),
+                              builder: (context) => const RegisterStall1(),
                             ),
                           );
                         },
@@ -141,7 +147,6 @@ class _PostScreenNavState extends State<PostScreenNav> {
                       final stall = userStalls[index];
                       return MyPostCard(
                         stall: stall,
-                        isReview: false,
                         sId: stall.sId,
                         onDelete: deleteStall,
                       );
@@ -155,7 +160,7 @@ class _PostScreenNavState extends State<PostScreenNav> {
               onPressed: () {
                 Navigator.of(context, rootNavigator: true).push(
                   MaterialPageRoute(
-                    builder: (context) => const RegisterStall(),
+                    builder: (context) => const RegisterStall1(),
                   ),
                 );
               },

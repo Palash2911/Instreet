@@ -35,7 +35,7 @@ class _HomePageCardState extends State<HomePageCard> {
   void _navigateStallScreen(String sId) {
     Navigator.of(context, rootNavigator: true).pushNamed(
       'stall-screen',
-      arguments: sId,
+      arguments: [sId, 'user'],
     );
   }
 

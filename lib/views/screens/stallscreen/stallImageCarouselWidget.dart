@@ -14,6 +14,32 @@ class StallImageCarouselWidget extends StatefulWidget {
 class _StallImageCarouselWidgetState extends State<StallImageCarouselWidget> {
   int _currentIndex = 0;
 
+  void _showImageDialog(String imageUrl) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return GestureDetector(
+          onTap: () => Navigator.of(context).pop(),
+          behavior: HitTestBehavior.opaque,
+          child: Dialog(
+            backgroundColor: Colors.transparent,
+            insetPadding: const EdgeInsets.all(10),
+            child: GestureDetector(
+              onTap: () {},
+              child: InteractiveViewer(
+                child: Image.network(
+                  imageUrl,
+                  fit: BoxFit.contain,
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+      barrierDismissible: true,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -38,15 +64,18 @@ class _StallImageCarouselWidgetState extends State<StallImageCarouselWidget> {
               items: widget.stallImages.map((image) {
                 return Builder(
                   builder: (BuildContext context) {
-                    return Padding(
-                      padding: const EdgeInsets.all(9.0),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(15),
-                        child: Image.network(
-                          image.toString(),
-                          fit: BoxFit.fill,
-                          width: MediaQuery.of(context).size.width,
-                          height: MediaQuery.of(context).size.height,
+                    return GestureDetector(
+                      onTap: () => _showImageDialog(image),
+                      child: Padding(
+                        padding: const EdgeInsets.all(9.0),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(15),
+                          child: Image.network(
+                            image.toString(),
+                            fit: BoxFit.fill,
+                            width: MediaQuery.of(context).size.width,
+                            height: MediaQuery.of(context).size.height,
+                          ),
                         ),
                       ),
                     );

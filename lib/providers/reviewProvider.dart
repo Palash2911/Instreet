@@ -48,6 +48,20 @@ class ReviewProvider extends ChangeNotifier {
     }
   }
 
+  Future<void> deleteReviews(String sId) async {
+    try {
+      CollectionReference reviewRef =FirebaseFirestore.instance.collection('reviews');
+      var querySnapshot = await reviewRef.where('stallId', isEqualTo: sId).get();
+      for (var doc in querySnapshot.docs) {
+        await reviewRef.doc(doc.id).delete();
+      }
+      _allReviews.removeWhere((review) => review.sid == sId);
+    } catch (e) {
+      print(e);
+      rethrow;
+    }
+  }
+
   List<ReviewModel> getStallReview(String sId) {
     return _allReviews.where((review) => review.sid == sId).toList();
   }

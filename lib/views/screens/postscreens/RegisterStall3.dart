@@ -8,41 +8,37 @@ import 'package:instreet/constants/constants.dart';
 import 'package:instreet/models/stallModel.dart';
 import 'package:instreet/providers/authProvider.dart';
 import 'package:instreet/providers/stallProvider.dart';
-import 'package:instreet/views/screens/postscreens/PostScreenNav.dart';
 import 'package:instreet/views/widgets/appbar_widget.dart';
 import 'package:multi_dropdown/multiselect_dropdown.dart';
 import 'package:provider/provider.dart';
 
-// ignore: must_be_immutable
-class DescribeStallPage extends StatefulWidget {
-  List<File> stallImagesList = [];
-  List<File> menuImagesList = [];
-  String location;
-  String role;
-  String name;
-  String ownername;
-  String contactnumber;
-  String bannerImageUrl;
-  String? sId;
+class RegisterStall3 extends StatefulWidget {
+  final List<dynamic> stallImagesList;
+  final List<dynamic> menuImagesList;
+  final String location;
+  final String role;
+  final String name;
+  final String ownerName;
+  final String contactNumber;
+  final String? sId;
 
-  DescribeStallPage(
+  const RegisterStall3(
       {super.key,
       required this.stallImagesList,
       required this.menuImagesList,
       required this.location,
       required this.role,
       required this.name,
-      required this.ownername,
-      required this.contactnumber,
-      required this.bannerImageUrl,
+      required this.ownerName,
+      required this.contactNumber,
       this.sId});
 
   @override
   // ignore: library_private_types_in_public_api
-  _DescribeStallPageState createState() => _DescribeStallPageState();
+  _RegisterStall3State createState() => _RegisterStall3State();
 }
 
-class _DescribeStallPageState extends State<DescribeStallPage> {
+class _RegisterStall3State extends State<RegisterStall3> {
   TextEditingController _descriptionController = TextEditingController();
 
   final MultiSelectController _controller = MultiSelectController();
@@ -76,25 +72,31 @@ class _DescribeStallPageState extends State<DescribeStallPage> {
 
   Future<void> fetchStallDetails() async {
     try {
-      var existingStall =
-          await Provider.of<StallProvider>(context, listen: false)
-              .getStall(widget.sId!);
+      var authToken = Provider.of<Auth>(context, listen: false).token;
+      Stall existingStall = Provider.of<StallProvider>(context, listen: false)
+          .getUserRegisteredStalls(authToken)
+          .firstWhere((stall) => stall.sId == widget.sId);
 
-      if (existingStall != null) {
-        setState(() {
-          _descriptionController.text = existingStall['stallDescription'];
-        });
-      } else {
-        Fluttertoast.showToast(
-          msg:
-              "Error while fetching stall details, please fill in the blank spaces",
-          toastLength: Toast.LENGTH_SHORT,
-          timeInSecForIosWeb: 1,
-          backgroundColor: kprimaryColor,
-          textColor: Colors.white,
-          fontSize: 16.0,
-        );
-      }
+      _controller.setOptions(allCategories
+          .map((category) => ValueItem<dynamic>(
+                label: category.toString(),
+                value: category,
+              ))
+          .toList());
+
+      selectedCategories = existingStall.stallCategories;
+      var selectedOptions = selectedCategories
+          .map((category) => ValueItem<dynamic>(
+                label: category.toString(),
+                value: category,
+              ))
+          .toList();
+
+      setState(() {
+        _descriptionController.text = existingStall.stallDescription;
+        _controller.clearAllSelection();
+        _controller.setSelectedOptions(selectedOptions);
+      });
     } catch (e) {
       print(e);
       Fluttertoast.showToast(
@@ -165,6 +167,10 @@ class _DescribeStallPageState extends State<DescribeStallPage> {
                 child: Container(
                   width: MediaQuery.of(context).size.width * 0.4,
                   padding: const EdgeInsets.all(15),
+                  decoration: BoxDecoration(
+                    color: kprimaryColor,
+                    borderRadius: BorderRadius.circular(50),
+                  ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -181,10 +187,6 @@ class _DescribeStallPageState extends State<DescribeStallPage> {
                         style: TextStyle(color: Colors.white),
                       ),
                     ],
-                  ),
-                  decoration: BoxDecoration(
-                    color: kprimaryColor,
-                    borderRadius: BorderRadius.circular(50),
                   ),
                 ),
               ),
@@ -220,7 +222,7 @@ class _DescribeStallPageState extends State<DescribeStallPage> {
     );
   }
 
-  Future<void> _submitStall() async {
+  Future<void> _submitStall(BuildContext context) async {
     if (selectedCategories.isEmpty && _descriptionController.text.isEmpty) {
       showToast("Please Fill All Fields !");
       return;
@@ -231,32 +233,32 @@ class _DescribeStallPageState extends State<DescribeStallPage> {
     });
 
     var stallProvider = Provider.of<StallProvider>(context, listen: false);
-
     var authId = Provider.of<Auth>(context, listen: false).token;
 
     try {
       await stallProvider.addStall(
         Stall(
-          sId: "",
+          sId: widget.sId != null ? widget.sId.toString() : '',
           stallName: widget.name,
-          ownerName: widget.ownername,
+          ownerName: widget.ownerName,
           rating: 0.0,
           stallCategories: selectedCategories,
           stallDescription: _descriptionController.text,
-          bannerImageUrl: widget.bannerImageUrl,
+          bannerImageUrl: '',
           favoriteUsers: [],
-          ownerContact: widget.contactnumber,
+          ownerContact: widget.contactNumber,
           location: widget.location,
-          stallImages: [],
-          menuImages: [],
+          stallImages: widget.sId != null ? widget.stallImagesList : [],
+          menuImages: widget.sId != null ? widget.menuImagesList : [],
           creatorUID: authId,
+          isOwner: widget.role == 'user' ? false : true,
         ),
         widget.stallImagesList,
         widget.menuImagesList,
+        widget.sId != null ? 'update' : 'add',
       );
-
       Fluttertoast.showToast(
-        msg: "Stall Added successfully",
+        msg: "Stall ${widget.sId != null ? 'Updated' : 'Added'} successfully",
         toastLength: Toast.LENGTH_SHORT,
         timeInSecForIosWeb: 1,
         backgroundColor: kprimaryColor,
@@ -264,7 +266,8 @@ class _DescribeStallPageState extends State<DescribeStallPage> {
         fontSize: 16.0,
       );
       if (mounted) {
-        Navigator.of(context).pushReplacementNamed('bottom-nav');
+        Navigator.of(context, rootNavigator: true)
+            .pushReplacementNamed('bottom-nav');
       }
     } catch (error) {
       print("Error submitting stall: $error");
@@ -276,74 +279,6 @@ class _DescribeStallPageState extends State<DescribeStallPage> {
         backgroundColor: Colors.red,
         textColor: Colors.white,
         fontSize: 10.0,
-      );
-    } finally {
-      setState(() {
-        isLoading = false;
-      });
-    }
-  }
-
-  Future<void> _updateStall() async {
-    if (widget.name.isEmpty ||
-        widget.bannerImageUrl.isEmpty ||
-        selectedCategories.isEmpty ||
-        widget.location.isEmpty ||
-        widget.stallImagesList.isEmpty ||
-        widget.menuImagesList.isEmpty ||
-        widget.ownername.isEmpty ||
-        widget.contactnumber.isEmpty ||
-        widget.location.isEmpty) {
-      showToast("Please fill in all required fields.");
-      return;
-    }
-
-    setState(() {
-      isLoading = true;
-    });
-
-    var stallProvider = Provider.of<StallProvider>(context, listen: false);
-
-    try {
-      await stallProvider.updateStall(
-        Stall(
-          sId: widget.sId.toString(),
-          stallName: widget.name,
-          ownerName: widget.ownername,
-          rating: 0.0,
-          stallCategories: selectedCategories,
-          stallDescription: _descriptionController.text,
-          bannerImageUrl: widget.bannerImageUrl,
-          favoriteUsers: [],
-          ownerContact: widget.contactnumber,
-          location: widget.location,
-          stallImages: widget.stallImagesList,
-          menuImages: widget.menuImagesList,
-          creatorUID: Provider.of<Auth>(context, listen: false).token,
-        ),
-      );
-
-      Fluttertoast.showToast(
-        msg: "Stall Updated successfully",
-        toastLength: Toast.LENGTH_SHORT,
-        timeInSecForIosWeb: 1,
-        backgroundColor: kprimaryColor,
-        textColor: Colors.white,
-        fontSize: 16.0,
-      );
-      if (mounted) {
-        Navigator.of(context).pushReplacementNamed('bottom-nav');
-      }
-    } catch (error) {
-      print("Error updating stall: $error");
-
-      Fluttertoast.showToast(
-        msg: "Error Updating Stall. Please try again !",
-        toastLength: Toast.LENGTH_SHORT,
-        timeInSecForIosWeb: 1,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-        fontSize: 16.0,
       );
     } finally {
       setState(() {
@@ -443,11 +378,7 @@ class _DescribeStallPageState extends State<DescribeStallPage> {
                     Container(
                       alignment: Alignment.center,
                       child: GestureDetector(
-                        onTap: isLoading
-                            ? null
-                            : (widget.sId != null
-                                ? _updateStall
-                                : _submitStall),
+                        onTap: isLoading ? null : () => _submitStall(context),
                         child: Container(
                           width: MediaQuery.of(context).size.width,
                           padding: const EdgeInsets.all(15),
