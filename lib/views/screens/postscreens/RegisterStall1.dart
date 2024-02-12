@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:instreet/constants/constants.dart';
 import 'package:instreet/models/stallModel.dart';
 import 'package:instreet/providers/authProvider.dart';

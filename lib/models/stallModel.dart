@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class Stall {
   String sId;
   final String ownerName;
-  final double rating;
+  double rating;
   final List<dynamic> stallCategories;
   final String stallDescription;
   final String stallName;

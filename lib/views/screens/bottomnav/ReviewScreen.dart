@@ -5,7 +5,7 @@ import 'package:instreet/providers/reviewProvider.dart';
 import 'package:instreet/providers/stallProvider.dart';
 import 'package:instreet/views/widgets/appbar_widget.dart';
 import 'package:instreet/views/widgets/homePageCard.dart';
-import 'package:instreet/views/widgets/shimmerSkeleton.dart';
+import 'package:instreet/views/widgets/shimmer_skeleton.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -55,7 +55,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
   Widget build(BuildContext context) {
     final stalls = currentUid.isNotEmpty
         ? Provider.of<StallProvider>(context, listen: false)
-            .getAllStalls(currentUid)
+            .getNotUserStalls(currentUid)
         : [];
     final userReviews = currentUid.isNotEmpty
         ? Provider.of<ReviewProvider>(context, listen: false).allReviews
@@ -90,16 +90,17 @@ class _ReviewScreenState extends State<ReviewScreen> {
                   itemCount: filteredStalls.length,
                   itemBuilder: (context, index) {
                     var stall = filteredStalls[index];
-                    var review =
-                        userReviews.firstWhere((r) => r.sid == stall.sId,
-                            orElse: () => ReviewModel(
-                                  rid: '',
-                                  sid: '',
-                                  review: '',
-                                  rating: 0,
-                                  uid: '',
-                                  userName: '',
-                                ));
+                    var review = userReviews.firstWhere(
+                      (r) => r.sid == stall.sId,
+                      orElse: () => ReviewModel(
+                        rid: '',
+                        sid: '',
+                        review: '',
+                        rating: 0,
+                        uid: '',
+                        userName: '',
+                      ),
+                    );
                     if (review.sid.toString().isNotEmpty) {
                       return HomePageCard(
                         stall: stall,

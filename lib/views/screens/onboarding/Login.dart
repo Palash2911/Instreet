@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:instreet/constants/constants.dart';
-import 'package:instreet/views/screens/onboarding/register.dart';
+import 'package:instreet/views/screens/onboarding/Register.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:provider/provider.dart';
 import 'package:sign_in_button/sign_in_button.dart';

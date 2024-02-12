@@ -13,17 +13,15 @@ class ProfileList extends StatefulWidget {
 }
 
 class _ProfileListState extends State<ProfileList> {
-  bool isExpanded = false;
+  bool isExpanded = true;
   List<IconData> iconsHelp = [
     Icons.info_outline,
     Icons.phone,
-    Icons.event_note,
   ];
 
   List<String> textHelp = [
     'About Us',
     'Contact Us',
-    'Terms & Conditions',
   ];
 
   void _toggleExpanded() {
@@ -44,7 +42,7 @@ class _ProfileListState extends State<ProfileList> {
         duration: const Duration(milliseconds: 300),
         padding: const EdgeInsets.all(15.0),
         width: 310,
-        height: isExpanded && widget.text == "Help" ? 216 : 54,
+        height: isExpanded && widget.text == "Help" ? 166 : 54,
         decoration: BoxDecoration(
           border: Border.all(color: Colors.grey, width: 1.2),
           borderRadius: const BorderRadius.all(
@@ -73,7 +71,7 @@ class _ProfileListState extends State<ProfileList> {
               ),
               if (isExpanded && widget.text == "Help")
                 ...List.generate(
-                  3,
+                  2,
                   (index) => Column(
                     children: [
                       const SizedBox(height: 6),

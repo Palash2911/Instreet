@@ -2,10 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:instreet/providers/stallProvider.dart';
-import 'package:instreet/views/screens/bottomnav/Categories.dart';
+import 'package:instreet/views/screens/otherscreens/Categories.dart';
 import 'package:instreet/views/widgets/header_widget.dart';
 import 'package:instreet/views/widgets/homePageCard.dart';
-import 'package:instreet/views/widgets/shimmerSkeleton.dart';
+import 'package:instreet/views/widgets/shimmer_skeleton.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../../constants/constants.dart';
@@ -82,7 +82,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final stalls = currentUid.isNotEmpty
-        ? Provider.of<StallProvider>(context).getAllStalls(currentUid)
+        ? Provider.of<StallProvider>(context).getNotUserStalls(currentUid)
         : [];
 
     return Scaffold(

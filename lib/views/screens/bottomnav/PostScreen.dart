@@ -7,8 +7,8 @@ import 'package:instreet/providers/reviewProvider.dart';
 import 'package:instreet/providers/stallProvider.dart';
 import 'package:instreet/views/screens/postscreens/RegisterStall1.dart';
 import 'package:instreet/views/widgets/appbar_widget.dart';
-import 'package:instreet/views/widgets/myPostCard.dart';
-import 'package:instreet/views/widgets/shimmerSkeleton.dart';
+import 'package:instreet/views/widgets/my_post_card.dart';
+import 'package:instreet/views/widgets/shimmer_skeleton.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -61,7 +61,7 @@ class _PostScreenNavState extends State<PostScreenNav> {
           .deleteReviews(sId);
       if (mounted) {
         await Provider.of<StallProvider>(context, listen: false)
-            .deleteStall(sId);
+            .deleteStall(sId, currentUid);
       }
       Fluttertoast.showToast(
         msg: "Stall Deleted Successfully",

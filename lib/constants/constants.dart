@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:instreet/models/categories_model.dart';
+import 'package:instreet/models/categoriesModel.dart';
 
 // Colors
 Color kprimaryColor = Color(0xFFFF4500);

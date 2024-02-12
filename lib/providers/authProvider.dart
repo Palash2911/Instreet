@@ -173,4 +173,11 @@ class Auth extends ChangeNotifier {
     _joiningDate = prefs.getString("JDate")!;
     notifyListeners();
   }
+
+  Future<void> getProfile() async {
+    final prefs = await SharedPreferences.getInstance();
+    _userName = prefs.getString("UserName")!;
+    _isCreator = prefs.getBool("IsCreator")!;
+    _joiningDate = prefs.getString("JDate")!;
+  }
 }

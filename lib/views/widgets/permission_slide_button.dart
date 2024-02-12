@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:instreet/constants/constants.dart';
-import 'package:instreet/views/screens/onboarding/login.dart';
+import 'package:instreet/views/screens/onboarding/Login.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:swipeable_button_view/swipeable_button_view.dart';
 

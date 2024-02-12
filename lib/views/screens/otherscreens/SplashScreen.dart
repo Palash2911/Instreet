@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:instreet/constants/constants.dart';
-import 'package:instreet/views/screens/onboarding/permission.dart';
+import 'package:instreet/views/screens/onboarding/Permission.dart';
 import 'package:provider/provider.dart';
 
 import '../../../providers/authProvider.dart';

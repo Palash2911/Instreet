@@ -10,7 +10,7 @@ import '../../../providers/stallProvider.dart';
 import '../../widgets/appbar_widget.dart';
 import '../../widgets/carousal_slider.dart';
 import '../../widgets/homePageCard.dart';
-import '../../widgets/shimmerSkeleton.dart';
+import '../../widgets/shimmer_skeleton.dart';
 
 class FavroiteScreen extends StatefulWidget {
   const FavroiteScreen({Key? key}) : super(key: key);

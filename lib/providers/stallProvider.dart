@@ -4,6 +4,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../constants/constants.dart';
 import '../models/stallModel.dart';
 
@@ -12,6 +13,7 @@ class StallProvider extends ChangeNotifier {
 
   Future<void> addStall(Stall stall, List<dynamic> preSI, List<dynamic> preMI,
       String type) async {
+    final prefs = await SharedPreferences.getInstance();
     try {
       var stallRef;
       var docRef;
@@ -67,8 +69,21 @@ class StallProvider extends ChangeNotifier {
         'isOwner': stall.isOwner,
       });
 
-      stall.sId = docRef.id;
-      _stalls.add(stall);
+      if (type == 'add') {
+        stall.sId = docRef.id;
+        _stalls.add(stall);
+      }
+
+      var isCreator = prefs.getBool("IsCreator")!;
+      if (!isCreator) {
+        prefs.setBool('IsCreator', true);
+        var usersDoc = FirebaseFirestore.instance
+            .collection('users')
+            .doc(stall.creatorUID);
+        await usersDoc.update({
+          'Creator': true,
+        });
+      }
 
       notifyListeners();
     } catch (e) {
@@ -77,7 +92,8 @@ class StallProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> deleteStall(String sId) async {
+  Future<void> deleteStall(String sId, String uid) async {
+    final prefs = await SharedPreferences.getInstance();
     try {
       DocumentReference documentReference =
           FirebaseFirestore.instance.collection('stalls').doc(sId);
@@ -85,6 +101,19 @@ class StallProvider extends ChangeNotifier {
       deleteImages(sId, 'StallImages');
       _stalls.removeWhere((stall) => stall.sId == sId);
       await documentReference.delete();
+
+      var isCreator = prefs.getBool("IsCreator");
+      List<dynamic> userStalls = getUserRegisteredStalls(uid);
+      if (isCreator != null && isCreator) {
+        if (userStalls.isEmpty) {
+          prefs.setBool('IsCreator', false);
+          var usersDoc =
+              FirebaseFirestore.instance.collection('users').doc(uid);
+          await usersDoc.update({
+            'Creator': false,
+          });
+        }
+      }
     } catch (e) {
       print(e);
       rethrow;
@@ -171,6 +200,35 @@ class StallProvider extends ChangeNotifier {
     }
   }
 
+  Future<void> updateStallReview(
+      double rating, String sId, int noOfReviews) async {
+    try {
+      DocumentReference documentReference =
+          FirebaseFirestore.instance.collection('stalls').doc(sId);
+      var documentSnapshot = await documentReference.get();
+      if (!documentSnapshot.exists) {
+        throw Exception("Stall not found");
+      }
+      var cR = 0.0;
+      var nR = 0.0;
+      if (noOfReviews <= 1) {
+        nR = rating;
+      } else {
+        cR = documentSnapshot['rating'].toDouble() ?? 0.0;
+        nR = ((cR * (noOfReviews - 1)) + rating) / noOfReviews;
+      }
+      await documentReference.update({'rating': nR});
+      int index = _stalls.indexWhere((stall) => stall.sId == sId);
+      if (index != -1) {
+        _stalls[index].rating = nR;
+      }
+      notifyListeners();
+    } catch (e) {
+      print(e);
+      rethrow;
+    }
+  }
+
   List<Stall> getFavoriteStalls(String uid) {
     return _stalls.where((stall) => stall.favoriteUsers.contains(uid)).toList();
   }
@@ -186,7 +244,7 @@ class StallProvider extends ChangeNotifier {
     return _stalls.where((stall) => stall.creatorUID == uid).toList();
   }
 
-  List<Stall> getAllStalls(String uid) {
+  List<Stall> getNotUserStalls(String uid) {
     return _stalls.where((stall) => stall.creatorUID != uid).toList();
   }
 

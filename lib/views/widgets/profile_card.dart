@@ -1,42 +1,17 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import '../../constants/constants.dart';
-import '../../providers/authProvider.dart';
 
-class ProfileCard extends StatefulWidget {
-  const ProfileCard({super.key});
+class ProfileCard extends StatelessWidget {
+  final String uName;
+  final bool isCreator;
+  final String jDate;
 
-  @override
-  State<ProfileCard> createState() => _ProfileCardState();
-}
-
-class _ProfileCardState extends State<ProfileCard> {
-  var uName = '';
-  var isCreator = false;
-  var jDate = '';
-
-  @override
-  void initState() {
-    super.initState();
-    getUser();
-  }
-
-  Future getUser() async {
-    var auth = Provider.of<Auth>(context, listen: false);
-    try {
-      setState(() {
-        uName = auth.userName;
-        isCreator = auth.isCreator;
-        jDate = auth.joiningDate;
-      });
-
-    } catch (e) {
-      print(e);
-    }
-  }
-
-
+  const ProfileCard(
+      {super.key,
+      required this.uName,
+      required this.isCreator,
+      required this.jDate});
 
   @override
   Widget build(BuildContext context) {
@@ -54,7 +29,9 @@ class _ProfileCardState extends State<ProfileCard> {
             Image.asset(
               "assets/images/profile_avtar.png",
             ),
-            const SizedBox(width: 6,),
+            const SizedBox(
+              width: 6,
+            ),
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -66,7 +43,6 @@ class _ProfileCardState extends State<ProfileCard> {
                       uName,
                       style: kTextPopB16,
                       maxLines: 1,
-
                     ),
                     const SizedBox(
                       height: 10,

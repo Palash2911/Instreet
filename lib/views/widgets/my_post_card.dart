@@ -7,7 +7,7 @@ import 'package:instreet/models/reviewModel.dart';
 import 'package:instreet/models/stallModel.dart';
 import 'package:instreet/providers/authProvider.dart';
 import 'package:instreet/providers/stallProvider.dart';
-import 'package:instreet/views/screens/onboarding/register.dart';
+import 'package:instreet/views/screens/onboarding/Register.dart';
 import 'package:instreet/views/screens/postscreens/RegisterStall1.dart';
 import 'package:instreet/views/widgets/review_card.dart';
 import 'package:provider/provider.dart';
