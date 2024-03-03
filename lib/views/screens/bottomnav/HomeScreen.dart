@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:instreet/providers/stallProvider.dart';
 import 'package:instreet/views/screens/otherscreens/Categories.dart';

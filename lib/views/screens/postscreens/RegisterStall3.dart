@@ -1,6 +1,5 @@
-import 'dart:io';
+import 'dart:convert';
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:gradient_borders/box_borders/gradient_box_border.dart';
@@ -11,6 +10,7 @@ import 'package:instreet/providers/stallProvider.dart';
 import 'package:instreet/views/widgets/appbar_widget.dart';
 import 'package:multi_dropdown/multiselect_dropdown.dart';
 import 'package:provider/provider.dart';
+import 'package:http/http.dart' as http;
 
 class RegisterStall3 extends StatefulWidget {
   final List<dynamic> stallImagesList;
@@ -39,9 +39,14 @@ class RegisterStall3 extends StatefulWidget {
 }
 
 class _RegisterStall3State extends State<RegisterStall3> {
+
   TextEditingController _descriptionController = TextEditingController();
 
   final MultiSelectController _controller = MultiSelectController();
+
+  TextEditingController _aiContoller = TextEditingController();
+
+  bool _isFetchingData = false;
 
   List<dynamic> selectedCategories = [];
 
@@ -142,7 +147,7 @@ class _RegisterStall3State extends State<RegisterStall3> {
             Container(
               padding: EdgeInsets.all(10),
               decoration: BoxDecoration(
-                border: GradientBoxBorder(
+                border: const GradientBoxBorder(
                   width: 1,
                   gradient: LinearGradient(
                     colors: [Colors.green, Colors.blue, Colors.purple],
@@ -151,6 +156,7 @@ class _RegisterStall3State extends State<RegisterStall3> {
                 borderRadius: BorderRadius.circular(10.0),
               ),
               child: TextField(
+                controller: _aiContoller,
                 decoration: InputDecoration(
                   border: InputBorder.none,
                 ),
@@ -162,8 +168,7 @@ class _RegisterStall3State extends State<RegisterStall3> {
             Container(
               alignment: Alignment.center,
               child: GestureDetector(
-                // here is one problem when u try to pop the dialog insted to poping the dialog the main screen is getting pop itself not dialog
-                onTap: null,
+                onTap: _isFetchingData ? null : getStallDescriptionFromAi,
                 child: Container(
                   width: MediaQuery.of(context).size.width * 0.4,
                   padding: const EdgeInsets.all(15),
@@ -171,23 +176,20 @@ class _RegisterStall3State extends State<RegisterStall3> {
                     color: kprimaryColor,
                     borderRadius: BorderRadius.circular(50),
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(
-                        Icons.create,
-                        color: Colors.white,
-                      ),
-                      const SizedBox(
-                        width: 10,
-                      ),
-                      Text(
-                        "Create",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ],
-                  ),
+                  child: _isFetchingData
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: const [
+                            Icon(Icons.create, color: Colors.white),
+                            SizedBox(width: 10),
+                            Text(
+                              "Create",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ],
+                        ),
                 ),
               ),
             ),
@@ -195,6 +197,59 @@ class _RegisterStall3State extends State<RegisterStall3> {
         ),
       ),
     );
+  }
+
+  // Ai description 
+  void getStallDescriptionFromAi() async {
+
+    setState(() {
+      isLoading = true; // Start loading
+    });
+
+    Navigator.of(context).pop();
+
+    const ourUrl ='https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=AIzaSyCI-BViPUvEpgYt9QJ4-YUuDzOVHNjL8yI';
+
+    final header = {'Content-Type': 'application/json'};
+    var data = {
+      "contents": [
+        {
+          "parts": [
+            {"text": _aiContoller.text.trim()}
+          ]
+        }
+      ]
+    };
+
+    try {
+      final response = await http.post(
+        Uri.parse(ourUrl),
+        headers: header,
+        body: jsonEncode(data)
+      );
+
+      if (response.statusCode == 200) {
+        var result = jsonDecode(response.body);
+        print(result['candidates'][0]['content']['parts'][0]['text']);
+        setState(() {
+          _descriptionController.text = result['candidates'][0]['content']['parts'][0]['text'];
+          isLoading = false;
+        });
+      } else {
+        showToast("There was some error while generating description please add manually");
+        setState(() {
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      showToast("There was some error while generating description please add manually");
+      setState(() {
+        isLoading = false;
+      });
+    }
+
+    _aiContoller.clear();
+    
   }
 
   Widget setTitle(String title, bool isAI) {
@@ -266,10 +321,10 @@ class _RegisterStall3State extends State<RegisterStall3> {
         fontSize: 16.0,
       );
       if (mounted) {
-        Navigator.of(context, rootNavigator: true)
-            .pushReplacementNamed('bottom-nav');
+        Navigator.of(context, rootNavigator: true).pushReplacementNamed('bottom-nav');
       }
     } catch (error) {
+
       print("Error submitting stall: $error");
 
       Fluttertoast.showToast(
@@ -300,6 +355,8 @@ class _RegisterStall3State extends State<RegisterStall3> {
 
   @override
   Widget build(BuildContext context) {
+
+    
     return Scaffold(
       appBar: const AppBarWidget(
         isSearch: false,
@@ -315,7 +372,6 @@ class _RegisterStall3State extends State<RegisterStall3> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    /*Stall description start */
                     setTitle("Describe the Stall", true),
                     TextField(
                       controller: _descriptionController,

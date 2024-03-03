@@ -67,7 +67,7 @@ class _AppBarWidgetState extends State<AppBarWidget> {
                 const SizedBox(width: 10),
                 const CircleAvatar(
                   backgroundImage:
-                      NetworkImage('https://via.placeholder.com/150'),
+                    NetworkImage('https://via.placeholder.com/150'),
                 ),
               ],
             ),
