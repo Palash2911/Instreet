@@ -9,6 +9,7 @@ import 'package:instreet/providers/userProvider.dart';
 import 'package:provider/provider.dart';
 import 'constants/constants.dart';
 import 'constants/routes.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
 
@@ -16,6 +17,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   FirebaseMessaging.onBackgroundMessage(backgroundHandler);
+  // await dotenv.load(fileName: ".env");
   runApp(const MyApp());
 }
 

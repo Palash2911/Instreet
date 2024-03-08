@@ -372,7 +372,7 @@ class _RegisterStall2State extends State<RegisterStall2> {
                                         shape: BoxShape.circle,
                                         color: kprimaryColor,
                                       ),
-                                      child: Icon(
+                                      child: const  Icon(
                                         Icons.close,
                                         size: 16,
                                         color: Colors.white,
@@ -459,7 +459,7 @@ class _RegisterStall2State extends State<RegisterStall2> {
                                         shape: BoxShape.circle,
                                         color: kprimaryColor,
                                       ),
-                                      child: Icon(
+                                      child: const  Icon(
                                         Icons.close,
                                         size: 16,
                                         color: Colors.white,
