@@ -251,7 +251,7 @@ class _RegisterStall3State extends State<RegisterStall3> {
           stallImages: widget.sId != null ? widget.stallImagesList : [],
           menuImages: widget.sId != null ? widget.menuImagesList : [],
           creatorUID: authId,
-          isOwner: widget.role == 'user' ? false : true,
+          isOwner: widget.role == 'creator' ? false : true,
         ),
         widget.stallImagesList,
         widget.menuImagesList,

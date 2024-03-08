@@ -49,7 +49,7 @@ List<Category> categories = [
   Category('Toys', 'assets/images/toys.png'),
   Category('Sport', 'assets/images/sport.png'),
   Category('Saloon', 'assets/images/saloon4.jpg'),
-  Category('Jawelry', 'assets/images/jawelry.png'),
+  Category('Jewellery', 'assets/images/jawelry.png'),
   Category('Health', 'assets/images/health.jpg'),
   Category('Food', 'assets/images/food.png'),
   Category('Flowers', 'assets/images/flower.jpg'),

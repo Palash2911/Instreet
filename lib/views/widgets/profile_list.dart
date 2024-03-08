@@ -80,7 +80,7 @@ class _ProfileListState extends State<ProfileList> {
                         color: Colors.black38,
                       ),
                       const SizedBox(height: 6),
-                      GestureDetector(
+                      InkWell(
                         onTap: () => widget.ontap(textHelp[index]),
                         child: Row(
                           children: [
