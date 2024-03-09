@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:instreet/constants/constants.dart';
 import 'package:instreet/providers/stallProvider.dart';
+import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 import 'package:provider/provider.dart';
 
 class AppBarWidget extends StatefulWidget implements PreferredSizeWidget {
   final bool isSearch;
   final String screenTitle;
   final Function(String)? onSearch;
+  final PersistentTabController? controller;
 
   const AppBarWidget({
     super.key,
     required this.isSearch,
     required this.screenTitle,
     this.onSearch,
+    this.controller,
   });
 
   @override
@@ -25,7 +28,6 @@ class AppBarWidget extends StatefulWidget implements PreferredSizeWidget {
 }
 
 class _AppBarWidgetState extends State<AppBarWidget> {
-
   @override
   Widget build(BuildContext context) {
     return AppBar(
@@ -64,10 +66,15 @@ class _AppBarWidgetState extends State<AppBarWidget> {
                     ),
                   ),
                 ),
-                const SizedBox(width: 10),
-                const CircleAvatar(
-                  backgroundImage:
-                    NetworkImage('https://via.placeholder.com/150'),
+                const SizedBox(width: 15),
+                InkWell(
+                  onTap: () {
+                    widget.controller?.jumpToTab(4);
+                  },
+                  child: const CircleAvatar(
+                    backgroundImage:
+                        AssetImage('assets/images/profile_avtar.png'),
+                  ),
                 ),
               ],
             ),

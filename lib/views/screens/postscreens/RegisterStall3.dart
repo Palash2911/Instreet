@@ -203,7 +203,7 @@ class _RegisterStall3State extends State<RegisterStall3> {
   void getStallDescriptionFromAi() async {
 
     setState(() {
-      isLoading = true; // Start loading
+      isLoading = true;
     });
 
     Navigator.of(context).pop();
@@ -307,6 +307,7 @@ class _RegisterStall3State extends State<RegisterStall3> {
           menuImages: widget.sId != null ? widget.menuImagesList : [],
           creatorUID: authId,
           isOwner: widget.role == 'creator' ? false : true,
+          isTrending: false,
         ),
         widget.stallImagesList,
         widget.menuImagesList,

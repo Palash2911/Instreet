@@ -38,7 +38,7 @@ class BottomNavState extends State<BottomNav> {
 
   List<Widget> _buildScreens() {
     return [
-      HomeScreen(),
+      HomeScreen(controller: controller),
       FavroiteScreen(),
       PostScreenNav(),
       ReviewScreen(),

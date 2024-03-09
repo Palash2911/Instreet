@@ -15,6 +15,7 @@ class Stall {
   final List<dynamic> menuImages;
   final String creatorUID;
   final bool isOwner;
+  final bool isTrending;
 
   Stall({
     required this.sId,
@@ -31,6 +32,7 @@ class Stall {
     required this.menuImages,
     required this.creatorUID,
     required this.isOwner,
+    required this.isTrending,
   });
 
   Stall.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc)
@@ -47,5 +49,6 @@ class Stall {
         creatorUID = doc['creatorUID'],
         menuImages = doc['menuImages'],
         isOwner = doc['isOwner'],
+        isTrending = doc['isTrending'],
         favoriteUsers = doc['favoriteUsers'];
 }

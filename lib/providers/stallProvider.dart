@@ -67,6 +67,7 @@ class StallProvider extends ChangeNotifier {
         'menuImages': stall.menuImages,
         'favoriteUsers': stall.favoriteUsers,
         'isOwner': stall.isOwner,
+        'isTrending': stall.isTrending,
       });
 
       if (type == 'add') {
@@ -246,6 +247,10 @@ class StallProvider extends ChangeNotifier {
 
   List<Stall> getNotUserStalls(String uid) {
     return _stalls.where((stall) => stall.creatorUID != uid).toList();
+  }
+
+  List<Stall> getTrendingStalls(String uid) {
+    return _stalls.where((stall) => stall.isTrending == true && stall.creatorUID != uid).toList();
   }
 
   List<Stall> getSearchStalls(String query, String uid) {

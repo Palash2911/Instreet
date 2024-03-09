@@ -5,16 +5,18 @@ import 'package:instreet/views/screens/otherscreens/Categories.dart';
 import 'package:instreet/views/widgets/header_widget.dart';
 import 'package:instreet/views/widgets/homePageCard.dart';
 import 'package:instreet/views/widgets/shimmer_skeleton.dart';
+import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../../constants/constants.dart';
 import '../../../providers/authProvider.dart';
 import '../../widgets/appbar_widget.dart';
-import '../../widgets/carousal_slider.dart';
+import '../../widgets/trending_slider.dart';
 import '../../widgets/categories_items.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  final PersistentTabController controller;
+  const HomeScreen({Key? key, required this.controller}) : super(key: key);
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -84,6 +86,10 @@ class _HomeScreenState extends State<HomeScreen> {
         ? Provider.of<StallProvider>(context).getNotUserStalls(currentUid)
         : [];
 
+    final trendingStalls = currentUid.isNotEmpty
+        ? Provider.of<StallProvider>(context).getTrendingStalls(currentUid)
+        : [];
+
     return Scaffold(
       appBar: AppBarWidget(
         isSearch: true,
@@ -91,6 +97,7 @@ class _HomeScreenState extends State<HomeScreen> {
         onSearch: (query) {
           loadSearchStalls(query);
         },
+        controller: widget.controller,
       ),
       body: SafeArea(
         child: isLoading
@@ -113,7 +120,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: SingleChildScrollView(
                     child: Column(
                       children: [
-                        const CarousalSlider(),
+                        trendingStalls.length > 0
+                            ? TrendingSlider(trendingStalls: trendingStalls,)
+                            : SizedBox(width: 0),
                         HeaderWidget(
                           expandedView: true,
                           title: 'Categories',

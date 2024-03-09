@@ -1,14 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
-
-import '../../../constants/constants.dart';
-import '../../../models/stallModel.dart';
 import '../../../providers/authProvider.dart';
 import '../../../providers/stallProvider.dart';
 import '../../widgets/appbar_widget.dart';
-import '../../widgets/carousal_slider.dart';
 import '../../widgets/homePageCard.dart';
 import '../../widgets/shimmer_skeleton.dart';
 
