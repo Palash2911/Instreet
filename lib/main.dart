@@ -14,10 +14,10 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 final navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
+  await dotenv.load(fileName: '.env');
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   FirebaseMessaging.onBackgroundMessage(backgroundHandler);
-  // await dotenv.load(fileName: ".env");
   runApp(const MyApp());
 }
 

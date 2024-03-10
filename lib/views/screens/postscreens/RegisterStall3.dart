@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:gradient_borders/box_borders/gradient_box_border.dart';
 import 'package:instreet/constants/constants.dart';
 import 'package:instreet/models/stallModel.dart';
@@ -34,19 +36,19 @@ class RegisterStall3 extends StatefulWidget {
       this.sId});
 
   @override
-  // ignore: library_private_types_in_public_api
   _RegisterStall3State createState() => _RegisterStall3State();
 }
 
 class _RegisterStall3State extends State<RegisterStall3> {
-
-  TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
 
   final MultiSelectController _controller = MultiSelectController();
 
-  TextEditingController _aiContoller = TextEditingController();
+  final TextEditingController _aiController = TextEditingController();
 
   bool _isFetchingData = false;
+  late final GenerativeModel _model;
+  late final ChatSession _chat;
 
   List<dynamic> selectedCategories = [];
 
@@ -69,6 +71,9 @@ class _RegisterStall3State extends State<RegisterStall3> {
 
   @override
   void initState() {
+    _model =
+        GenerativeModel(model: 'gemini-pro', apiKey: dotenv.env['API_KEY']!);
+    _chat = _model.startChat();
     super.initState();
     if (widget.sId != null) {
       fetchStallDetails();
@@ -127,41 +132,40 @@ class _RegisterStall3State extends State<RegisterStall3> {
 
   Widget AIDescriptionWidget() {
     return Dialog(
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(
-          Radius.circular(10),
-        ),
-      ),
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+        color: Colors.white,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Text(
-              'Create with AI',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
-              textAlign: TextAlign.center,
+            Text(
+              'Describe With AI',
+              style: kTextPopM16,
+              textAlign: TextAlign.left,
             ),
             const SizedBox(height: 16),
             Container(
-              padding: EdgeInsets.all(10),
+              padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 10),
               decoration: BoxDecoration(
                 border: const GradientBoxBorder(
-                  width: 1,
+                  width: 2,
                   gradient: LinearGradient(
-                    colors: [Colors.green, Colors.blue, Colors.purple],
+                    colors: [Colors.blue, Colors.green, Colors.purple],
                   ),
                 ),
                 borderRadius: BorderRadius.circular(10.0),
               ),
               child: TextField(
-                controller: _aiContoller,
-                decoration: InputDecoration(
+                textCapitalization: TextCapitalization.sentences,
+                controller: _aiController,
+                decoration: const InputDecoration(
                   border: InputBorder.none,
+                  hintText: "Describe the Stall in 5-10 words and watch the Magic of AI.",
                 ),
+                textAlign: TextAlign.justify,
                 showCursor: true,
-                maxLines: 5,
+                maxLines: 4,
               ),
             ),
             const SizedBox(height: 16),
@@ -178,9 +182,9 @@ class _RegisterStall3State extends State<RegisterStall3> {
                   ),
                   child: _isFetchingData
                       ? const CircularProgressIndicator(color: Colors.white)
-                      : Row(
+                      : const Row(
                           mainAxisAlignment: MainAxisAlignment.center,
-                          children: const [
+                          children: [
                             Icon(Icons.create, color: Colors.white),
                             SizedBox(width: 10),
                             Text(
@@ -199,57 +203,27 @@ class _RegisterStall3State extends State<RegisterStall3> {
     );
   }
 
-  // Ai description 
-  void getStallDescriptionFromAi() async {
-
+  Future<void> getStallDescriptionFromAi() async {
     setState(() {
       isLoading = true;
     });
 
     Navigator.of(context).pop();
-
-    const ourUrl ='https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=AIzaSyCI-BViPUvEpgYt9QJ4-YUuDzOVHNjL8yI';
-
-    final header = {'Content-Type': 'application/json'};
-    var data = {
-      "contents": [
-        {
-          "parts": [
-            {"text": _aiContoller.text.trim()}
-          ]
-        }
-      ]
-    };
-
     try {
-      final response = await http.post(
-        Uri.parse(ourUrl),
-        headers: header,
-        body: jsonEncode(data)
-      );
-
-      if (response.statusCode == 200) {
-        var result = jsonDecode(response.body);
-        print(result['candidates'][0]['content']['parts'][0]['text']);
-        setState(() {
-          _descriptionController.text = result['candidates'][0]['content']['parts'][0]['text'];
-          isLoading = false;
-        });
-      } else {
-        showToast("There was some error while generating description please add manually");
-        setState(() {
-          isLoading = false;
-        });
-      }
+      String prompt = "Generate a brief description for a street stall with name '${widget.name}', a stall in categories ${selectedCategories.join(', ')}, described as: ${_aiController.text}. Summarize in under 50 words and in simple english.";
+      print(prompt);
+      final res = await _chat
+          .sendMessage(Content.text(prompt));
+      final text = res.text;
+      _descriptionController.text = text!;
+      print(text);
     } catch (e) {
-      showToast("There was some error while generating description please add manually");
-      setState(() {
-        isLoading = false;
-      });
+      debugPrint(e.toString());
     }
-
-    _aiContoller.clear();
-    
+    setState(() {
+      _aiController.clear();
+      isLoading = false;
+    });
   }
 
   Widget setTitle(String title, bool isAI) {
@@ -264,11 +238,33 @@ class _RegisterStall3State extends State<RegisterStall3> {
           ),
           (isAI)
               ? GestureDetector(
-                  onTap: _openAIDescriptionWidget,
-                  child: Icon(
-                    Icons.edit,
-                    size: 25,
-                    color: kprimaryColor,
+                  onTap: selectedCategories.isEmpty
+                      ? () => showToast('Please Select The Categories First !')
+                      : _openAIDescriptionWidget,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 5,
+                    ),
+                    decoration: BoxDecoration(
+                      color: kprimaryColor,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        Text(
+                          'Use AI..',
+                          style: kTextPopM16.copyWith(color: Colors.white),
+                        ),
+                        const SizedBox(width: 5),
+                        const Icon(
+                          Icons.edit,
+                          size: 20,
+                          color: Colors.white,
+                        ),
+                      ],
+                    ),
                   ),
                 )
               : Container()
@@ -322,10 +318,10 @@ class _RegisterStall3State extends State<RegisterStall3> {
         fontSize: 16.0,
       );
       if (mounted) {
-        Navigator.of(context, rootNavigator: true).pushReplacementNamed('bottom-nav');
+        Navigator.of(context, rootNavigator: true)
+            .pushReplacementNamed('bottom-nav');
       }
     } catch (error) {
-
       print("Error submitting stall: $error");
 
       Fluttertoast.showToast(
@@ -356,8 +352,6 @@ class _RegisterStall3State extends State<RegisterStall3> {
 
   @override
   Widget build(BuildContext context) {
-
-    
     return Scaffold(
       appBar: const AppBarWidget(
         isSearch: false,
@@ -373,7 +367,7 @@ class _RegisterStall3State extends State<RegisterStall3> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    setTitle("Describe the Stall", true),
+                    setTitle("Describe The Stall", true),
                     TextField(
                       controller: _descriptionController,
                       maxLines: 5,
@@ -394,17 +388,8 @@ class _RegisterStall3State extends State<RegisterStall3> {
                           borderSide:
                               BorderSide(color: kprimaryColor, width: 1.0),
                         ),
-                        labelText: 'Describe The Stall....',
+                        labelText: 'Tell us more...',
                       ),
-                    ),
-                    const SizedBox(height: 16),
-                    const Row(
-                      children: [
-                        Text(
-                          'Around 100 words',
-                          style: TextStyle(fontSize: 16, color: Colors.grey),
-                        ),
-                      ],
                     ),
                     setTitle("Stall Category", false),
                     MultiSelectDropDown(

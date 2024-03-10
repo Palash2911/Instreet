@@ -3,11 +3,11 @@
 *.log
 *.pyc
 *.swp
+*.env
 .DS_Store
 .atom/
 .buildlog/
 .history
-.env
 .svn/
 migrate_working_dir/
 

@@ -133,7 +133,7 @@ class _PostScreenNavState extends State<PostScreenNav> {
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        "Creat Post",
+                        "Create Post",
                         style: kTextPopM16,
                       )
                     ],
