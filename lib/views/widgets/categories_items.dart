@@ -1,7 +1,6 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:instreet/constants/constants.dart';
-import 'package:instreet/views/screens/otherscreens/Categories.dart';
 
 class CategoriesItems extends StatefulWidget {
   const CategoriesItems({super.key, required this.NavigateCategory});
