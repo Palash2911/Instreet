@@ -12,7 +12,6 @@ import 'package:instreet/providers/stallProvider.dart';
 import 'package:instreet/views/widgets/appbar_widget.dart';
 import 'package:multi_dropdown/multiselect_dropdown.dart';
 import 'package:provider/provider.dart';
-import 'package:http/http.dart' as http;
 
 class RegisterStall3 extends StatefulWidget {
   final List<dynamic> stallImagesList;
@@ -71,13 +70,13 @@ class _RegisterStall3State extends State<RegisterStall3> {
 
   @override
   void initState() {
-    _model =
-        GenerativeModel(model: 'gemini-pro', apiKey: dotenv.env['API_KEY']!);
+    _model =GenerativeModel(model: 'gemini-pro', apiKey: dotenv.env['API_KEY']!);
     _chat = _model.startChat();
     super.initState();
     if (widget.sId != null) {
       fetchStallDetails();
     }
+
   }
 
   Future<void> fetchStallDetails() async {
@@ -110,8 +109,7 @@ class _RegisterStall3State extends State<RegisterStall3> {
     } catch (e) {
       print(e);
       Fluttertoast.showToast(
-        msg:
-            "Error while fetching stall details, please fill in the blank spaces",
+        msg:"Error while fetching stall details, please fill in the blank spaces",
         toastLength: Toast.LENGTH_SHORT,
         timeInSecForIosWeb: 1,
         backgroundColor: kprimaryColor,
@@ -204,27 +202,35 @@ class _RegisterStall3State extends State<RegisterStall3> {
   }
 
   Future<void> getStallDescriptionFromAi() async {
-    setState(() {
-      isLoading = true;
-    });
+    
+  setState(() {
+    isLoading = true;
+  });
 
-    Navigator.of(context).pop();
-    try {
-      String prompt = "Generate a brief description for a street stall with name '${widget.name}', a stall in categories ${selectedCategories.join(', ')}, described as: ${_aiController.text}. Summarize in under 50 words and in simple english.";
-      print(prompt);
-      final res = await _chat
-          .sendMessage(Content.text(prompt));
-      final text = res.text;
-      _descriptionController.text = text!;
-      print(text);
-    } catch (e) {
-      debugPrint(e.toString());
-    }
-    setState(() {
-      _aiController.clear();
-      isLoading = false;
-    });
+  Navigator.of(context).pop();
+
+  try {
+    String prompt = "Generate a concise description for a street stall named '${widget.name}', categorized under ${selectedCategories.join(', ')}. The description should be based on the following details: ${_aiController.text}. Aim for a summary that is under 50 words, straightforward, and easily understandable.";
+    print(prompt);
+    final res = await _chat.sendMessage(Content.text(prompt));
+
+    String fallbackText = "Explore '${widget.name}', a unique street stall in the ${selectedCategories.join(', ')} category. '${widget.name}' street stall is located at '${widget.location}' ";
+
+    final text = res.text!.isEmpty ? fallbackText : res.text;
+    
+    _descriptionController.text = text.toString();
+
+    print(text);
+  } catch (e) {
+    debugPrint(e.toString());
+    showToast("Unable to generate description automatically. Please input the description manually.");
   }
+  setState(() {
+    _aiController.clear();
+    isLoading = false;
+  });
+}
+
 
   Widget setTitle(String title, bool isAI) {
     return Padding(

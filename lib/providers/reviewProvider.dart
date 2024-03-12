@@ -65,4 +65,20 @@ class ReviewProvider extends ChangeNotifier {
   List<ReviewModel> getStallReview(String sId) {
     return _allReviews.where((review) => review.sid == sId).toList();
   }
+
+
+  // delete function to delete review
+  Future<void> deleteReview(String reviewId,String currentUid) async {
+    try {
+      CollectionReference reviewRef = FirebaseFirestore.instance.collection('reviews');
+      await reviewRef.doc(reviewId).delete();
+      _allReviews.removeWhere((review) => review.rid == reviewId && review.uid==currentUid);
+      notifyListeners();
+    } catch (e) {
+      print(e);
+      rethrow;
+    }
+  }
+
+
 }

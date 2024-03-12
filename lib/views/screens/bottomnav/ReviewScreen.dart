@@ -1,5 +1,6 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:instreet/constants/constants.dart';
 import 'package:instreet/models/reviewModel.dart';
 import 'package:instreet/providers/reviewProvider.dart';
 import 'package:instreet/providers/stallProvider.dart';
@@ -8,7 +9,6 @@ import 'package:instreet/views/widgets/homePageCard.dart';
 import 'package:instreet/views/widgets/shimmer_skeleton.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
-
 import '../../../providers/authProvider.dart';
 
 class ReviewScreen extends StatefulWidget {
@@ -91,7 +91,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
                   itemBuilder: (context, index) {
                     var stall = filteredStalls[index];
                     var review = userReviews.firstWhere(
-                      (r) => r.sid == stall.sId,
+                      (r) => r.sid == stall.sId && r.uid == currentUid,
                       orElse: () => ReviewModel(
                         rid: '',
                         sid: '',
@@ -101,14 +101,63 @@ class _ReviewScreenState extends State<ReviewScreen> {
                         userName: '',
                       ),
                     );
-                    if (review.sid.toString().isNotEmpty) {
-                      return HomePageCard(
-                        stall: stall,
-                        isReview: true,
-                        review: review,
-                      );
-                    }
-                    return null;
+
+                    return GestureDetector(
+                      onLongPress: () async {
+                        // Confirm deletion from the user
+                        bool delete = await showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: const Text("Delete Review"),
+                              content: const Text(
+                                  "Are you sure you want to delete this review?"),
+                              actions: <Widget>[
+                                TextButton(
+                                  child: const Text("Cancel"),
+                                  onPressed: () =>
+                                      Navigator.of(context).pop(false),
+                                ),
+                                TextButton(
+                                  child: const Text("Delete"),
+                                  onPressed: () =>
+                                      Navigator.of(context).pop(true),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+
+                        if (delete) {
+                          try {
+                            await Provider.of<ReviewProvider>(context,listen: false).deleteReview(review.rid, currentUid);
+                            Fluttertoast.showToast(
+                              msg:"Review deleted Successfully!",
+                              toastLength: Toast.LENGTH_SHORT,
+                              timeInSecForIosWeb: 1,
+                              backgroundColor: kprimaryColor,
+                              textColor: Colors.white,
+                              fontSize: 16.0,
+                            );
+                            loadReviewData(context);
+                          } catch (error) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Error deleting review: $error'),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          }
+                        }
+                      },
+                      child: review.sid.toString().isNotEmpty
+                          ? HomePageCard(
+                              stall: stall,
+                              isReview: true,
+                              review: review,
+                            )
+                          : const SizedBox.shrink(),
+                    );
                   },
                 ),
               ),

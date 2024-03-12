@@ -57,11 +57,9 @@ class _PostScreenNavState extends State<PostScreenNav> {
       setState(() {
         isLoading = true;
       });
-      await Provider.of<ReviewProvider>(context, listen: false)
-          .deleteReviews(sId);
+      await Provider.of<ReviewProvider>(context, listen: false).deleteReviews(sId);
       if (mounted) {
-        await Provider.of<StallProvider>(context, listen: false)
-            .deleteStall(sId, currentUid);
+        await Provider.of<StallProvider>(context, listen: false).deleteStall(sId, currentUid);
       }
       Fluttertoast.showToast(
         msg: "Stall Deleted Successfully",
