@@ -10,8 +10,7 @@ class UserProvider extends ChangeNotifier {
 
     final prefs = await SharedPreferences.getInstance();
     try {
-      CollectionReference users =
-          FirebaseFirestore.instance.collection('users');
+      CollectionReference users =FirebaseFirestore.instance.collection('users');
 
       await users.doc(user.uid).set({
         'Name': user.uName,

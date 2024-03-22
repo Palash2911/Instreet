@@ -1,8 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:instreet/constants/constants.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class Auth extends ChangeNotifier {
   var _token = "";
@@ -105,22 +108,6 @@ class Auth extends ChangeNotifier {
     }
   }
 
-  // Future linkCredentials(String type, String? otp) async {
-  //   try {
-  //     if(type == 'Google') {
-  //     } else {
-  //       var phoneCred = PhoneAuthProvider.credential(
-  //         verificationId: verificationId,
-  //         smsCode: otp,
-  //       );
-  //       await _auth.currentUser!.linkWithCredential(phoneCred);
-  //
-  //     }
-  //   } catch(e) {
-  //     rethrow;
-  //   }
-  // }
-
   Future<bool> checkUser() async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -179,5 +166,73 @@ class Auth extends ChangeNotifier {
     _userName = prefs.getString("UserName")!;
     _isCreator = prefs.getBool("IsCreator")!;
     _joiningDate = prefs.getString("JDate")!;
+  }
+
+  Future<void> sendOtp(String phoneNumber) async {
+    await _auth.verifyPhoneNumber(
+      phoneNumber: phoneNumber,
+      verificationCompleted: (PhoneAuthCredential credential) async {
+        await _auth.currentUser!.linkWithCredential(credential);
+      },
+      verificationFailed: (FirebaseAuthException e) {
+        throw e;
+      },
+      codeSent: (String verificationId, int? resendToken) {
+        this.verificationId = verificationId;
+      },
+      codeAutoRetrievalTimeout: (String verificationId) {
+        this.verificationId = verificationId;
+      },
+    );
+  }
+
+  // account link functions
+  bool isUserAuthenticatedWithGoogle() {
+    return _auth.currentUser?.providerData.any((provider) => provider.providerId == 'google.com') ?? false;
+  }
+
+   Future<void> linkPhoneNumber(String smsCode) async {
+    var phoneAuthCredential = PhoneAuthProvider.credential(
+      verificationId: verificationId,
+      smsCode: smsCode,
+    );
+
+    try {
+      await _auth.currentUser!.linkWithCredential(phoneAuthCredential);
+      print("Phone number linked successfully!");
+      notifyListeners();
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future<void> linkGoogleAccount() async {
+    final GoogleSignIn googleSignIn = GoogleSignIn();
+    final GoogleSignInAccount? googleSignInAccount = await googleSignIn.signIn();
+
+    if (googleSignInAccount != null) {
+      final GoogleSignInAuthentication googleSignInAuthentication = await googleSignInAccount.authentication;
+      final AuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleSignInAuthentication.accessToken,
+        idToken: googleSignInAuthentication.idToken,
+      );
+
+      try {
+        await _auth.currentUser!.linkWithCredential(credential);
+        Fluttertoast.showToast(
+            msg: 'Google account linked successfully!',
+            toastLength: Toast.LENGTH_SHORT,
+            timeInSecForIosWeb: 1,
+            backgroundColor: kprimaryColor,
+            textColor: Colors.white,
+            fontSize: 16.0,
+          );
+        print("Google account linked successfully!");
+
+        notifyListeners();
+      } catch (e) {
+        print(e);
+      }
+    }
   }
 }

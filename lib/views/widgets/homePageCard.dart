@@ -1,9 +1,11 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:instreet/constants/constants.dart';
 import 'package:instreet/models/reviewModel.dart';
 import 'package:instreet/models/stallModel.dart';
 import 'package:instreet/providers/authProvider.dart';
+import 'package:instreet/providers/reviewProvider.dart';
 import 'package:instreet/providers/stallProvider.dart';
 import 'package:instreet/views/widgets/review_card.dart';
 import 'package:provider/provider.dart';
@@ -12,8 +14,15 @@ class HomePageCard extends StatefulWidget {
   final Stall stall;
   final bool isReview;
   final ReviewModel? review;
+  final currentUid;
+  final loadReviewData;
   HomePageCard(
-      {super.key, required this.stall, required this.isReview, this.review});
+      {super.key,
+      required this.stall,
+      required this.isReview,
+      this.review,
+      this.currentUid,
+      this.loadReviewData});
 
   @override
   State<HomePageCard> createState() => _HomePageCardState();
@@ -169,10 +178,79 @@ class _HomePageCardState extends State<HomePageCard> {
                           ),
                           if (widget.isReview != null &&
                               widget.isReview == true)
-                            Text(
-                              widget.stall.stallDescription,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Container(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.55,
+                                  child: Text(
+                                    widget.stall.stallDescription,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                IconButton(
+                                  onPressed: () async {
+                                    // Confirm deletion from the user
+                                    bool delete = await showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          title: const Text("Delete Review"),
+                                          content: const Text(
+                                              "Are you sure you want to delete this review?"),
+                                          actions: <Widget>[
+                                            TextButton(
+                                              child: const Text("Cancel"),
+                                              onPressed: () =>
+                                                  Navigator.of(context)
+                                                      .pop(false),
+                                            ),
+                                            TextButton(
+                                              child: const Text("Delete"),
+                                              onPressed: () =>
+                                                  Navigator.of(context)
+                                                      .pop(true),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+
+                                    if (delete) {
+                                      try {
+                                        await Provider.of<ReviewProvider>(
+                                                context,
+                                                listen: false)
+                                            .deleteSingleReview(
+                                                widget.review!.rid,
+                                                widget.currentUid);
+                                        Fluttertoast.showToast(
+                                          msg: "Review deleted Successfully!",
+                                          toastLength: Toast.LENGTH_SHORT,
+                                          timeInSecForIosWeb: 1,
+                                          backgroundColor: kprimaryColor,
+                                          textColor: Colors.white,
+                                          fontSize: 16.0,
+                                        );
+                                        widget.loadReviewData(context);
+                                      } catch (error) {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                                'Error deleting review: $error'),
+                                            backgroundColor: Colors.red,
+                                          ),
+                                        );
+                                      }
+                                    }
+                                  },
+                                  icon: const Icon(Icons.delete),
+                                  color: Colors.red,
+                                ),
+                              ],
                             )
                           else
                             Container(),

@@ -4,7 +4,7 @@ import 'package:instreet/constants/constants.dart';
 class ProfileList extends StatefulWidget {
   final IconData icon;
   final String text;
-  final Function(dynamic) ontap;
+  final  ontap;
   ProfileList(
       {super.key, required this.icon, required this.text, required this.ontap});
 

@@ -68,7 +68,7 @@ class ReviewProvider extends ChangeNotifier {
 
 
   // delete function to delete review
-  Future<void> deleteReview(String reviewId,String currentUid) async {
+  Future<void> deleteSingleReview(String reviewId,String currentUid) async {
     try {
       CollectionReference reviewRef = FirebaseFirestore.instance.collection('reviews');
       await reviewRef.doc(reviewId).delete();
