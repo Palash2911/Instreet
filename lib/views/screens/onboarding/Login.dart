@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:instreet/constants/constants.dart';
+import 'package:instreet/providers/notificationProvider.dart';
+import 'package:instreet/providers/userProvider.dart';
 import 'package:instreet/views/screens/onboarding/Register.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:provider/provider.dart';
@@ -97,14 +99,12 @@ class _LoginScreenState extends State<LoginScreen> {
           fontSize: 16.0,
         );
         var user = await authProvider.checkUser();
-        // var fcmT = await FirebaseNotification().getToken();
         if (user) {
-          // await Provider.of<UserProvider>(context, listen: false)
-          //     .updateToken(fcmT.toString(), authProvider.token)
-          //     .then((value) {
-          //   const initin = 0;
-          //
-          // });
+          await Provider.of<UserProvider>(context, listen: false)
+              .updateToken(authProvider.token)
+              .catchError((e) {
+                print(e);
+              });
           await authProvider.autoLogin();
           if(mounted){
             Navigator.of(ctx).pushReplacementNamed('bottom-nav');
@@ -179,14 +179,13 @@ class _LoginScreenState extends State<LoginScreen> {
       });
       if (isValid) {
         var user = await authProvider.checkUser();
-        // var fcmT = await FirebaseNotification().getToken();
+
         if (user) {
-          // await Provider.of<UserProvider>(context, listen: false)
-          //     .updateToken(fcmT.toString(), authProvider.token)
-          //     .then((value) {
-          //   const initin = 0;
-          //
-          // });
+          await Provider.of<UserProvider>(context, listen: false)
+              .updateToken(authProvider.token)
+              .catchError((e) {
+                print(e);
+              });
           await authProvider.autoLogin();
           if(mounted){
             Navigator.of(ctx).pushReplacementNamed('bottom-nav');

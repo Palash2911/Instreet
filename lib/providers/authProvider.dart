@@ -90,6 +90,7 @@ class Auth extends ChangeNotifier {
     }
   }
 
+
   Future signInGoogle() async {
     try {
       GoogleAuthProvider googleAuthProvider = GoogleAuthProvider();
@@ -122,10 +123,7 @@ class Auth extends ChangeNotifier {
                 {
                   prefs.setString("UserName", dataSnapshot['Name']),
                   prefs.setBool("IsCreator", dataSnapshot['Creator']),
-                  prefs.setString(
-                      "JDate",
-                      DateFormat("dd MMM, yyyy")
-                          .format(dataSnapshot['CreatedAt'].toDate())),
+                  prefs.setString("JDate",DateFormat("dd MMM, yyyy").format(dataSnapshot['CreatedAt'].toDate())),
                 }
             },
           );
@@ -188,10 +186,26 @@ class Auth extends ChangeNotifier {
 
   // account link functions
   bool isUserAuthenticatedWithGoogle() {
-    return _auth.currentUser?.providerData.any((provider) => provider.providerId == 'google.com') ?? false;
+    return _auth.currentUser?.providerData
+            .any((provider) => provider.providerId == 'google.com') ??
+        false;
   }
 
-   Future<void> linkPhoneNumber(String smsCode) async {
+  // Checks if the user's phone number is linked
+  bool isPhoneNumberLinked() {
+    User? user = _auth.currentUser;
+    if (user != null) {
+      for (var info in user.providerData) {
+        if (info.providerId == 'phone') {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  // link phone number 
+  Future<void> linkPhoneNumber(String smsCode) async {
     var phoneAuthCredential = PhoneAuthProvider.credential(
       verificationId: verificationId,
       smsCode: smsCode,
@@ -202,16 +216,27 @@ class Auth extends ChangeNotifier {
       print("Phone number linked successfully!");
       notifyListeners();
     } catch (e) {
-      print(e);
+      Fluttertoast.showToast(
+          msg: e.toString(),
+          toastLength: Toast.LENGTH_SHORT,
+          timeInSecForIosWeb: 1,
+          backgroundColor: kprimaryColor,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
+        print(e);
     }
   }
 
+  // link google account
   Future<void> linkGoogleAccount() async {
     final GoogleSignIn googleSignIn = GoogleSignIn();
-    final GoogleSignInAccount? googleSignInAccount = await googleSignIn.signIn();
+    final GoogleSignInAccount? googleSignInAccount =
+        await googleSignIn.signIn();
 
     if (googleSignInAccount != null) {
-      final GoogleSignInAuthentication googleSignInAuthentication = await googleSignInAccount.authentication;
+      final GoogleSignInAuthentication googleSignInAuthentication =
+          await googleSignInAccount.authentication;
       final AuthCredential credential = GoogleAuthProvider.credential(
         accessToken: googleSignInAuthentication.accessToken,
         idToken: googleSignInAuthentication.idToken,
@@ -220,17 +245,25 @@ class Auth extends ChangeNotifier {
       try {
         await _auth.currentUser!.linkWithCredential(credential);
         Fluttertoast.showToast(
-            msg: 'Google account linked successfully!',
-            toastLength: Toast.LENGTH_SHORT,
-            timeInSecForIosWeb: 1,
-            backgroundColor: kprimaryColor,
-            textColor: Colors.white,
-            fontSize: 16.0,
-          );
+          msg: 'Google account linked successfully!',
+          toastLength: Toast.LENGTH_SHORT,
+          timeInSecForIosWeb: 1,
+          backgroundColor: kprimaryColor,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
         print("Google account linked successfully!");
 
         notifyListeners();
       } catch (e) {
+        Fluttertoast.showToast(
+          msg: e.toString(),
+          toastLength: Toast.LENGTH_SHORT,
+          timeInSecForIosWeb: 1,
+          backgroundColor: kprimaryColor,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
         print(e);
       }
     }

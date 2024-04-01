@@ -1,14 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:instreet/models/userModel.dart';
+import 'package:instreet/providers/notificationProvider.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UserProvider extends ChangeNotifier {
 
+
+  Future updateToken(String uid) async {
+    final prefs = await SharedPreferences.getInstance();
+    var fcmt = await FirebaseNotification().getToken();
+    try {
+      CollectionReference users =FirebaseFirestore.instance.collection('users');
+      await users.doc(uid).update({"FcmToken": fcmt.toString()});
+      prefs.setString("FCMT", fcmt.toString());
+      notifyListeners();
+    } catch (e) {
+      notifyListeners();
+      rethrow;
+    }
+  }
+
   Future registerUser(UserModel user) async {
 
     final prefs = await SharedPreferences.getInstance();
+    
     try {
       CollectionReference users =FirebaseFirestore.instance.collection('users');
 
@@ -25,8 +42,8 @@ class UserProvider extends ChangeNotifier {
       
       prefs.setString("UserName", user.uName);
       prefs.setBool("IsCreator", user.isCreator);
-      prefs.setString(
-          "JDate", DateFormat("dd MMM, yyyy").format(user.createdAt));
+      prefs.setString("JDate", DateFormat("dd MMM, yyyy").format(user.createdAt));
+      updateToken(user.uid);
       notifyListeners();
     } catch (e) {
       prefs.setString("UserName", "");
@@ -48,13 +65,12 @@ class UserProvider extends ChangeNotifier {
       throw Exception("Failed to fetch user data");
     }
   }
-  
+
 
   Future updateUser(UserModel user) async {
     final prefs = await SharedPreferences.getInstance();
     try {
-      CollectionReference users =
-          FirebaseFirestore.instance.collection('users');
+      CollectionReference users =FirebaseFirestore.instance.collection('users');
       await users.doc(user.uid).update({
         'Name': user.uName,
         "CreatedAt": user.createdAt,
@@ -67,8 +83,7 @@ class UserProvider extends ChangeNotifier {
       });
       prefs.setString("UserName", user.uName);
       prefs.setBool("IsCreator", user.isCreator);
-      prefs.setString(
-          "JDate", DateFormat("dd MMM, yyyy").format(user.createdAt));
+      prefs.setString("JDate", DateFormat("dd MMM, yyyy").format(user.createdAt));
       notifyListeners();
     } catch (e) {
       prefs.setString("UserName", "");

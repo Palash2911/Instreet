@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:instreet/constants/constants.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../../providers/authProvider.dart';
@@ -66,23 +67,41 @@ class _FavroiteScreenState extends State<FavroiteScreen> {
                   );
                 },
               )
-            : Container(
-                height: MediaQuery.of(context).size.height -
-                    kBottomNavigationBarHeight,
-                padding: const EdgeInsets.only(bottom: 20),
-                child: RefreshIndicator(
-                  onRefresh: () => loadStallsData(context),
-                  child: ListView.builder(
-                    itemCount: favoriteStalls.length,
-                    itemBuilder: (context, index) {
-                      return HomePageCard(
-                        stall: favoriteStalls[index],
-                        isReview: false,
-                      );
-                    },
+            : favoriteStalls.isEmpty
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset(
+                          'assets/images/asterik.png',
+                          height: 300,
+                          color: kprimaryColor,
+                        ),
+                        const Text(
+                          'No favourite yet!',
+                          style: TextStyle(
+                              fontSize: 24, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                  )
+                : Container(
+                    height: MediaQuery.of(context).size.height -
+                        kBottomNavigationBarHeight,
+                    padding: const EdgeInsets.only(bottom: 20),
+                    child: RefreshIndicator(
+                      onRefresh: () => loadStallsData(context),
+                      child: ListView.builder(
+                        itemCount: favoriteStalls.length,
+                        itemBuilder: (context, index) {
+                          return HomePageCard(
+                            stall: favoriteStalls[index],
+                            isReview: false,
+                          );
+                        },
+                      ),
+                    ),
                   ),
-                ),
-              ),
       ),
     );
   }

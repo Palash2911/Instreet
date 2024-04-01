@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:instreet/constants/constants.dart';
 import 'package:instreet/models/reviewModel.dart';
+import 'package:instreet/providers/authProvider.dart';
 import 'package:instreet/providers/reviewProvider.dart';
 import 'package:instreet/providers/stallProvider.dart';
 import 'package:instreet/views/widgets/appbar_widget.dart';
@@ -7,7 +9,6 @@ import 'package:instreet/views/widgets/homePageCard.dart';
 import 'package:instreet/views/widgets/shimmer_skeleton.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
-import '../../../providers/authProvider.dart';
 
 class ReviewScreen extends StatefulWidget {
   const ReviewScreen({super.key});
@@ -81,35 +82,53 @@ class _ReviewScreenState extends State<ReviewScreen> {
                   );
                 },
               )
-            : RefreshIndicator(
-                onRefresh: () => loadReviewData(context),
-                child: ListView.builder(
-                  itemCount: filteredStalls.length,
-                  itemBuilder: (context, index) {
-                    var stall = filteredStalls[index];
-                    var review = userReviews.firstWhere(
-                      (r) => r.sid == stall.sId && r.uid == currentUid,
-                      orElse: () => ReviewModel(
-                        rid: '',
-                        sid: '',
-                        review: '',
-                        rating: 0,
-                        uid: '',
-                        userName: '',
-                      ),
-                    );
-                    return review.sid.toString().isNotEmpty
-                        ? HomePageCard(
-                            stall: stall,
-                            isReview: true,
-                            review: review,
-                            currentUid: currentUid,
-                            loadReviewData: loadReviewData,
-                          )
-                        : const SizedBox.shrink();
-                  },
-                ),
-              ),
+            : filteredStalls.isEmpty
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset(
+                          'assets/images/asterik.png',
+                          height: 300,
+                          color: kprimaryColor,
+                        ),
+                        const Text(
+                          'No reviews yet!',
+                          style: TextStyle(
+                              fontSize: 24, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                  )
+                : RefreshIndicator(
+                    onRefresh: () => loadReviewData(context),
+                    child: ListView.builder(
+                      itemCount: filteredStalls.length,
+                      itemBuilder: (context, index) {
+                        var stall = filteredStalls[index];
+                        var review = userReviews.firstWhere(
+                          (r) => r.sid == stall.sId && r.uid == currentUid,
+                          orElse: () => ReviewModel(
+                            rid: '',
+                            sid: '',
+                            review: '',
+                            rating: 0,
+                            uid: '',
+                            userName: '',
+                          ),
+                        );
+                        return review.sid.toString().isNotEmpty
+                            ? HomePageCard(
+                                stall: stall,
+                                isReview: true,
+                                review: review,
+                                currentUid: currentUid,
+                                loadReviewData: loadReviewData,
+                              )
+                            : const SizedBox.shrink();
+                      },
+                    ),
+                  ),
       ),
     );
   }

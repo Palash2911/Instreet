@@ -3,6 +3,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:instreet/providers/authProvider.dart';
+import 'package:instreet/providers/notificationProvider.dart';
 import 'package:instreet/providers/reviewProvider.dart';
 import 'package:instreet/providers/stallProvider.dart';
 import 'package:instreet/providers/userProvider.dart';
@@ -17,7 +18,9 @@ void main() async {
   await dotenv.load(fileName: '.env');
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  FirebaseNotification().initNotification();
   FirebaseMessaging.onBackgroundMessage(backgroundHandler);
+  // FirebaseMessaging.instance.subscribeToTopic('users');
   runApp(const MyApp());
 }
 

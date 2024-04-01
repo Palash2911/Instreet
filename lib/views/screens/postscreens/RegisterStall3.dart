@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:ui';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -12,6 +13,7 @@ import 'package:instreet/providers/stallProvider.dart';
 import 'package:instreet/views/widgets/appbar_widget.dart';
 import 'package:multi_dropdown/multiselect_dropdown.dart';
 import 'package:provider/provider.dart';
+import 'package:http/http.dart' as http;
 
 class RegisterStall3 extends StatefulWidget {
   final List<dynamic> stallImagesList;
@@ -36,6 +38,63 @@ class RegisterStall3 extends StatefulWidget {
 
   @override
   _RegisterStall3State createState() => _RegisterStall3State();
+}
+
+Future<void> sendNotificationToAllUsers(String stallName,String id) async {
+  try {
+    List<String> token = [];
+    CollectionReference user = FirebaseFirestore.instance.collection('users');
+
+    final querySnapshot = await user.get();
+
+    if (querySnapshot.docs.isNotEmpty) {
+      for (int i = 0; i < querySnapshot.docs.length; i++) {
+        token.add(querySnapshot.docs[i]['FcmToken']);
+      }
+    } else {
+      print('No users found');
+    }
+
+    final serverKey = dotenv.env['FIREBASE_SERVER_KEY'];
+    const fcmUrl = 'https://fcm.googleapis.com/fcm/send';
+
+    if (token.isNotEmpty) {
+      for (int i = 0; i < token.length; i++) {
+        final response = await http.post(
+          Uri.parse(fcmUrl),
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization':serverKey!,
+          },
+          body: jsonEncode({
+            'to': token[i],
+            'notification': {
+              'title': 'New Stall Added',
+              'body': 'Check out the new stall: $stallName',
+              'sound': 'default',
+              'icon': 'logo_img',
+              'data': {
+                'click_action': 'FLUTTER_NOTIFICATION_CLICK',
+                'stall_id': id,
+                'status': 'done'
+              }
+            },
+          }),
+        );
+
+        if (response.statusCode == 200) {
+          print('Notification sent to all users');
+        } else {
+          print('Failed to send notification: ${response.body}');
+        }
+      }
+    }else{
+      print(token.length);
+    }
+  } catch (e) {
+    print('Error: $e');
+  }
+
 }
 
 class _RegisterStall3State extends State<RegisterStall3> {
@@ -70,13 +129,13 @@ class _RegisterStall3State extends State<RegisterStall3> {
 
   @override
   void initState() {
-    _model =GenerativeModel(model: 'gemini-pro', apiKey: dotenv.env['API_KEY']!);
+    _model =
+        GenerativeModel(model: 'gemini-pro', apiKey: dotenv.env['API_KEY']!);
     _chat = _model.startChat();
     super.initState();
     if (widget.sId != null) {
       fetchStallDetails();
     }
-
   }
 
   Future<void> fetchStallDetails() async {
@@ -159,7 +218,8 @@ class _RegisterStall3State extends State<RegisterStall3> {
                 controller: _aiController,
                 decoration: const InputDecoration(
                   border: InputBorder.none,
-                  hintText: "Describe the Stall in 5-10 words and watch the Magic of AI.",
+                  hintText:
+                      "Describe the Stall in 5-10 words and watch the Magic of AI.",
                 ),
                 textAlign: TextAlign.justify,
                 showCursor: true,
@@ -202,35 +262,36 @@ class _RegisterStall3State extends State<RegisterStall3> {
   }
 
   Future<void> getStallDescriptionFromAi() async {
-    
-  setState(() {
-    isLoading = true;
-  });
+    setState(() {
+      isLoading = true;
+    });
 
-  Navigator.of(context).pop();
+    Navigator.of(context).pop();
 
-  try {
-    String prompt = "Generate a concise description for a street stall named '${widget.name}', categorized under ${selectedCategories.join(', ')}. The description should be based on the following details: ${_aiController.text}. Aim for a summary that is under 50 words, straightforward, and easily understandable.";
-    print(prompt);
-    final res = await _chat.sendMessage(Content.text(prompt));
+    try {
+      String prompt =
+          "Generate a concise description for a street stall named '${widget.name}', categorized under ${selectedCategories.join(', ')}. The description should be based on the following details: ${_aiController.text}. Aim for a summary that is under 50 words, straightforward, and easily understandable.";
+      print(prompt);
+      final res = await _chat.sendMessage(Content.text(prompt));
 
-    String fallbackText = "Explore '${widget.name}', a unique street stall in the ${selectedCategories.join(', ')} category. '${widget.name}' street stall is located at '${widget.location}' ";
+      String fallbackText =
+          "Explore '${widget.name}', a unique street stall in the ${selectedCategories.join(', ')} category. '${widget.name}' street stall is located at '${widget.location}' ";
 
-    final text = res.text!.isEmpty ? fallbackText : res.text;
-    
-    _descriptionController.text = text.toString();
+      final text = res.text!.isEmpty ? fallbackText : res.text;
 
-    print(text);
-  } catch (e) {
-    debugPrint(e.toString());
-    showToast("Unable to generate description automatically. Please input the description manually.");
+      _descriptionController.text = text.toString();
+
+      print(text);
+    } catch (e) {
+      debugPrint(e.toString());
+      showToast(
+          "Unable to generate description automatically. Please input the description manually.");
+    }
+    setState(() {
+      _aiController.clear();
+      isLoading = false;
+    });
   }
-  setState(() {
-    _aiController.clear();
-    isLoading = false;
-  });
-}
-
 
   Widget setTitle(String title, bool isAI) {
     return Padding(
@@ -293,7 +354,8 @@ class _RegisterStall3State extends State<RegisterStall3> {
     var authId = Provider.of<Auth>(context, listen: false).token;
 
     try {
-      await stallProvider.addStall(
+      // ignore: unused_local_variable
+      String currentAddedStallId =  await stallProvider.addStall(
         Stall(
           sId: widget.sId != null ? widget.sId.toString() : '',
           stallName: widget.name,
@@ -315,6 +377,7 @@ class _RegisterStall3State extends State<RegisterStall3> {
         widget.menuImagesList,
         widget.sId != null ? 'update' : 'add',
       );
+      print("this stall is added now ${currentAddedStallId}");
       Fluttertoast.showToast(
         msg: "Stall ${widget.sId != null ? 'Updated' : 'Added'} successfully",
         toastLength: Toast.LENGTH_SHORT,
@@ -324,8 +387,8 @@ class _RegisterStall3State extends State<RegisterStall3> {
         fontSize: 16.0,
       );
       if (mounted) {
-        Navigator.of(context, rootNavigator: true)
-            .pushReplacementNamed('bottom-nav');
+        sendNotificationToAllUsers(widget.name,currentAddedStallId);
+        Navigator.of(context, rootNavigator: true).pushReplacementNamed('bottom-nav');
       }
     } catch (error) {
       print("Error submitting stall: $error");
@@ -344,6 +407,7 @@ class _RegisterStall3State extends State<RegisterStall3> {
       });
     }
   }
+  // sendNotification
 
   void showToast(String message) {
     Fluttertoast.showToast(

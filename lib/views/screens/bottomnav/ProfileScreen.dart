@@ -39,6 +39,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
     super.didChangeDependencies();
   }
 
+
+  @override
+  void dispose() {
+    _phoneController.dispose();
+    _otpController.dispose();
+    super.dispose();
+  }
+
   void onProfileListTap(ListName) async {
     switch (ListName) {
       case "My Stalls":
@@ -65,8 +73,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           await Provider.of<Auth>(context, listen: false)
               .signOut()
               .catchError((e) {
-            print(e);
-          });
+                print(e);
+              });
           if (mounted) {
             Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
               MaterialPageRoute(builder: (context) => const SplashScreen()),
@@ -118,8 +126,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
 
     try {
-      await Provider.of<Auth>(context, listen: false)
-          .sendOtp("+91" + _phoneController.text.trim());
+      await Provider.of<Auth>(context, listen: false).sendOtp("+91" + _phoneController.text.trim());
       setState(() {
         otpSent = true;
       });
@@ -151,94 +158,102 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _linkAccountButton(Auth authProvider) {
     print("this is auth with google ${authProvider.isUserAuthenticatedWithGoogle()}");
-    if (authProvider.isAuth && !authProvider.isUserAuthenticatedWithGoogle()) {
+    if (authProvider.isAuth && !authProvider.isUserAuthenticatedWithGoogle()  && authProvider.isPhoneNumberLinked()) {
       // If the user is authenticated but not with Google, show link Google button
       return ElevatedButton(
         onPressed: () => authProvider.linkGoogleAccount(),
         child: const  Text('Link Google Account'),
       );
-      // return ProfileList(
-      //   icon: Icons.mail,
-      //   ontap: () => authProvider.linkGoogleAccount(),
-      //   text: "Link Google Account",
-      // );
-
-    } else if (authProvider.isAuth && authProvider.isUserAuthenticatedWithGoogle()) {
+    } else if (authProvider.isAuth && authProvider.isUserAuthenticatedWithGoogle() && !authProvider.isPhoneNumberLinked()) {
       const SizedBox(height: 18);
-      return Container(
-        margin: const EdgeInsets.symmetric(horizontal: 26),
-        // padding: const EdgeInsets.all(15.0),
-        // width: 310,
-        // height:54,
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey, width: 1.2),
-          borderRadius: const BorderRadius.all(
-            Radius.circular(10),
-          ),
-        ),
-        child: Column(
-          children: [
-            ListTile(
-              leading: const Icon(Icons.call),
-              title: const Text('Link Mobile Number'),
-              onTap: () {
-                setState(() {
-                  isLinkMobileExpanded = !isLinkMobileExpanded;
-                });
-              },
-            ),
-            if (isLinkMobileExpanded)
-              Container(
-                padding: EdgeInsets.all(8),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const SizedBox(height: 20),
-                    IntlPhoneField(
-                      controller: _phoneController,
-                      decoration: const InputDecoration(
-                        labelText: "Phone Number",
-                        border: OutlineInputBorder(),
-                      ),
-                      initialCountryCode: 'IN',
-                      onChanged: (phone) {
-                        setState(() {
-                          otpSent = false;
-                        });
-                      },
-                    ),
-                    const SizedBox(height: 20),
-                    PinCodeTextField(
-                      appContext: context,
-                      length: 6,
-                      onChanged: (value) {
-                        _otpController.text = value;
-                      },
-                      beforeTextPaste: (text) => true,
-                    ),
-                    const SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: () =>
-                          otpSent ? _linkPhoneNumber(context) : _sendOtp(context),
-                      child: Text(otpSent ? 'Link Phone Number' : 'Send OTP'),
-                    ),
-                  ],
-                ),
-              ),
-          ],
-        ),
+      // If the user is authenticated with Google but phone number is not linked, show link phone number button
+      return ElevatedButton(
+        onPressed: () => _showLinkPhoneNumberDialog(context),
+        child: const Text('Link Mobile Number'),
       );
     } else {
       return const SizedBox.shrink();
     }
   }
 
-  @override
-  void dispose() {
-    _phoneController.dispose();
-    _otpController.dispose();
-    super.dispose();
+  Future<void> _showLinkPhoneNumberDialog(BuildContext context) async {
+  bool localOtpSent = false;
+
+  void updateLocalOtpSent(bool value) {
+    Navigator.of(context).pop();
+    localOtpSent = value;
+    _showLinkPhoneNumberDialog(context);
   }
+
+  return showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (BuildContext context) {
+      return StatefulBuilder(
+        builder: (context, setState) {
+          return AlertDialog(
+            contentPadding: const  EdgeInsets.all(15),
+            title: const Text('Link Mobile Number'),
+            content: SingleChildScrollView(
+              child: ListBody(
+                children: <Widget>[
+                  IntlPhoneField(
+                    controller: _phoneController,
+                    decoration: const InputDecoration(
+                      labelText: "Phone Number",
+                      border: OutlineInputBorder(),
+                    ),
+                    initialCountryCode: 'IN',
+                    onChanged: (phone) {
+                      if (localOtpSent) {
+                        setState(() {
+                          localOtpSent = false;
+                        });
+                      }
+                    },
+                  ),
+                  const SizedBox(height: 20),
+                  localOtpSent ? PinCodeTextField(
+                    appContext: context,
+                    length: 6,
+                    onChanged: (value) {
+                      _otpController.text = value;
+                    },
+                    beforeTextPaste: (text) => true,
+                  ) : Container(),
+                ],
+              ),
+            ),
+            actions: <Widget>[
+              TextButton(
+                child: const Text('Cancel'),
+                onPressed: () {
+                  _phoneController.clear();
+                  Navigator.of(context).pop();
+                },
+              ),
+              TextButton(
+                child: Text(localOtpSent ? 'Verify OTP' : 'Send OTP'),
+                onPressed: () {
+                  if (localOtpSent) {
+                    _linkPhoneNumber(context).then((_) => Navigator.of(context).pop());
+                  } else {
+                    _sendOtp(context).then((_) {
+                      setState(() {
+                        localOtpSent = true;
+                      });
+                    });
+                  }
+                },
+              ),
+            ],
+          );
+        },
+      );
+    },
+  );
+}
+
 
   @override
   Widget build(BuildContext context) {

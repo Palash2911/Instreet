@@ -11,8 +11,7 @@ import '../models/stallModel.dart';
 class StallProvider extends ChangeNotifier {
   List<Stall> _stalls = [];
 
-  Future<void> addStall(Stall stall, List<dynamic> preSI, List<dynamic> preMI,
-      String type) async {
+  Future<String> addStall(Stall stall, List<dynamic> preSI, List<dynamic> preMI,String type) async {
     final prefs = await SharedPreferences.getInstance();
     try {
       var stallRef;
@@ -87,6 +86,7 @@ class StallProvider extends ChangeNotifier {
       }
 
       notifyListeners();
+      return docRef.id;
     } catch (e) {
       notifyListeners();
       rethrow;
