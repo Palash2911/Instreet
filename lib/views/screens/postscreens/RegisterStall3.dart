@@ -67,7 +67,7 @@ Future<void> sendNotificationToAllUsers(String stallName,String id) async {
             'Authorization':serverKey!,
           },
           body: jsonEncode({
-            'to': token[i],
+            'to': token,
             'notification': {
               'title': 'New Stall Added',
               'body': 'Check out the new stall: $stallName',

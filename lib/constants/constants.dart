@@ -42,18 +42,18 @@ TextStyle kTextPopR12 =
     GoogleFonts.poppins(fontSize: 12.0, fontWeight: FontWeight.w400);
 
 List<Category> categories = [
-  Category('Books', 'assets/images/book.jpg'),
-  Category('Electronics', 'assets/images/electronics.png'),
-  Category('Clothes', 'assets/images/cloothes.png'),
-  Category('Art', 'assets/images/art.png'),
-  Category('Toys', 'assets/images/toys.png'),
-  Category('Sport', 'assets/images/sport.png'),
-  Category('Saloon', 'assets/images/saloon4.jpg'),
-  Category('Jewellery', 'assets/images/jawelry.png'),
-  Category('Health', 'assets/images/health.jpg'),
-  Category('Food', 'assets/images/food.png'),
-  Category('Flowers', 'assets/images/flower.jpg'),
-  Category('Other', 'assets/images/all.png')
+  Category('Books', 'assets/images/book.webp'),
+  Category('Electronics', 'assets/images/electronics.webp'),
+  Category('Clothes', 'assets/images/cloothes.webp'),
+  Category('Art', 'assets/images/art.webp'),
+  Category('Toys', 'assets/images/toys.webp'),
+  Category('Sport', 'assets/images/sport.webp'),
+  Category('Saloon', 'assets/images/saloon4.webp'),
+  Category('Jewellery', 'assets/images/jawelry.webp'),
+  Category('Health', 'assets/images/health.webp'),
+  Category('Food', 'assets/images/food.webp'),
+  Category('Flowers', 'assets/images/flower.webp'),
+  Category('Other', 'assets/images/all.webp')
 ];
 
 double calculateGridHeight() {

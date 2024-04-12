@@ -49,6 +49,7 @@ class _FavroiteScreenState extends State<FavroiteScreen> {
 
   @override
   Widget build(BuildContext context) {
+
     final favoriteStalls = currentUid.isNotEmpty
         ? Provider.of<StallProvider>(context).getFavoriteStalls(currentUid)
         : [];
@@ -73,15 +74,14 @@ class _FavroiteScreenState extends State<FavroiteScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Image.asset(
-                          'assets/images/asterik.png',
+                          'assets/images/noFavourite.png',
                           height: 300,
-                          color: kprimaryColor,
                         ),
-                        const Text(
-                          'No favourite yet!',
-                          style: TextStyle(
-                              fontSize: 24, fontWeight: FontWeight.bold),
-                        ),
+                        // const Text(
+                        //   'No favourite yet!',
+                        //   style: TextStyle(
+                        //       fontSize: 24, fontWeight: FontWeight.bold),
+                        // ),
                       ],
                     ),
                   )
