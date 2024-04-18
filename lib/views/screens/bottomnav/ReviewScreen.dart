@@ -88,15 +88,14 @@ class _ReviewScreenState extends State<ReviewScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Image.asset(
-                          'assets/images/asterik.png',
+                          'assets/images/noReviews.png',
                           height: 300,
-                          color: kprimaryColor,
                         ),
-                        const Text(
-                          'No reviews yet!',
-                          style: TextStyle(
-                              fontSize: 24, fontWeight: FontWeight.bold),
-                        ),
+                        // const Text(
+                        //   'No reviews yet!',
+                        //   style: TextStyle(
+                        //       fontSize: 24, fontWeight: FontWeight.bold),
+                        // ),
                       ],
                     ),
                   )
