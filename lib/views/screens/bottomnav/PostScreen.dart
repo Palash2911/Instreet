@@ -57,9 +57,11 @@ class _PostScreenNavState extends State<PostScreenNav> {
       setState(() {
         isLoading = true;
       });
-      await Provider.of<ReviewProvider>(context, listen: false).deleteReviews(sId);
+      await Provider.of<ReviewProvider>(context, listen: false)
+          .deleteReviews(sId);
       if (mounted) {
-        await Provider.of<StallProvider>(context, listen: false).deleteStall(sId, currentUid);
+        await Provider.of<StallProvider>(context, listen: false)
+            .deleteStall(sId, currentUid);
       }
       Fluttertoast.showToast(
         msg: "Stall Deleted Successfully",
@@ -110,60 +112,42 @@ class _PostScreenNavState extends State<PostScreenNav> {
                 );
               },
             )
-          : userStalls.isEmpty
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.of(context, rootNavigator: true).push(
-                            MaterialPageRoute(
-                              builder: (context) => const RegisterStall1(),
-                            ),
-                          );
-                        },
-                        child: Icon(
-                          Icons.add_circle,
-                          size: 100,
-                          color: kprimaryColor,
-                        ),
+          : RefreshIndicator(
+              onRefresh: () => loadAddedStalls(context),
+              child: userStalls.isEmpty
+                  ? Center(
+                      child: Column(
+                        children: [
+                          Image.asset(
+                            'assets/images/emptyPostScreen.png',
+                            height: 510,
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 16),
-                      Text(
-                        "Create Post",
-                        style: kTextPopM16,
-                      )
-                    ],
-                  ),
-                )
-              : RefreshIndicator(
-                  onRefresh: () => loadAddedStalls(context),
-                  child: ListView.builder(
-                    itemCount: userStalls.length,
-                    itemBuilder: (context, index) {
-                      final stall = userStalls[index];
-                      return MyPostCard(
-                        stall: stall,
-                        sId: stall.sId,
-                        onDelete: deleteStall,
-                      );
-                    },
-                  ),
-                ),
-      floatingActionButton: userStalls.isEmpty
-          ? Container()
-          : FloatingActionButton(
-              backgroundColor: kprimaryColor,
-              onPressed: () {
-                Navigator.of(context, rootNavigator: true).push(
-                  MaterialPageRoute(
-                    builder: (context) => const RegisterStall1(),
-                  ),
-                );
-              },
-              child: Icon(Icons.add),
+                    )
+                  : ListView.builder(
+                      itemCount: userStalls.length,
+                      itemBuilder: (context, index) {
+                        final stall = userStalls[index];
+                        return MyPostCard(
+                          stall: stall,
+                          sId: stall.sId,
+                          onDelete: deleteStall,
+                        );
+                      },
+                    ),
             ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: kprimaryColor,
+        onPressed: () {
+          Navigator.of(context, rootNavigator: true).push(
+            MaterialPageRoute(
+              builder: (context) => const RegisterStall1(),
+            ),
+          );
+        },
+        child: Icon(Icons.add),
+      ),
     );
   }
 }

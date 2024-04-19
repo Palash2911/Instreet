@@ -10,13 +10,13 @@ class ContactUs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
-    Widget contactUsList(String titleText, String subTitleText,IconData icon,Color iconColor) {
+    Widget contactUsList(
+        String titleText, String subTitleText, IconData icon, Color iconColor) {
       return ListTile(
         leading: Icon(icon, color: iconColor),
         title: Text(
           titleText,
-          style: const TextStyle(fontSize: 18,fontWeight: FontWeight.w600),
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
         ),
         subtitle: Text(
           subTitleText,
@@ -32,24 +32,28 @@ class ContactUs extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            contactUsList('Address', 'D Y Patil College Of Engineering Akurdi , Pune',Icons.location_on,Colors.blue),
+            contactUsList(
+                'Address',
+                'D Y Patil College Of Engineering Akurdi , Pune',
+                Icons.location_on,
+                Colors.blue),
             const Divider(
               thickness: 1,
               color: Colors.grey,
             ),
-            contactUsList('Phone', '+91 1743727491',Icons.phone,Colors.green),
+            contactUsList('Phone', '+91 1743727491', Icons.phone, Colors.green),
             const Divider(
               thickness: 1,
               color: Colors.grey,
             ),
-            contactUsList('Email', 'instreetpvt@gmail.com',Icons.email,Colors.red)
+            contactUsList(
+                'Email', 'instreetpvt@gmail.com', Icons.email, Colors.red)
           ],
         ),
       ),
     );
   }
 }
-
 
 class AboutUs extends StatefulWidget {
   static var routeName = 'about-us';
@@ -66,12 +70,18 @@ class _AboutUsState extends State<AboutUs> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const AppBarWidget(screenTitle: 'About Us', isSearch: false),
-      body: ListView(
-        children: [
-          buildSection(0, "Mission", "Our mission is to enhance and transform the street food discovery experience through innovative use of Augmented Reality (AR) and advanced data analytics. We aim to provide street food enthusiasts with a user-friendly, dynamic platform that not only helps them discover new culinary delights but also enriches their dining adventures with personalized, context-aware recommendations."),
-          buildSection(1, "Vision", "Our vision is to redefine the way people interact with street food environments, making the discovery process as enjoyable as the dining experience itself. By leveraging cutting-edge technologies like AR and machine learning, we strive to foster a vibrant community of food lovers who appreciate the rich tapestry of local and global street food cultures."),
-          buildSection(2, "History", "Founded by a team of passionate food and technology enthusiasts, our project began with the goal of merging technological innovation with the burgeoning interest in street food. Since our inception, we have continuously evolved, incorporating user feedback and the latest technological advancements to improve and expand our services. Our journey from a simple idea to a robust platform reflects our commitment to excellence and community engagement in the culinary tech space."),
-        ],
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 30),
+        child: ListView(
+          children: [
+            buildSection(0, "Mission",
+                "Our mission is to enhance and transform the street food discovery experience through innovative use of Augmented Reality (AR) and advanced data analytics. We aim to provide street food enthusiasts with a user-friendly, dynamic platform that not only helps them discover new culinary delights but also enriches their dining adventures with personalized, context-aware recommendations."),
+            buildSection(1, "Vision",
+                "Our vision is to redefine the way people interact with street food environments, making the discovery process as enjoyable as the dining experience itself. By leveraging cutting-edge technologies like AR and machine learning, we strive to foster a vibrant community of food lovers who appreciate the rich tapestry of local and global street food cultures."),
+            buildSection(2, "History",
+                "Founded by a team of passionate food and technology enthusiasts, our project began with the goal of merging technological innovation with the burgeoning interest in street food. Since our inception, we have continuously evolved, incorporating user feedback and the latest technological advancements to improve and expand our services. Our journey from a simple idea to a robust platform reflects our commitment to excellence and community engagement in the culinary tech space."),
+          ],
+        ),
       ),
     );
   }
@@ -79,14 +89,23 @@ class _AboutUsState extends State<AboutUs> {
   Widget buildSection(int index, String title, String content) {
     return Card(
       elevation: 5,
-      shadowColor: Colors.black,
       margin: const EdgeInsets.all(12.0),
+      color: kprimaryColor.withOpacity(1),
       child: Column(
         children: [
           ListTile(
-            title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold,fontSize: 20,color: Colors.black)),
+            title: Text(
+              title,
+              style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                  color: Colors.white),
+            ),
             trailing: IconButton(
-              icon: Icon(showDetail[index] ? Icons.expand_less : Icons.expand_more),
+              icon: Icon(
+                showDetail[index] ? Icons.expand_less : Icons.expand_more,
+                color: Colors.white,
+              ),
               onPressed: () {
                 setState(() {
                   showDetail[index] = !showDetail[index];
@@ -97,13 +116,27 @@ class _AboutUsState extends State<AboutUs> {
               },
             ),
           ),
-          if (showDetail[index])
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 10.0),
-              child: Text(content,style: const  TextStyle(fontSize: 18),),
-            )
+          AnimatedCrossFade(
+            duration: const Duration(milliseconds: 400),
+            firstChild: Container(),
+            secondChild: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 11.0),
+              child: Text(
+                content,
+                style: const TextStyle(
+                  fontSize: 16,
+                  color: Colors.white,
+                ),
+                textAlign: TextAlign.justify,
+              ),
+            ),
+            crossFadeState: showDetail[index]
+                ? CrossFadeState.showSecond
+                : CrossFadeState.showFirst,
+          ),
         ],
       ),
     );
   }
+
 }

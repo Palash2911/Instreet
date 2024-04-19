@@ -179,11 +179,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> _showLinkPhoneNumberDialog(BuildContext context) async {
   bool localOtpSent = false;
 
-  void updateLocalOtpSent(bool value) {
-    Navigator.of(context).pop();
-    localOtpSent = value;
-    _showLinkPhoneNumberDialog(context);
-  }
+  // void updateLocalOtpSent(bool value) {
+  //   Navigator.of(context).pop();
+  //   localOtpSent = value;
+  //   _showLinkPhoneNumberDialog(context);
+  // }
 
   return showDialog(
     context: context,
@@ -192,6 +192,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       return StatefulBuilder(
         builder: (context, setState) {
           return AlertDialog(
+            backgroundColor: Colors.white,
             contentPadding: const  EdgeInsets.all(15),
             title: const Text('Link Mobile Number'),
             content: SingleChildScrollView(

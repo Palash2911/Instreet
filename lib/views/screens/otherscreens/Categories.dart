@@ -67,7 +67,13 @@ class _CategoriesState extends State<Categories> {
               child: categoryStalls.isEmpty ? Padding(
                 padding: const EdgeInsets.only(top: 80.0),
                 child: Center(
-                  child: Text('No Stalls With Selected Category !', style: kTextPopM16,),
+                  child: Column(
+                    children: [
+                      Image.asset(
+                        'assets/images/emptyCategoryScreen.png',
+                      ),
+                    ],
+                  ),
                 ),
               ) : Column(
                 children: [
