@@ -42,14 +42,19 @@ class RegisterStall3 extends StatefulWidget {
 
 Future<void> sendNotificationToAllUsers(String stallName,String id) async {
   try {
-    List<String> token = [];
+    List<String> tokens = [];
     CollectionReference user = FirebaseFirestore.instance.collection('users');
 
     final querySnapshot = await user.get();
 
     if (querySnapshot.docs.isNotEmpty) {
-      for (int i = 0; i < querySnapshot.docs.length; i++) {
-        token.add(querySnapshot.docs[i]['FcmToken']);
+        for (var doc in querySnapshot.docs) {
+        // Cast data to Map<String, dynamic> before checking for keys
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+        var token = data.containsKey('FcmToken') ? data['FcmToken'] : null;
+        if (token != null) {
+          tokens.add(token);
+        }
       }
     } else {
       print('No users found');
@@ -58,8 +63,8 @@ Future<void> sendNotificationToAllUsers(String stallName,String id) async {
     final serverKey = dotenv.env['FIREBASE_SERVER_KEY'];
     const fcmUrl = 'https://fcm.googleapis.com/fcm/send';
 
-    if (token.isNotEmpty) {
-      for (int i = 0; i < token.length; i++) {
+    if (tokens.isNotEmpty) {
+      for (int i = 0; i < tokens.length; i++) {
         final response = await http.post(
           Uri.parse(fcmUrl),
           headers: {
@@ -67,7 +72,7 @@ Future<void> sendNotificationToAllUsers(String stallName,String id) async {
             'Authorization':serverKey!,
           },
           body: jsonEncode({
-            'to': token,
+            'to': tokens[i],
             'notification': {
               'title': 'New Stall Added',
               'body': 'Check out the new stall: $stallName',
@@ -89,13 +94,15 @@ Future<void> sendNotificationToAllUsers(String stallName,String id) async {
         }
       }
     }else{
-      print(token.length);
+      print(tokens.length);
     }
   } catch (e) {
     print('Error: $e');
   }
 
 }
+
+
 
 class _RegisterStall3State extends State<RegisterStall3> {
   final TextEditingController _descriptionController = TextEditingController();

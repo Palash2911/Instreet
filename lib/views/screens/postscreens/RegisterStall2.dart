@@ -507,8 +507,8 @@ class _RegisterStall2State extends State<RegisterStall2> {
           if (isLoading)
             Container(
               color: Colors.black.withOpacity(0.5),
-              child: const Center(
-                child: CircularProgressIndicator(),
+              child:  Center(
+                child: Image.asset('assets/images/lo.gif',width: 150,)
               ),
             ),
         ],
