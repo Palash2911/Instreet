@@ -143,7 +143,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         const HeaderWidget(
                           expandedView: false,
-                          title: 'Trending',
+                          title: 'All Stalls',
                           isExpanded: false,
                         ),
                         ...stalls

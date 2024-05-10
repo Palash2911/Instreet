@@ -1,6 +1,7 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:instreet/constants/constants.dart';
+import 'package:instreet/views/screens/stallscreen/ARWidget.dart';
 
 class StallImageCarouselWidget extends StatefulWidget {
   final List<dynamic> stallImages;
@@ -24,14 +25,39 @@ class _StallImageCarouselWidgetState extends State<StallImageCarouselWidget> {
           child: Dialog(
             backgroundColor: Colors.transparent,
             insetPadding: const EdgeInsets.all(10),
-            child: GestureDetector(
-              onTap: () {},
-              child: InteractiveViewer(
-                child: Image.network(
-                  imageUrl,
-                  fit: BoxFit.contain,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                GestureDetector(
+                  onTap: () {},
+                  child: InteractiveViewer(
+                    child: Image.network(
+                      imageUrl,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
                 ),
-              ),
+                Container(
+                  padding: const EdgeInsets.all(11),
+                  margin: const EdgeInsets.all(11),
+                  width: 220,
+                  color: kprimaryColor,
+                  child: GestureDetector(
+                    onTap: () {
+                      // Navigator.of(context, rootNavigator: true).push(
+                      //   MaterialPageRoute(
+                      //     builder: (context) => ARObjectsScreen(imagePath: 'assets/images/book.jpg', isLocal: true),
+                      //   ),
+                      // );
+                    },
+                    child: Text(
+                      'View in AR',
+                      style: kTextPopB16.copyWith(color: Colors.white),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         );
@@ -54,7 +80,8 @@ class _StallImageCarouselWidgetState extends State<StallImageCarouselWidget> {
                 autoPlayAnimationDuration: const Duration(milliseconds: 1800),
                 height: 300,
                 viewportFraction: 1.0,
-                enableInfiniteScroll: widget.stallImages.length > 1 ? true : false,
+                enableInfiniteScroll:
+                    widget.stallImages.length > 1 ? true : false,
                 onPageChanged: (index, reason) {
                   setState(() {
                     _currentIndex = index;

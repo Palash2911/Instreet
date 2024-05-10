@@ -144,7 +144,7 @@ class _HomePageCardState extends State<HomePageCard> {
                         ),
                   Expanded(
                     child: Padding(
-                      padding: const EdgeInsets.only(left: 9.0),
+                      padding: const EdgeInsets.only(left: 6.0),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -183,7 +183,7 @@ class _HomePageCardState extends State<HomePageCard> {
                               children: [
                                 Container(
                                   width:
-                                      MediaQuery.of(context).size.width * 0.55,
+                                      MediaQuery.of(context).size.width * 0.52,
                                   child: Text(
                                     widget.stall.stallDescription,
                                     maxLines: 2,
@@ -192,7 +192,6 @@ class _HomePageCardState extends State<HomePageCard> {
                                 ),
                                 IconButton(
                                   onPressed: () async {
-                                    // Confirm deletion from the user
                                     bool delete = await showDialog(
                                       context: context,
                                       builder: (BuildContext context) {
