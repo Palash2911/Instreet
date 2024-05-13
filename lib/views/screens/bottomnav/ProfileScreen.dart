@@ -199,6 +199,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: ListBody(
                 children: <Widget>[
                   IntlPhoneField(
+                    readOnly: true,
                     controller: _phoneController,
                     decoration: const InputDecoration(
                       labelText: "Phone Number",
