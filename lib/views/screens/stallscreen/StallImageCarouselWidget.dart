@@ -44,11 +44,11 @@ class _StallImageCarouselWidgetState extends State<StallImageCarouselWidget> {
                   color: kprimaryColor,
                   child: GestureDetector(
                     onTap: () {
-                      // Navigator.of(context, rootNavigator: true).push(
-                      //   MaterialPageRoute(
-                      //     builder: (context) => ARObjectsScreen(imagePath: 'assets/images/book.jpg', isLocal: true),
-                      //   ),
-                      // );
+                      Navigator.of(context, rootNavigator: true).push(
+                        MaterialPageRoute(
+                          builder: (context) => CameraWithOverlay(stallImage: imageUrl,),
+                        ),
+                      );
                     },
                     child: Text(
                       'View in AR',
