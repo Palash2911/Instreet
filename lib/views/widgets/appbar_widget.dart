@@ -79,6 +79,7 @@ class _AppBarWidgetState extends State<AppBarWidget> {
               ],
             ),
       backgroundColor: ksecondaryColor.withOpacity(0.8),
+      iconTheme: const IconThemeData(color: Colors.white, size: 30),
       elevation: 3,
       centerTitle: true,
       shape: const RoundedRectangleBorder(
