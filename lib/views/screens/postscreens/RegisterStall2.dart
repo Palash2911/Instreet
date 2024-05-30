@@ -372,7 +372,7 @@ class _RegisterStall2State extends State<RegisterStall2> {
                                         shape: BoxShape.circle,
                                         color: kprimaryColor,
                                       ),
-                                      child: const  Icon(
+                                      child: const Icon(
                                         Icons.close,
                                         size: 16,
                                         color: Colors.white,
@@ -459,7 +459,7 @@ class _RegisterStall2State extends State<RegisterStall2> {
                                         shape: BoxShape.circle,
                                         color: kprimaryColor,
                                       ),
-                                      child: const  Icon(
+                                      child: const Icon(
                                         Icons.close,
                                         size: 16,
                                         color: Colors.white,
@@ -507,9 +507,8 @@ class _RegisterStall2State extends State<RegisterStall2> {
           if (isLoading)
             Container(
               color: Colors.black.withOpacity(0.5),
-              child:  Center(
-                child: Image.asset('assets/images/lo.gif',width: 150,)
-              ),
+              child: Center(
+                  child: Image.asset('assets/images/loader.gif', width: 150)),
             ),
         ],
       ),

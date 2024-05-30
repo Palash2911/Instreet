@@ -40,7 +40,7 @@ class RegisterStall3 extends StatefulWidget {
   _RegisterStall3State createState() => _RegisterStall3State();
 }
 
-Future<void> sendNotificationToAllUsers(String stallName,String id) async {
+Future<void> sendNotificationToAllUsers(String stallName, String id) async {
   try {
     List<String> tokens = [];
     CollectionReference user = FirebaseFirestore.instance.collection('users');
@@ -48,7 +48,7 @@ Future<void> sendNotificationToAllUsers(String stallName,String id) async {
     final querySnapshot = await user.get();
 
     if (querySnapshot.docs.isNotEmpty) {
-        for (var doc in querySnapshot.docs) {
+      for (var doc in querySnapshot.docs) {
         // Cast data to Map<String, dynamic> before checking for keys
         Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
         var token = data.containsKey('FcmToken') ? data['FcmToken'] : null;
@@ -69,7 +69,7 @@ Future<void> sendNotificationToAllUsers(String stallName,String id) async {
           Uri.parse(fcmUrl),
           headers: {
             'Content-Type': 'application/json',
-            'Authorization':serverKey!,
+            'Authorization': serverKey!,
           },
           body: jsonEncode({
             'to': tokens[i],
@@ -77,7 +77,7 @@ Future<void> sendNotificationToAllUsers(String stallName,String id) async {
               'title': 'New Stall Added',
               'body': 'Check out the new stall: $stallName',
               'sound': 'default',
-              'icon': 'logo_img',
+              'icon': 'assets/images/logo_img.png',
               'data': {
                 'click_action': 'FLUTTER_NOTIFICATION_CLICK',
                 'stall_id': id,
@@ -93,16 +93,13 @@ Future<void> sendNotificationToAllUsers(String stallName,String id) async {
           print('Failed to send notification: ${response.body}');
         }
       }
-    }else{
+    } else {
       print(tokens.length);
     }
   } catch (e) {
     print('Error: $e');
   }
-
 }
-
-
 
 class _RegisterStall3State extends State<RegisterStall3> {
   final TextEditingController _descriptionController = TextEditingController();
@@ -175,7 +172,8 @@ class _RegisterStall3State extends State<RegisterStall3> {
     } catch (e) {
       print(e);
       Fluttertoast.showToast(
-        msg:"Error while fetching stall details, please fill in the blank spaces",
+        msg:
+            "Error while fetching stall details, please fill in the blank spaces",
         toastLength: Toast.LENGTH_SHORT,
         timeInSecForIosWeb: 1,
         backgroundColor: kprimaryColor,
@@ -362,7 +360,7 @@ class _RegisterStall3State extends State<RegisterStall3> {
 
     try {
       // ignore: unused_local_variable
-      String currentAddedStallId =  await stallProvider.addStall(
+      String currentAddedStallId = await stallProvider.addStall(
         Stall(
           sId: widget.sId != null ? widget.sId.toString() : '',
           stallName: widget.name,
@@ -394,8 +392,9 @@ class _RegisterStall3State extends State<RegisterStall3> {
         fontSize: 16.0,
       );
       if (mounted) {
-        sendNotificationToAllUsers(widget.name,currentAddedStallId);
-        Navigator.of(context, rootNavigator: true).pushReplacementNamed('bottom-nav');
+        sendNotificationToAllUsers(widget.name, currentAddedStallId);
+        Navigator.of(context, rootNavigator: true)
+            .pushReplacementNamed('bottom-nav');
       }
     } catch (error) {
       print("Error submitting stall: $error");
@@ -538,8 +537,12 @@ class _RegisterStall3State extends State<RegisterStall3> {
                 filter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
                 child: Container(
                   color: Colors.black.withOpacity(0.1),
-                  child: const Center(
-                    child: CircularProgressIndicator(),
+                  child: Center(
+                    child: Image.asset(
+                      'assets/images/loader.gif',
+                      width: 150,
+                      height: 150,
+                    ),
                   ),
                 ),
               ),

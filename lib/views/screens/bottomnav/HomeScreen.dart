@@ -27,6 +27,7 @@ class _HomeScreenState extends State<HomeScreen> {
   var init = true;
   bool isHeaderExpanded = false;
   var currentUid = '';
+  var isSearching = false;
 
   @override
   void didChangeDependencies() {
@@ -46,11 +47,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void loadSearchStalls(String query) {
     if (query.isEmpty) {
+      isSearching = false;
       Provider.of<StallProvider>(context, listen: false).fetchStalls();
     } else {
+      isSearching = true;
       Provider.of<StallProvider>(context, listen: false)
           .getSearchStalls(query, currentUid);
     }
+    setState(() {});
   }
 
   Future<void> loadStallsData(BuildContext context) async {
@@ -90,6 +94,8 @@ class _HomeScreenState extends State<HomeScreen> {
         ? Provider.of<StallProvider>(context).getTrendingStalls(currentUid)
         : [];
 
+    stalls.sort((a, b) => b.rating.compareTo(a.rating));
+
     return Scaffold(
       appBar: AppBarWidget(
         isSearch: true,
@@ -120,27 +126,33 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: SingleChildScrollView(
                     child: Column(
                       children: [
-                        trendingStalls.length > 0
-                            ? TrendingSlider(trendingStalls: trendingStalls,)
+                        !isSearching && trendingStalls.length > 0
+                            ? TrendingSlider(
+                                trendingStalls: trendingStalls,
+                              )
                             : SizedBox(width: 0),
-                        HeaderWidget(
-                          expandedView: true,
-                          title: 'Categories',
-                          isExpanded: isHeaderExpanded,
-                          onExpansionChanged: _handleHeaderExpansion,
-                        ),
-                        AnimatedContainer(
-                          duration: const Duration(milliseconds: 500),
-                          height: isHeaderExpanded
-                              ? calculateGridHeight()
-                              : (true)
-                                  ? 100
-                                  : 0,
-                          // Adjust as needed
-                          child: CategoriesItems(
-                            NavigateCategory: navigateCategory,
-                          ),
-                        ),
+                        !isSearching
+                            ? HeaderWidget(
+                                expandedView: true,
+                                title: 'Categories',
+                                isExpanded: isHeaderExpanded,
+                                onExpansionChanged: _handleHeaderExpansion,
+                              )
+                            : const SizedBox(width: 0),
+                        !isSearching
+                            ? AnimatedContainer(
+                                duration: const Duration(milliseconds: 500),
+                                height: isHeaderExpanded
+                                    ? calculateGridHeight()
+                                    : (true)
+                                        ? 100
+                                        : 0,
+                                // Adjust as needed
+                                child: CategoriesItems(
+                                  NavigateCategory: navigateCategory,
+                                ),
+                              )
+                            : const SizedBox(width: 0),
                         const HeaderWidget(
                           expandedView: false,
                           title: 'All Stalls',

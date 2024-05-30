@@ -89,7 +89,7 @@ class _LoginScreenState extends State<LoginScreen> {
         fontSize: 16.0,
       );
     }).then((value) async {
-      if (value!=null) {
+      if (value != null) {
         Fluttertoast.showToast(
           msg: "Welcome To Instreet",
           toastLength: Toast.LENGTH_SHORT,
@@ -103,14 +103,14 @@ class _LoginScreenState extends State<LoginScreen> {
           await Provider.of<UserProvider>(context, listen: false)
               .updateToken(authProvider.token)
               .catchError((e) {
-                print(e);
-              });
+            print(e);
+          });
           await authProvider.autoLogin();
-          if(mounted){
+          if (mounted) {
             Navigator.of(ctx).pushReplacementNamed('bottom-nav');
           }
         } else {
-          if(mounted){
+          if (mounted) {
             Navigator.of(ctx).pushReplacementNamed('register-screen');
           }
         }
@@ -184,14 +184,14 @@ class _LoginScreenState extends State<LoginScreen> {
           await Provider.of<UserProvider>(context, listen: false)
               .updateToken(authProvider.token)
               .catchError((e) {
-                print(e);
-              });
+            print(e);
+          });
           await authProvider.autoLogin();
-          if(mounted){
+          if (mounted) {
             Navigator.of(ctx).pushReplacementNamed('bottom-nav');
           }
         } else {
-          if(mounted){
+          if (mounted) {
             Navigator.of(ctx).pushReplacementNamed('register-screen');
           }
         }
@@ -221,165 +221,182 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: SafeArea(
-          child: Stack(
-            children: [
-              isLoading
-                  ? Container(
-                      height: MediaQuery.of(context).size.height,
-                      color: Colors.black.withOpacity(0.7),
-                      child: const Center(child: CircularProgressIndicator()),
-                    )
-                  : const SizedBox(width: 0),
-              Container(
-                height: MediaQuery.of(context).size.height * 0.81,
-                padding: const EdgeInsets.only(left: 35, right: 35, top: 50),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: <Widget>[
-                    const Text(
-                      'Welcome Explorer',
-                      style: TextStyle(
-                        fontSize: 33,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    // const SizedBox(height: 20),
-                    SizedBox(
-                      height: 50,
-                      width: 270,
-                      child: SignInButton(
-                        Buttons.google,
-                        text: "Sign up with Google",
-                        onPressed: () {
-                          _signInGoogle(context);
-                        },
-                      ),
-                    ),
-                    // const SizedBox(height: 20),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          width: MediaQuery.of(context).size.width * 0.35,
-                          height: 2,
-                          color: kprimaryColor,
-                        ),
-                        const Text("   OR   "),
-                        Container(
-                          width: MediaQuery.of(context).size.width * 0.35,
-                          height: 2,
-                          color: kprimaryColor,
-                        )
-                      ],
-                    ),
-                    // const SizedBox(height: 20),
-                    Form(
-                      key: _form,
+      body: isLoading
+          ? Container(
+              height: MediaQuery.of(context).size.height,
+              color: Colors.black.withOpacity(0.7),
+              child: Center(
+                child: Image.asset(
+                  'assets/images/loader.gif',
+                  width: 150,
+                  height: 150,
+                ),
+              ),
+            )
+          : SingleChildScrollView(
+              child: SafeArea(
+                child: Stack(
+                  children: [
+                    Container(
+                      height: MediaQuery.of(context).size.height * 0.81,
+                      padding:
+                          const EdgeInsets.only(left: 35, right: 35, top: 50),
                       child: Column(
-                        children: [
-                          IntlPhoneField(
-                            controller: _phoneController,
-                            decoration: InputDecoration(
-                              labelText: 'Phone Number',
-                              counterText: "",
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10.0),
-                                borderSide: const BorderSide(width: 1, color: Colors.black),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10.0),
-                                borderSide:
-                                const BorderSide(color: Colors.black, width: 1.0),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10.0),
-                                borderSide:
-                                BorderSide(color: kprimaryColor, width: 2.0),
-                              ),
-                              suffixIcon: Container(
-                                margin: const EdgeInsets.all(9.0),
-                                height: 40,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: isOtpEnable || !isPhoneFilled ? Colors.grey : kprimaryColor.withOpacity(0.9),
-                                ),
-                                child: IconButton(
-                                  icon: const Icon(Icons.arrow_forward),
-                                  onPressed: isOtpEnable || !isPhoneFilled ? null  : () {
-                                    _sendOtP(context);
-                                  },
-                                  color: Colors.white,
-                                ),
-                              ),
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: <Widget>[
+                          const Text(
+                            'Welcome Explorer',
+                            style: TextStyle(
+                              fontSize: 33,
+                              fontWeight: FontWeight.w500,
                             ),
-                            validator: (value) {
-                              if (value!.number.isEmpty) {
-                                return 'Please Enter Valid Number!';
-                              }
-                              return null;
-                            },
-                            initialCountryCode: 'IN',
-                            onChanged: (phone) {
-                              bool phoneFilled = phone.number.isNotEmpty;
-                              setState(() {
-                                phoneNo = phone.completeNumber.toString();
-                                isPhoneFilled = phoneFilled;
-                              });
-                            },
                           ),
-                          const SizedBox(height: 20),
-                          PinCodeTextField(
-                            appContext: context,
-                            length: 6,
-                            controller: _otpController,
-                            enabled: isOtpEnable,
-                            onChanged: (otp) {
-                              setState(() {
-                                otp = otp.toString();
-                              });
-                            },
-                            pinTheme: PinTheme(
-                              shape: PinCodeFieldShape.box,
-                              borderRadius: BorderRadius.circular(5),
-                              fieldHeight: 50,
-                              fieldWidth: 40,
-                              activeFillColor: Colors.grey.withOpacity(0.1),
+                          // const SizedBox(height: 20),
+                          SizedBox(
+                            height: 50,
+                            width: 270,
+                            child: SignInButton(
+                              Buttons.google,
+                              text: "Sign up with Google",
+                              onPressed: () {
+                                _signInGoogle(context);
+                              },
+                            ),
+                          ),
+                          // const SizedBox(height: 20),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                width: MediaQuery.of(context).size.width * 0.35,
+                                height: 2,
+                                color: kprimaryColor,
+                              ),
+                              const Text("   OR   "),
+                              Container(
+                                width: MediaQuery.of(context).size.width * 0.35,
+                                height: 2,
+                                color: kprimaryColor,
+                              )
+                            ],
+                          ),
+                          // const SizedBox(height: 20),
+                          Form(
+                            key: _form,
+                            child: Column(
+                              children: [
+                                IntlPhoneField(
+                                  controller: _phoneController,
+                                  decoration: InputDecoration(
+                                    labelText: 'Phone Number',
+                                    counterText: "",
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10.0),
+                                      borderSide: const BorderSide(
+                                          width: 1, color: Colors.black),
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10.0),
+                                      borderSide: const BorderSide(
+                                          color: Colors.black, width: 1.0),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10.0),
+                                      borderSide: BorderSide(
+                                          color: kprimaryColor, width: 2.0),
+                                    ),
+                                    suffixIcon: Container(
+                                      margin: const EdgeInsets.all(9.0),
+                                      height: 40,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: isOtpEnable || !isPhoneFilled
+                                            ? Colors.grey
+                                            : kprimaryColor.withOpacity(0.9),
+                                      ),
+                                      child: IconButton(
+                                        icon: const Icon(Icons.arrow_forward),
+                                        onPressed: isOtpEnable || !isPhoneFilled
+                                            ? null
+                                            : () {
+                                                _sendOtP(context);
+                                              },
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                  validator: (value) {
+                                    if (value!.number.isEmpty) {
+                                      return 'Please Enter Valid Number!';
+                                    }
+                                    return null;
+                                  },
+                                  initialCountryCode: 'IN',
+                                  onChanged: (phone) {
+                                    bool phoneFilled = phone.number.isNotEmpty;
+                                    setState(() {
+                                      phoneNo = phone.completeNumber.toString();
+                                      isPhoneFilled = phoneFilled;
+                                    });
+                                  },
+                                ),
+                                const SizedBox(height: 20),
+                                PinCodeTextField(
+                                  appContext: context,
+                                  length: 6,
+                                  controller: _otpController,
+                                  enabled: isOtpEnable,
+                                  onChanged: (otp) {
+                                    setState(() {
+                                      otp = otp.toString();
+                                    });
+                                  },
+                                  pinTheme: PinTheme(
+                                    shape: PinCodeFieldShape.box,
+                                    borderRadius: BorderRadius.circular(5),
+                                    fieldHeight: 50,
+                                    fieldWidth: 40,
+                                    activeFillColor:
+                                        Colors.grey.withOpacity(0.1),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          AnimatedOpacity(
+                            duration: const Duration(seconds: 1),
+                            opacity: 1,
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 20.0, vertical: 0),
+                              child: ElevatedButton(
+                                onPressed:
+                                    otpBtn ? () => _verifyOtp(context) : null,
+                                style: ElevatedButton.styleFrom(
+                                    fixedSize: const Size(300, 50),
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(10)),
+                                    backgroundColor: kprimaryColor,
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 20, vertical: 10),
+                                    textStyle: const TextStyle(
+                                      fontSize: 18,
+                                    )),
+                                child: const Text(
+                                  'Start Exploring',
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                              ),
                             ),
                           ),
                         ],
                       ),
                     ),
-                    AnimatedOpacity(
-                      duration: const Duration(seconds: 1),
-                      opacity: 1,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 20.0, vertical: 0),
-                        child: ElevatedButton(
-                          onPressed: otpBtn ? () => _verifyOtp(context) : null,
-                          style: ElevatedButton.styleFrom(
-                              fixedSize: const Size(300, 50),
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10)),
-                              backgroundColor: kprimaryColor,
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 20, vertical: 10),
-                              textStyle: const TextStyle(
-                                fontSize: 18,
-                              )),
-                          child: const Text('Start Exploring', style: TextStyle(color: Colors.white),),
-                        ),
-                      ),
-                    ),
                   ],
                 ),
               ),
-            ],
-          ),
-        ),
-      ),
+            ),
     );
   }
 }

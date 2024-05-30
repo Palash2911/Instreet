@@ -41,7 +41,7 @@ class ContactUs extends StatelessWidget {
               thickness: 1,
               color: Colors.grey,
             ),
-            contactUsList('Phone', '+91 1743727491', Icons.phone, Colors.green),
+            contactUsList('Phone', '+91 9619142912', Icons.phone, Colors.green),
             const Divider(
               thickness: 1,
               color: Colors.grey,

@@ -91,11 +91,6 @@ class _ReviewScreenState extends State<ReviewScreen> {
                           'assets/images/noReviews.png',
                           height: 300,
                         ),
-                        // const Text(
-                        //   'No reviews yet!',
-                        //   style: TextStyle(
-                        //       fontSize: 24, fontWeight: FontWeight.bold),
-                        // ),
                       ],
                     ),
                   )
